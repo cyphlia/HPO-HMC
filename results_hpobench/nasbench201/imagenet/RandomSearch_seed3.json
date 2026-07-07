@@ -1,0 +1,1421 @@
+{
+  "optimizer": "RandomSearch",
+  "benchmark_suite": "nasbench201",
+  "dataset": "imagenet",
+  "seed": 3,
+  "max_trials": 100,
+  "direction": "minimize",
+  "original_direction": "maximize",
+  "trajectory": [
+    {
+      "trial": 1,
+      "cost": -39.23333332316081,
+      "best_cost": -39.23333332316081,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 2.8e-05
+    },
+    {
+      "trial": 2,
+      "cost": -39.400000030517575,
+      "best_cost": -39.400000030517575,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_3x3",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 1.3e-05
+    },
+    {
+      "trial": 3,
+      "cost": -29.23333336385091,
+      "best_cost": -39.400000030517575,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 4,
+      "cost": -34.03333329264323,
+      "best_cost": -39.400000030517575,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 5,
+      "cost": -43.33333318074544,
+      "best_cost": -43.33333318074544,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "none",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_1x1",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 6,
+      "cost": -44.23333334350586,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "none",
+        "Op2": "nor_conv_3x3",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 7,
+      "cost": -16.566666646321615,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "skip_connect",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 8,
+      "cost": -34.3000000406901,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_1x1",
+        "Op2": "avg_pool_3x3",
+        "Op3": "none",
+        "Op4": "none",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 9,
+      "cost": -31.833333297729492,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 10,
+      "cost": -0.8333333326975505,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "none",
+        "Op3": "none",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 11,
+      "cost": -42.13333336385091,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "none",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 12,
+      "cost": -29.90000002034505,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "skip_connect",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 13,
+      "cost": -38.03333332316081,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 14,
+      "cost": -39.166666666666664,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_3x3",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 1.1e-05
+    },
+    {
+      "trial": 15,
+      "cost": -0.8333333307902018,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "none",
+        "Op1": "none",
+        "Op2": "none",
+        "Op3": "none",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 16,
+      "cost": -20.633333267211913,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "none",
+        "Op2": "nor_conv_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 17,
+      "cost": -24.299999928792317,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 18,
+      "cost": -42.933333302815754,
+      "best_cost": -44.23333334350586,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "none",
+        "Op2": "none",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 19,
+      "cost": -45.433333282470706,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "avg_pool_3x3",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 20,
+      "cost": -36.30000002034505,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "skip_connect",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 21,
+      "cost": -28.89999999491374,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_3x3",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 1.7e-05
+    },
+    {
+      "trial": 22,
+      "cost": -0.8333333320617676,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "avg_pool_3x3",
+        "Op5": "none"
+      },
+      "time": 1.1e-05
+    },
+    {
+      "trial": 23,
+      "cost": -21.199999918619792,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 24,
+      "cost": -33.49999998982747,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_1x1",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 25,
+      "cost": -19.866666697184243,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 26,
+      "cost": -13.933333302815756,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "none",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 27,
+      "cost": -16.400000005086262,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 28,
+      "cost": -39.233333394368486,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 29,
+      "cost": -26.90000002034505,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 30,
+      "cost": -17.06666664123535,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 31,
+      "cost": -38.9333332417806,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 32,
+      "cost": -41.99999989827474,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "skip_connect",
+        "Op2": "none",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 33,
+      "cost": -36.90000006103516,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 34,
+      "cost": -33.96666655476888,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 35,
+      "cost": -23.066666615804035,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "skip_connect",
+        "Op3": "skip_connect",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 36,
+      "cost": -32.466666564941406,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 37,
+      "cost": -34.60000006103515,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 38,
+      "cost": -42.56666654459635,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 39,
+      "cost": -37.83333331298828,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "nor_conv_1x1",
+        "Op3": "none",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 40,
+      "cost": -43.29999983723958,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "nor_conv_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 41,
+      "cost": -29.033333221435548,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 42,
+      "cost": -18.499999966939292,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 43,
+      "cost": -38.199999928792316,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "none",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 44,
+      "cost": -29.433333287556966,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "skip_connect",
+        "Op5": "none"
+      },
+      "time": 2.6e-05
+    },
+    {
+      "trial": 45,
+      "cost": -44.09999983723959,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 46,
+      "cost": -37.93333338419596,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_3x3",
+        "Op2": "none",
+        "Op3": "nor_conv_3x3",
+        "Op4": "none",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 47,
+      "cost": -42.36666662597656,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 48,
+      "cost": -37.499999837239585,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "skip_connect",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 49,
+      "cost": -40.39999990844726,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_3x3",
+        "Op4": "skip_connect",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 50,
+      "cost": -38.166666717529296,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "nor_conv_1x1",
+        "Op2": "avg_pool_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 51,
+      "cost": -32.1,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 52,
+      "cost": -43.73333331298828,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_3x3",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_1x1",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 53,
+      "cost": -42.36666660563151,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 54,
+      "cost": -38.63333335367839,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "none",
+        "Op4": "nor_conv_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 55,
+      "cost": -16.933333297729494,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "avg_pool_3x3",
+        "Op4": "skip_connect",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 56,
+      "cost": -28.833333267211913,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_1x1",
+        "Op3": "none",
+        "Op4": "skip_connect",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 57,
+      "cost": -41.86666657511393,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "none",
+        "Op3": "nor_conv_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 58,
+      "cost": -28.799999994913737,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "nor_conv_1x1",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 59,
+      "cost": -20.066666631062827,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 60,
+      "cost": -39.86666650390625,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_3x3",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 61,
+      "cost": -40.166666646321616,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "skip_connect",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_3x3",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 62,
+      "cost": -29.633333241780598,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "avg_pool_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 63,
+      "cost": -26.266666646321614,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "none",
+        "Op2": "nor_conv_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 64,
+      "cost": -16.49999996948242,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "none",
+        "Op2": "nor_conv_1x1",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 65,
+      "cost": -23.03333326212565,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "skip_connect",
+        "Op2": "skip_connect",
+        "Op3": "avg_pool_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 66,
+      "cost": -33.63333336385091,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 67,
+      "cost": -41.83333332316081,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_3x3",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 68,
+      "cost": -33.36666657511393,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "none",
+        "Op3": "none",
+        "Op4": "nor_conv_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 69,
+      "cost": -35.26666670735677,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "none",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 70,
+      "cost": -16.49999994913737,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 71,
+      "cost": -29.23333332824707,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "none",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 72,
+      "cost": -36.80000002034505,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "none",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 73,
+      "cost": -21.63333327738444,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "avg_pool_3x3",
+        "Op2": "skip_connect",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 74,
+      "cost": -21.033333292643228,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_1x1",
+        "Op2": "skip_connect",
+        "Op3": "skip_connect",
+        "Op4": "avg_pool_3x3",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 75,
+      "cost": -29.199999908447264,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "skip_connect",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 76,
+      "cost": -38.866666687011715,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "skip_connect",
+        "Op2": "none",
+        "Op3": "nor_conv_3x3",
+        "Op4": "none",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 77,
+      "cost": -20.366666615804036,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "none",
+        "Op4": "none",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 78,
+      "cost": -0.8333333326975505,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_1x1",
+        "Op2": "avg_pool_3x3",
+        "Op3": "none",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 79,
+      "cost": -39.83333318074544,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_3x3",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 80,
+      "cost": -42.066666514078776,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "none",
+        "Op2": "nor_conv_3x3",
+        "Op3": "nor_conv_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 81,
+      "cost": -30.76666655476888,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "nor_conv_3x3",
+        "Op2": "skip_connect",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 82,
+      "cost": -34.3333332010905,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "skip_connect",
+        "Op2": "skip_connect",
+        "Op3": "none",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 83,
+      "cost": -44.03333335367839,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 84,
+      "cost": -40.133333323160805,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "none",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 85,
+      "cost": -34.10000003051758,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "avg_pool_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 86,
+      "cost": -41.03333319091797,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "avg_pool_3x3",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "none",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 87,
+      "cost": -33.46666665649414,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "none",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "skip_connect",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 88,
+      "cost": -29.23333329772949,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_1x1",
+        "Op2": "none",
+        "Op3": "skip_connect",
+        "Op4": "avg_pool_3x3",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 89,
+      "cost": -19.766666633605958,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 90,
+      "cost": -10.599999969482422,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "avg_pool_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "skip_connect",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 91,
+      "cost": -42.2333332824707,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "avg_pool_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "none",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 92,
+      "cost": -16.233333305358887,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "skip_connect",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "none",
+        "Op5": "none"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 93,
+      "cost": -45.33333318074544,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_1x1",
+        "Op1": "nor_conv_1x1",
+        "Op2": "nor_conv_3x3",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_1x1",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 94,
+      "cost": -42.89999984741211,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_3x3",
+        "Op2": "avg_pool_3x3",
+        "Op3": "nor_conv_1x1",
+        "Op4": "nor_conv_1x1",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 95,
+      "cost": -39.39999989827474,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "nor_conv_3x3",
+        "Op2": "skip_connect",
+        "Op3": "skip_connect",
+        "Op4": "nor_conv_3x3",
+        "Op5": "none"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 96,
+      "cost": -26.299999994913737,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "none",
+        "Op3": "avg_pool_3x3",
+        "Op4": "skip_connect",
+        "Op5": "nor_conv_1x1"
+      },
+      "time": 8e-06
+    },
+    {
+      "trial": 97,
+      "cost": -24.7333332417806,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "skip_connect",
+        "Op2": "nor_conv_3x3",
+        "Op3": "skip_connect",
+        "Op4": "skip_connect",
+        "Op5": "avg_pool_3x3"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 98,
+      "cost": -41.73333325195313,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "none",
+        "Op1": "nor_conv_3x3",
+        "Op2": "nor_conv_1x1",
+        "Op3": "nor_conv_1x1",
+        "Op4": "skip_connect",
+        "Op5": "skip_connect"
+      },
+      "time": 9e-06
+    },
+    {
+      "trial": 99,
+      "cost": -42.766666544596355,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "nor_conv_3x3",
+        "Op1": "nor_conv_1x1",
+        "Op2": "skip_connect",
+        "Op3": "nor_conv_3x3",
+        "Op4": "nor_conv_1x1",
+        "Op5": "skip_connect"
+      },
+      "time": 1e-05
+    },
+    {
+      "trial": 100,
+      "cost": -39.43333319091797,
+      "best_cost": -45.433333282470706,
+      "config": {
+        "Op0": "skip_connect",
+        "Op1": "avg_pool_3x3",
+        "Op2": "nor_conv_3x3",
+        "Op3": "nor_conv_3x3",
+        "Op4": "avg_pool_3x3",
+        "Op5": "nor_conv_3x3"
+      },
+      "time": 9e-06
+    }
+  ],
+  "final_best_cost": -45.433333282470706,
+  "final_best_config": {
+    "Op0": "nor_conv_3x3",
+    "Op1": "nor_conv_1x1",
+    "Op2": "avg_pool_3x3",
+    "Op3": "skip_connect",
+    "Op4": "nor_conv_1x1",
+    "Op5": "nor_conv_1x1"
+  },
+  "wall_time_seconds": 0.0042
+}

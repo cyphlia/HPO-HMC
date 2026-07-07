@@ -1,0 +1,1724 @@
+{
+  "optimizer": "MethodA_HHD",
+  "benchmark_suite": "hpolib",
+  "dataset": "protein_structure",
+  "seed": 3,
+  "max_trials": 100,
+  "direction": "minimize",
+  "original_direction": "minimize",
+  "trajectory": [
+    {
+      "trial": 1,
+      "cost": 0.2489713877439499,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 128
+      },
+      "time": 0.000336
+    },
+    {
+      "trial": 2,
+      "cost": 0.8944940567016602,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 256
+      },
+      "time": 0.000271
+    },
+    {
+      "trial": 3,
+      "cost": 0.36201202869415283,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 64
+      },
+      "time": 0.000225
+    },
+    {
+      "trial": 4,
+      "cost": 0.6544758677482605,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.000224
+    },
+    {
+      "trial": 5,
+      "cost": 0.36063072085380554,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 16
+      },
+      "time": 0.00025
+    },
+    {
+      "trial": 6,
+      "cost": 0.4308925271034241,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.05,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 16
+      },
+      "time": 0.000216
+    },
+    {
+      "trial": 7,
+      "cost": 0.3026990294456482,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.000256
+    },
+    {
+      "trial": 8,
+      "cost": 0.6681862473487854,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 128
+      },
+      "time": 0.00039
+    },
+    {
+      "trial": 9,
+      "cost": 0.30737847089767456,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 64
+      },
+      "time": 0.000229
+    },
+    {
+      "trial": 10,
+      "cost": 0.39702749252319336,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 256
+      },
+      "time": 0.000209
+    },
+    {
+      "trial": 11,
+      "cost": 0.6539581418037415,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 256
+      },
+      "time": 0.000211
+    },
+    {
+      "trial": 12,
+      "cost": 0.6521742939949036,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.000184
+    },
+    {
+      "trial": 13,
+      "cost": 0.3148329555988312,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 256
+      },
+      "time": 0.00023
+    },
+    {
+      "trial": 14,
+      "cost": 0.2986259460449219,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.0005,
+        "lr_schedule": "cosine",
+        "n_units_1": 256,
+        "n_units_2": 256
+      },
+      "time": 0.000179
+    },
+    {
+      "trial": 15,
+      "cost": 0.29310286045074463,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 32
+      },
+      "time": 0.000167
+    },
+    {
+      "trial": 16,
+      "cost": 0.355534166097641,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 128
+      },
+      "time": 0.000164
+    },
+    {
+      "trial": 17,
+      "cost": 0.40547850728034973,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 32
+      },
+      "time": 0.000166
+    },
+    {
+      "trial": 18,
+      "cost": 0.2981838881969452,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 128
+      },
+      "time": 0.0002
+    },
+    {
+      "trial": 19,
+      "cost": 0.6521664261817932,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 32
+      },
+      "time": 0.000208
+    },
+    {
+      "trial": 20,
+      "cost": 0.3293886184692383,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 32
+      },
+      "time": 0.000206
+    },
+    {
+      "trial": 21,
+      "cost": 0.32767733931541443,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.021394
+    },
+    {
+      "trial": 22,
+      "cost": 0.32767733931541443,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.021116
+    },
+    {
+      "trial": 23,
+      "cost": 0.3036807179450989,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 512
+      },
+      "time": 0.021293
+    },
+    {
+      "trial": 24,
+      "cost": 0.3848116993904114,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 512
+      },
+      "time": 0.024946
+    },
+    {
+      "trial": 25,
+      "cost": 0.4232109487056732,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 256
+      },
+      "time": 0.013203
+    },
+    {
+      "trial": 26,
+      "cost": 0.4314970076084137,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 256
+      },
+      "time": 0.025479
+    },
+    {
+      "trial": 27,
+      "cost": 0.654002845287323,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 256
+      },
+      "time": 0.017947
+    },
+    {
+      "trial": 28,
+      "cost": 0.6568562388420105,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 512
+      },
+      "time": 0.026701
+    },
+    {
+      "trial": 29,
+      "cost": 0.2871662974357605,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 128
+      },
+      "time": 0.015354
+    },
+    {
+      "trial": 30,
+      "cost": 0.320583313703537,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 512
+      },
+      "time": 0.013938
+    },
+    {
+      "trial": 31,
+      "cost": 1.7364451885223389,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.018856
+    },
+    {
+      "trial": 32,
+      "cost": 1.2714625597000122,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.018997
+    },
+    {
+      "trial": 33,
+      "cost": 1.2714625597000122,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.018156
+    },
+    {
+      "trial": 34,
+      "cost": 0.6539946794509888,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 512
+      },
+      "time": 0.021042
+    },
+    {
+      "trial": 35,
+      "cost": 0.6538034081459045,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 512
+      },
+      "time": 0.022829
+    },
+    {
+      "trial": 36,
+      "cost": 0.6530201435089111,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 128
+      },
+      "time": 0.021222
+    },
+    {
+      "trial": 37,
+      "cost": 0.6542149186134338,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 256
+      },
+      "time": 0.017636
+    },
+    {
+      "trial": 38,
+      "cost": 0.4276212751865387,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 64
+      },
+      "time": 0.021241
+    },
+    {
+      "trial": 39,
+      "cost": 0.4765232503414154,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.3,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 64
+      },
+      "time": 0.02363
+    },
+    {
+      "trial": 40,
+      "cost": 0.3312166929244995,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 256,
+        "n_units_2": 512
+      },
+      "time": 0.012321
+    },
+    {
+      "trial": 41,
+      "cost": 0.3202208876609802,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.02155
+    },
+    {
+      "trial": 42,
+      "cost": 0.2834418714046478,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 256
+      },
+      "time": 0.022148
+    },
+    {
+      "trial": 43,
+      "cost": 0.29148590564727783,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 512,
+        "n_units_2": 16
+      },
+      "time": 0.027389
+    },
+    {
+      "trial": 44,
+      "cost": 0.3703889846801758,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "cosine",
+        "n_units_1": 256,
+        "n_units_2": 16
+      },
+      "time": 0.027207
+    },
+    {
+      "trial": 45,
+      "cost": 0.5204349160194397,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 16
+      },
+      "time": 0.018546
+    },
+    {
+      "trial": 46,
+      "cost": 0.6576014161109924,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 32
+      },
+      "time": 0.018205
+    },
+    {
+      "trial": 47,
+      "cost": 0.6838400363922119,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 32
+      },
+      "time": 0.025547
+    },
+    {
+      "trial": 48,
+      "cost": 0.6538384556770325,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 128,
+        "n_units_2": 32
+      },
+      "time": 0.012792
+    },
+    {
+      "trial": 49,
+      "cost": 0.5393515229225159,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 128
+      },
+      "time": 0.011427
+    },
+    {
+      "trial": 50,
+      "cost": 0.6536882519721985,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.012617
+    },
+    {
+      "trial": 51,
+      "cost": 0.6522337198257446,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 256
+      },
+      "time": 0.011399
+    },
+    {
+      "trial": 52,
+      "cost": 0.6628977656364441,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 256
+      },
+      "time": 0.012209
+    },
+    {
+      "trial": 53,
+      "cost": 0.6522359848022461,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.022653
+    },
+    {
+      "trial": 54,
+      "cost": 0.5334761142730713,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 256
+      },
+      "time": 0.014353
+    },
+    {
+      "trial": 55,
+      "cost": 0.32540228962898254,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 256
+      },
+      "time": 0.023707
+    },
+    {
+      "trial": 56,
+      "cost": 0.33155643939971924,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 64
+      },
+      "time": 0.015254
+    },
+    {
+      "trial": 57,
+      "cost": 0.3252023458480835,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 64
+      },
+      "time": 0.011966
+    },
+    {
+      "trial": 58,
+      "cost": 0.3366571366786957,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 64
+      },
+      "time": 0.018085
+    },
+    {
+      "trial": 59,
+      "cost": 0.2720870077610016,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 64
+      },
+      "time": 0.020615
+    },
+    {
+      "trial": 60,
+      "cost": 0.3019935190677643,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.6,
+        "init_lr": 0.0005,
+        "lr_schedule": "cosine",
+        "n_units_1": 512,
+        "n_units_2": 64
+      },
+      "time": 0.014958
+    },
+    {
+      "trial": 61,
+      "cost": 0.31131991744041443,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.001,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 128
+      },
+      "time": 0.014951
+    },
+    {
+      "trial": 62,
+      "cost": 0.36006075143814087,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 256
+      },
+      "time": 0.011419
+    },
+    {
+      "trial": 63,
+      "cost": 0.3498510420322418,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 512
+      },
+      "time": 0.025377
+    },
+    {
+      "trial": 64,
+      "cost": 0.28627243638038635,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 512,
+        "n_units_2": 256
+      },
+      "time": 0.01767
+    },
+    {
+      "trial": 65,
+      "cost": 0.34937673807144165,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 256
+      },
+      "time": 0.017422
+    },
+    {
+      "trial": 66,
+      "cost": 0.34539684653282166,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 128
+      },
+      "time": 0.020505
+    },
+    {
+      "trial": 67,
+      "cost": 0.37840813398361206,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 32
+      },
+      "time": 0.021423
+    },
+    {
+      "trial": 68,
+      "cost": 0.34453657269477844,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 16,
+        "n_units_2": 128
+      },
+      "time": 0.018682
+    },
+    {
+      "trial": 69,
+      "cost": 0.3332439661026001,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 32
+      },
+      "time": 0.02321
+    },
+    {
+      "trial": 70,
+      "cost": 0.28854742646217346,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 16
+      },
+      "time": 0.021236
+    },
+    {
+      "trial": 71,
+      "cost": 0.5409193634986877,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 16
+      },
+      "time": 0.023467
+    },
+    {
+      "trial": 72,
+      "cost": 0.6635056138038635,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 16
+      },
+      "time": 0.019971
+    },
+    {
+      "trial": 73,
+      "cost": 0.49052858352661133,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 32
+      },
+      "time": 0.022037
+    },
+    {
+      "trial": 74,
+      "cost": 0.4700123071670532,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 32
+      },
+      "time": 0.018083
+    },
+    {
+      "trial": 75,
+      "cost": 0.4700123071670532,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 32
+      },
+      "time": 0.019322
+    },
+    {
+      "trial": 76,
+      "cost": 0.5519113540649414,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 32
+      },
+      "time": 0.023871
+    },
+    {
+      "trial": 77,
+      "cost": 0.4936673939228058,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 32,
+        "n_units_2": 32
+      },
+      "time": 0.013401
+    },
+    {
+      "trial": 78,
+      "cost": 0.5334075093269348,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 128
+      },
+      "time": 0.018501
+    },
+    {
+      "trial": 79,
+      "cost": 0.6545543670654297,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 128
+      },
+      "time": 0.017699
+    },
+    {
+      "trial": 80,
+      "cost": 0.6538879871368408,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.017018
+    },
+    {
+      "trial": 81,
+      "cost": 0.6539583802223206,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 256,
+        "n_units_2": 128
+      },
+      "time": 0.013787
+    },
+    {
+      "trial": 82,
+      "cost": 0.67290198802948,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 128
+      },
+      "time": 0.012513
+    },
+    {
+      "trial": 83,
+      "cost": 0.6656675338745117,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.6,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 512,
+        "n_units_2": 128
+      },
+      "time": 0.011911
+    },
+    {
+      "trial": 84,
+      "cost": 0.6732202172279358,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.0,
+        "init_lr": 0.1,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 64
+      },
+      "time": 0.012916
+    },
+    {
+      "trial": 85,
+      "cost": 0.41516751050949097,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.3,
+        "dropout_2": 0.3,
+        "init_lr": 0.1,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 64
+      },
+      "time": 0.013956
+    },
+    {
+      "trial": 86,
+      "cost": 0.527193009853363,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 64,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.05,
+        "lr_schedule": "const",
+        "n_units_1": 16,
+        "n_units_2": 64
+      },
+      "time": 0.020014
+    },
+    {
+      "trial": 87,
+      "cost": 0.3348999619483948,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.001,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 256
+      },
+      "time": 0.020533
+    },
+    {
+      "trial": 88,
+      "cost": 0.3920135796070099,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 64,
+        "n_units_2": 64
+      },
+      "time": 0.015882
+    },
+    {
+      "trial": 89,
+      "cost": 0.4310620129108429,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 16
+      },
+      "time": 0.021869
+    },
+    {
+      "trial": 90,
+      "cost": 0.46837592124938965,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 128,
+        "n_units_2": 32
+      },
+      "time": 0.021122
+    },
+    {
+      "trial": 91,
+      "cost": 0.46837592124938965,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.01,
+        "lr_schedule": "cosine",
+        "n_units_1": 128,
+        "n_units_2": 32
+      },
+      "time": 0.021792
+    },
+    {
+      "trial": 92,
+      "cost": 0.4098716676235199,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 256,
+        "n_units_2": 64
+      },
+      "time": 0.013929
+    },
+    {
+      "trial": 93,
+      "cost": 0.3964155316352844,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.6,
+        "dropout_2": 0.3,
+        "init_lr": 0.005,
+        "lr_schedule": "cosine",
+        "n_units_1": 512,
+        "n_units_2": 64
+      },
+      "time": 0.011544
+    },
+    {
+      "trial": 94,
+      "cost": 0.30826252698898315,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 512
+      },
+      "time": 0.013271
+    },
+    {
+      "trial": 95,
+      "cost": 0.30826252698898315,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.3,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 256,
+        "n_units_2": 512
+      },
+      "time": 0.022576
+    },
+    {
+      "trial": 96,
+      "cost": 0.265509694814682,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "relu",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 128,
+        "n_units_2": 512
+      },
+      "time": 0.024503
+    },
+    {
+      "trial": 97,
+      "cost": 0.3209688067436218,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 32,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 512
+      },
+      "time": 0.025726
+    },
+    {
+      "trial": 98,
+      "cost": 0.31545352935791016,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.0,
+        "dropout_2": 0.0,
+        "init_lr": 0.0005,
+        "lr_schedule": "const",
+        "n_units_1": 64,
+        "n_units_2": 512
+      },
+      "time": 0.013544
+    },
+    {
+      "trial": 99,
+      "cost": 0.44122087955474854,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "tanh",
+        "activation_fn_2": "tanh",
+        "batch_size": 8,
+        "dropout_1": 0.6,
+        "dropout_2": 0.6,
+        "init_lr": 0.001,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.025449
+    },
+    {
+      "trial": 100,
+      "cost": 0.33945411443710327,
+      "best_cost": 0.2489713877439499,
+      "config": {
+        "activation_fn_1": "relu",
+        "activation_fn_2": "tanh",
+        "batch_size": 16,
+        "dropout_1": 0.0,
+        "dropout_2": 0.6,
+        "init_lr": 0.0005,
+        "lr_schedule": "cosine",
+        "n_units_1": 32,
+        "n_units_2": 512
+      },
+      "time": 0.019576
+    }
+  ],
+  "final_best_cost": 0.2489713877439499,
+  "final_best_config": {
+    "activation_fn_1": "relu",
+    "activation_fn_2": "relu",
+    "batch_size": 16,
+    "dropout_1": 0.0,
+    "dropout_2": 0.0,
+    "init_lr": 0.0005,
+    "lr_schedule": "const",
+    "n_units_1": 512,
+    "n_units_2": 128
+  },
+  "wall_time_seconds": 1.508
+}

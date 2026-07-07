@@ -1,0 +1,85 @@
+{
+  "optimizer": "SMAC3",
+  "benchmark_suite": "hpobench",
+  "dataset": "australian",
+  "seed": 0,
+  "max_trials": 5,
+  "direction": "minimize",
+  "original_direction": "maximize",
+  "trajectory": [
+    {
+      "trial": 1,
+      "cost": -0.9220647773279352,
+      "best_cost": -0.9220647773279352,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 64,
+        "depth": 1,
+        "learning_rate_init": 0.00012915497,
+        "width": 645
+      },
+      "time": 0.000413
+    },
+    {
+      "trial": 2,
+      "cost": -0.8298149219201851,
+      "best_cost": -0.9220647773279352,
+      "config": {
+        "alpha": 1.0,
+        "batch_size": 25,
+        "depth": 1,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000377
+    },
+    {
+      "trial": 3,
+      "cost": -0.8441777520724889,
+      "best_cost": -0.9220647773279352,
+      "config": {
+        "alpha": 0.12915497,
+        "batch_size": 6,
+        "depth": 1,
+        "learning_rate_init": 0.0059948424,
+        "width": 16
+      },
+      "time": 0.000314
+    },
+    {
+      "trial": 4,
+      "cost": -0.6176016965490649,
+      "best_cost": -0.9220647773279352,
+      "config": {
+        "alpha": 1.0,
+        "batch_size": 256,
+        "depth": 3,
+        "learning_rate_init": 1.0,
+        "width": 645
+      },
+      "time": 0.000356
+    },
+    {
+      "trial": 5,
+      "cost": -0.9132928475033739,
+      "best_cost": -0.9220647773279352,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 25,
+        "depth": 1,
+        "learning_rate_init": 0.07742637,
+        "width": 406
+      },
+      "time": 0.000297
+    }
+  ],
+  "final_best_cost": -0.9220647773279352,
+  "final_best_config": {
+    "alpha": 5.994842e-07,
+    "batch_size": 64,
+    "depth": 1,
+    "learning_rate_init": 0.00012915497,
+    "width": 645
+  },
+  "wall_time_seconds": 2.0857
+}

@@ -1,0 +1,207 @@
+HO: Hamiltonian-based Optimiser
+Revision Implementation Plan & SIAM Reference Guide
+Prepared for submission to SIAM Journal on Scientific Computing (SISC)
+
+June 2026
+
+1. Revision Overview
+This document provides a structured, phase-by-phase implementation plan for revising the HO paper to meet the standards required for acceptance at the SIAM Journal on Scientific Computing (SISC). It also catalogs newly identified SIAM-relevant references and details the LaTeX format conversion required for submission.
+The paper's core contributions are sound, but the following categories of work are required before submission:
+
+Statistical rigor: significance tests on all ranking comparisons
+Ablation study: isolation of each Method C component
+Missing baselines: BOHB, SMAC3
+Harder benchmarks: Hénon-Heiles system, CIFAR-10
+Formal complexity analysis (per-epoch cost theorem)
+Dedicated Related Work section
+SIAM LaTeX class + theorem environments
+Vector figures and code availability statement
+
+Phase Summary
+Total estimated revision time: 17–20 weeks for a single researcher working part-time on revisions alongside other duties.
+
+2. Phase-by-Phase Implementation Plan
+Phase 1 — Statistical Rigor (Weeks 1–3)
+The ranking table (Table IX, avg. ranks 2.18 / 2.64 / 2.91 / 2.91 / 3.55) is the paper's headline claim. Without statistical significance tests, this table cannot support publication at SIAM or any top ML venue.
+Action items:
+Run Friedman test across all 11 datasets for the 5 methods to obtain a global p-value. Report test statistic and significance level.
+Run Nemenyi post-hoc test to compute critical differences (CD) for each pair of methods. A CD diagram shows which method pairs are statistically distinguishable.
+Add standard deviation columns to all results tables (Tables IV–VIII). Metrics should read: 'mean ± std over 5 seeds'.
+Cite Demšar (2006) [JMLR 7:1–30] as the standard reference for this procedure.
+For the harmonic oscillator results (Table IX), report: mean ± std MSE over 5 independent initialisations, not just a single run. Currently the physics results use seed 101 only.
+Reference to add:
+Demšar, J. Statistical Comparisons of Classifiers over Multiple Data Sets. JMLR 7:1–30, 2006. (CD diagram and Friedman/Nemenyi test procedure)
+Code:
+Use scikit-posthocs (pip install scikit-posthocs) for Nemenyi tests.
+Use the autorank Python package for CD diagram generation.
+
+Phase 2 — Ablation Study (Weeks 1–3, parallel with Phase 1)
+Method C combines three components: Adam micro-steps (Phase 1), HMC leapfrog proposals (Phase 2), and plateau-triggered L-BFGS (Phase 3). Without ablating each component, reviewers cannot assess which components are individually responsible for the observed improvements.
+Ablation variants to implement and evaluate:
+C-noAdam: Remove Adam micro-steps; use only HMC + L-BFGS
+C-noHMC: Remove leapfrog proposals; use only Adam + L-BFGS (equivalent to a simpler warm-start BO)
+C-noLBFGS: Remove plateau-triggered L-BFGS; use only Adam + HMC
+C-noPlateauDetect: Run L-BFGS every epoch rather than plateau-triggered
+C-fixedStep: Remove adaptive step-size control; use fixed epsilon
+Evaluation:
+Run each variant on the harmonic oscillator and 3–4 representative tabular benchmarks (5 seeds each)
+Report average rank relative to the full Method C — a significant drop in rank indicates that component is necessary
+Table format: rows = ablation variant, columns = dataset, cells = mean best MSE ± std
+
+Phase 3 — New Baselines (Weeks 2–5)
+The two most important missing baselines are BOHB (Falkner et al., 2018) and SMAC3 (Lindauer et al., 2022). Both are already cited in the paper but not evaluated. Any reviewer familiar with AutoML will immediately notice their absence.
+Baselines to add:
+BOHB (Bayesian Optimization + Hyperband): Combines KDE-based BO with multi-fidelity Hyperband. Install via pip install hpbandster. For tabular benchmarks, use the lookup API so wall-time cost is minimal. BOHB is expected to be competitive with or better than Optuna TPE on most benchmarks.
+SMAC3: Random forest surrogate + EI, handles discrete spaces natively (no relaxation needed). Install via pip install smac. Particularly relevant for HPOBench classification.
+DARTS (for NAS-Bench-201 only): Differentiable architecture search. If DARTS outperforms all methods on CIFAR-10/100, it should appear in the table. If not, a sentence explaining its exclusion suffices.
+References to add:
+Falkner, S., Klein, A., & Hutter, F. BOHB: Robust and Efficient Hyperparameter Optimization at Scale. ICML 2018, pp. 1437–1446.
+Lindauer, M. et al. SMAC3: A Versatile Bayesian Optimization Package for Hyperparameter Optimization. JMLR 23(54):1–9, 2022.
+
+Phase 4 — Harder Physics Benchmarks (Weeks 3–6)
+The harmonic oscillator is a quadratic, integrable system. Its energy surface is a paraboloid and provides no challenge to any reasonably trained neural network. SIAM reviewers with physics backgrounds will push back on a single toy system.
+Recommended additional benchmarks:
+Hénon-Heiles system: H(q1,q2,p1,p2) = (p1^2 + p2^2)/2 + (q1^2 + q2^2)/2 + q1^2*q2 - q2^3/3. This is a 2-degree-of-freedom non-integrable Hamiltonian that exhibits a transition from regular to chaotic motion. Its energy surface is non-symmetric and more challenging to reconstruct. Standard benchmark in Hamiltonian neural network literature (Greydanus 2019, Offen & Ober-Blöbaum 2022).
+Double-well potential: V(q) = (q^2 - 1)^2, H(q,p) = p^2/2 + (q^2-1)^2. Two-well landscape with a saddle point. Tests whether the optimiser correctly learns a bimodal energy surface. Directly relevant to the argument that Method C handles non-convex landscapes better than Method B.
+Kepler two-body problem (optional): H = |p|^2/2 - 1/|q|. Singular potential. Tests robustness of leapfrog integration near the singularity.
+Implementation note:
+Generate N=2000 samples from [-4,4]^4 for the Hénon-Heiles system (4D phase space). Train-val split 80/20. Add sigma=0.05 noise as before.
+Evaluate all three methods + ablations on all three physics systems. Show that Method C maintains its MSE / R^2 advantage across harder systems.
+References to add:
+Offen, C. & Ober-Blöbaum, S. Learning Hamiltonian systems with symplectic structure-preserving integrators. J. Comput. Phys., 2022.
+David, J. E. et al. Physics enhanced neural networks predict order and chaos. arXiv:1912.01958. (Hénon-Heiles HNN benchmark)
+
+Phase 5 — CNN Benchmark Upgrade (Weeks 4–5)
+The current CNN experiment uses 5000 MNIST training samples, producing accuracy differences of 97.4% vs 97.7% vs 97.8% — within noise for MNIST. These results do not convincingly distinguish the methods.
+Required changes:
+Replace MNIST with CIFAR-10 (full 50,000 training set), or at minimum use a harder CNN architecture (ResNet-18) on MNIST.
+Report mean ± std validation accuracy over 5 seeds, not just single-run accuracy.
+Extend the HP search space to at least 4 dimensions: learning rate, dropout, weight decay, batch size. The current 2D search space (lr, dropout) is too simple to demonstrate the advantage of Hamiltonian co-evolution over BO.
+Report wall-time results for CIFAR-10 — the 3.3x speedup claim is the paper's most compelling practical result and must be verified on a harder benchmark.
+
+Phase 6 — Formal Complexity Analysis (Week 6)
+SIAM reviewers expect a formal per-epoch computational cost theorem. Without it, the wall-time comparisons lack theoretical grounding.
+Required theorem (template):
+Proposition 6.1 (Per-Epoch Cost of Method C). Let d denote the weight dimensionality, k the hyperparameter dimensionality, L the number of leapfrog sub-steps, N_micro the number of Adam micro-steps per epoch, and m the L-BFGS history size. The per-epoch computational cost of Method C is:
+Phase 1 (Adam): O(N_micro * d) gradient evaluations
+Phase 2 (HMC): O(L * (d + k)) gradient evaluations, plus O(d + k) acceptance test
+Phase 3 (L-BFGS): O(N_b * m * d) per plateau-triggered activation, amortised over P epochs
+Compare with Method B: O(N_BO * (N_a * d + N_b * m * d + t^3)) where t^3 is the GP cubic scaling. Method C eliminates the t^3 GP cost entirely.
+
+Phase 7 — Dedicated Related Work Section (Week 7)
+The current paper embeds related work in the Introduction. SIAM articles typically have a standalone Related Work or Prior Art section. Add Section 2 (before Background) covering:
+Gradient-based hyperparameter optimisation: MAML, DARTS, Lorraine et al. 2020 (implicit differentiation), Franceschi et al. 2018 (bilevel programming)
+Physics-informed optimisers: HNN (Greydanus 2019), Lagrangian NN (Cranmer 2020), symplectic integrators for ML (Leok 2021, 2022), dissipative symplectic integration (Franca et al. 2020)
+Multi-fidelity HPO: Hyperband (Li et al. 2018), BOHB (Falkner 2018), ASHA
+Neural architecture search: DARTS (Liu 2019), regularised evolution (Real 2019)
+References to add:
+Franca, G. et al. On Dissipative Symplectic Integration with Applications to Gradient-Based Optimization. arXiv:2004.06840, 2020.
+Franceschi, L. et al. Bilevel Programming for Hyperparameter Optimization and Meta-Learning. ICML 2018.
+Li, L. et al. Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization. JMLR 18(185):1–52, 2018.
+
+Phase 8 — SIAM LaTeX Conversion (Week 8)
+The paper currently uses IEEEtran. SIAM requires the siamart220329 class, which is available from epubs.siam.org/page/siamlatex.
+Step-by-step conversion:
+Download siamart220329.cls from SIAM's LaTeX page. Replace \documentclass[conference]{IEEEtran} with \documentclass[review,hidelinks]{siamart220329}.
+Add required SIAM preamble blocks: \begin{keywords}...\end{keywords} and \begin{MSCcodes}...\end{MSCcodes} (MSC 2020 codes: 65K10 Numerical optimization; 65P10 Numerical methods for Hamiltonian systems; 68T05 Learning and adaptive systems).
+Replace \IEEEauthorblockN{} with SIAM author macros: \author{Author Name\thanks{Affiliation, country. Email: author@inst.edu. ORCID: 0000-0000-0000-0000.}}.
+Wrap all mathematical claims in theorem environments: \begin{proposition}...\end{proposition}, \begin{theorem}...\end{theorem}, \begin{remark}...\end{remark}. Specifically: (a) shadow Hamiltonian bound as Proposition, (b) leapfrog stability result as Theorem, (c) convergence rate comparison as Proposition.
+Change \bibliographystyle{IEEEtran} to \bibliographystyle{siamplain}.
+Trim abstract to ≤250 words (currently ~330). Remove the numerical results from the abstract; move to Introduction contribution bullets.
+Fix section numbering: Background is currently called Section 3 but numbered as Section 2. Renumber consistently.
+Change figure float specifiers from [H] to [t] or [tb] throughout. SIAM copyeditors reject excessive [H] usage.
+
+Phase 9 — Figures and Code Release (Week 8)
+Figure conversion:
+All figures must be PDF or EPS for SIAM submission. Convert existing PNG plots using matplotlib's savefig('fig.pdf', format='pdf', bbox_inches='tight').
+Regenerate all plots in matplotlib or pgfplots directly rather than saving PNG. This guarantees vector output and consistent font rendering.
+Set matplotlib rcParams to use LaTeX text rendering (plt.rcParams['text.usetex'] = True) so axis labels match the paper's math font.
+Code and data availability:
+Add the following paragraph before the References section:
+'\paragraph{Code and Data Availability} The source code for all three methods, benchmark evaluation scripts, and figure generation routines is publicly available at \url{https://github.com/[author]/HO-optimizer}. The tabular benchmark data is provided by the \texttt{simple-hpo-bench} package (Klein \& Hutter, 2019). All experiments are fully reproducible using the provided \texttt{requirements.txt} and the fixed random seeds documented in Section~\ref{sec:setup}.'
+
+Phase 10 — Hyperparameter Sensitivity Analysis (Week 9)
+Method C introduces several new hyperparameters (epsilon, L, P, tau, m_lambda). A sensitivity analysis shows these do not require careful manual tuning.
+Experiments required:
+Sweep epsilon in {0.001, 0.003, 0.005, 0.01, 0.02} on the harmonic oscillator. Plot MSE vs epsilon. Show that performance is stable for epsilon in [0.003, 0.01].
+Sweep leapfrog steps L in {2, 3, 6, 10, 20}. Show performance plateau above L=3.
+Sweep plateau patience P in {2, 4, 8, 16}. Show that P=4 is not uniquely critical.
+Sweep mass ratio m_lambda/m_theta in {0.1, 0.25, 0.5, 1.0, 2.0}. Show that HP exploration rate is robust to this ratio.
+Format: 2x2 grid of sensitivity plots in a single figure. Each panel shows one hyperparameter sweep, with performance on y-axis and the parameter value on x-axis. The current best setting is marked with a star.
+
+3. SIAM-Relevant References
+The following table identifies references directly relevant to the paper's contributions that should be added to the bibliography. Items marked * are the highest priority and most likely to be requested by SIAM reviewers.
+
+
+3.1 SIAM Journal Publications (Direct Relevance)
+The two most important SIAM papers for this submission are the Duruisseaux-Leok series, which establishes exactly the symplectic + acceleration optimization connection that the paper claims as novel:
+Duruisseaux, V., Schmitt, J., & Leok, M. (2021). Adaptive Hamiltonian Variational Integrators and Applications to Symplectic Accelerated Optimization. SIAM Journal on Scientific Computing, 43(4), A2949–A2980. DOI: 10.1137/20M1383835
+This paper introduces adaptive symplectic integrators for accelerated optimization — directly overlapping with Method C's leapfrog + acceleration structure. The HO paper must acknowledge this line of work and explain how HHD differs (different problem setting: HPO co-evolution vs. fixed-space acceleration). Failure to cite this will likely result in a reviewer rejection citing 'lack of novelty awareness'.
+Duruisseaux, V. & Leok, M. (2022). A Variational Formulation of Accelerated Optimization on Riemannian Manifolds. SIAM Journal on Mathematics of Data Science, 4(2), 649–674. DOI: 10.1137/21M1395648
+Extends the above to Riemannian manifolds. Relevant because the joint (theta, lambda) phase space is not Euclidean when architecture hyperparameters (depth, width) are included.
+3.2 Bilevel HPO References (Related Work Section)
+Lorraine, J., Vicol, P., & Duvenaud, D. (2020). Optimizing Millions of Hyperparameters by Implicit Differentiation. AISTATS 2020.
+Franceschi, L., Frasconi, P., Salzo, S., Grazzi, R., & Pontil, M. (2018). Bilevel Programming for Hyperparameter Optimization and Meta-Learning. ICML 2018.
+Blondel, M. et al. (2021). Implicit Differentiation for Fast Hyperparameter Selection in Non-Smooth Convex Learning. JMLR 22(90):1–43.
+These three papers define the state-of-the-art for gradient-based HPO. Method C is in a different category (Hamiltonian dynamics, not implicit diff), but the Related Work section must position the paper relative to them.
+3.3 Symplectic Optimization References
+Franca, G., Sulam, J., Robinson, D. P., & Vidal, R. (2020). On Dissipative Symplectic Integration with Applications to Gradient-Based Optimization. arXiv:2004.06840.
+Goto, S. & Hino, H. (2021). Fast symplectic integrator for Nesterov-type acceleration method. arXiv:2106.07620.
+Both papers establish the connection between symplectic integration and gradient-based optimization — the foundational connection that Method A and C exploit. They should appear in the Related Work section to show awareness of this literature.
+3.4 Statistical Testing References
+Demšar, J. (2006). Statistical Comparisons of Classifiers over Multiple Data Sets. Journal of Machine Learning Research, 7(1), 1–30.
+Required for Phase 1. Provides the Friedman test + Nemenyi post-hoc test + CD diagram procedure that is standard for multi-method, multi-dataset comparisons. SIAM reviewers will ask for this test by name.
+
+4. SIAM Format Conversion Checklist
+The following table maps each structural element from the current IEEEtran format to the required SIAM format. Items in the 'Required' column must be completed before submission.
+
+
+4.1 Theorem Environments to Add
+SIAM articles use numbered theorem environments. The following claims in the current paper should be formalised:
+Proposition 3.1 (Shadow Hamiltonian Bound). 'Under the leapfrog integrator with step size epsilon, the numerical Hamiltonian error satisfies |DeltaH| = O(epsilon^2) globally, ensuring acceptance rate bounded away from zero.' Proof: cite Hairer et al. (2006) Theorem 3.1.
+Proposition 3.2 (Detailed Balance of Method C). 'The Metropolis-Hastings step in Phase 2 of Algorithm 3 satisfies detailed balance with respect to the joint stationary distribution pi(theta, lambda) proportional to exp(-H(theta, lambda, p_theta, p_lambda)).' Proof: standard HMC argument, cite Neal (2011).
+Remark 4.1 (Continuous Relaxation Approximation). 'The one-sided finite difference approximation in Eq. (18) introduces a truncation error of O(delta) in the HP gradient, where delta = 1.0 index step. This relaxation is consistent in the limit as the configuration space becomes dense.' This converts the current unsubstantiated claim into a documented approximation with known error.
+Theorem 5.1 (Per-Epoch Cost). Formal statement of the O(N_micro * d + L*(d+k) + N_b*m*d/P) per-epoch cost from Phase 6.
+4.2 Abstract Revision Template
+The current abstract is 330+ words and contains too many numerical results. SIAM limit is ~250 words. Suggested restructuring (150 words core + up to 100 words for key results):
+Sentences 1–2: Motivation (HPO bottleneck, why Hamiltonian perspective)
+Sentences 3–4: What is proposed (three frameworks A, B, C — one sentence each)
+Sentences 5–6: Key theoretical properties (symplectic conservation, detailed balance, second-order curvature)
+Sentences 7–8: Main results (best avg. rank 2.18 on 11 benchmarks; 30x MSE improvement; 3.3x speedup — pick the two most compelling, not all)
+Sentence 9: Conclusion sentence
+Remove from abstract: all table-level MSE/R^2 numbers, all method comparison details, the wall-time breakdown. These belong in the Results section.
+
+5. Recommended Timeline
+The following Gantt-style plan assumes a single researcher working approximately 15–20 hours per week on revisions.
+
+
+6. Pre-Submission Checklist
+Use this checklist immediately before submitting to SIAM:
+
+Experiments
+[ ] Friedman test + Nemenyi CD diagram added to Section 8.4
+[ ] All result tables show mean ± std over ≥5 seeds
+[ ] BOHB and SMAC3 included in all tabular benchmark comparisons
+[ ] Ablation table for Method C (5 variants, ≥3 benchmarks)
+[ ] Hénon-Heiles and double-well results added to Section 6
+[ ] CIFAR-10 CNN results replacing or supplementing MNIST
+[ ] Hyperparameter sensitivity plots (2×2 grid)
+Theory
+[ ] Proposition for shadow Hamiltonian bound (with proof sketch)
+[ ] Proposition for detailed balance of Method C (with proof sketch)
+[ ] Remark on finite-difference gradient approximation error
+[ ] Theorem for per-epoch computational cost
+Format
+[ ] siamart220329.cls loaded and compiles without errors
+[ ] Abstract ≤250 words
+[ ] Keywords and MSC codes blocks present
+[ ] Author block with full affiliation, email, ORCID
+[ ] Bibliography style: siamplain
+[ ] All figures as PDF or EPS (no PNG)
+[ ] Code availability statement added
+[ ] Related Work section present (Section 2)
+[ ] Dual-use of B for HP bounds AND plateau buffer resolved
+[ ] Section numbering consecutive (no gap between sections 2 and 4)
+[ ] No figure float [H] qualifiers remaining
+
+END OF DOCUMENT

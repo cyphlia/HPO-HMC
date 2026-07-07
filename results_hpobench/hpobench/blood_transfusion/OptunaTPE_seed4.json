@@ -1,0 +1,1320 @@
+{
+  "optimizer": "OptunaTPE",
+  "benchmark_suite": "hpobench",
+  "dataset": "blood_transfusion",
+  "seed": 4,
+  "max_trials": 100,
+  "direction": "minimize",
+  "original_direction": "maximize",
+  "trajectory": [
+    {
+      "trial": 1,
+      "cost": -0.5,
+      "best_cost": -0.5,
+      "config": {
+        "alpha": 1,
+        "batch_size": 40,
+        "depth": 3,
+        "learning_rate_init": 0.07742637,
+        "width": 256
+      },
+      "time": 0.000375
+    },
+    {
+      "trial": 2,
+      "cost": -0.5760821309655938,
+      "best_cost": -0.5760821309655938,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 256,
+        "depth": 1,
+        "learning_rate_init": 0.00012915497,
+        "width": 101
+      },
+      "time": 0.000357
+    },
+    {
+      "trial": 3,
+      "cost": -0.5,
+      "best_cost": -0.5760821309655938,
+      "config": {
+        "alpha": 0.016681006,
+        "batch_size": 6,
+        "depth": 3,
+        "learning_rate_init": 1,
+        "width": 25
+      },
+      "time": 0.000356
+    },
+    {
+      "trial": 4,
+      "cost": -0.629245283018868,
+      "best_cost": -0.629245283018868,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 1e-05,
+        "width": 1024
+      },
+      "time": 0.000476
+    },
+    {
+      "trial": 5,
+      "cost": -0.5,
+      "best_cost": -0.629245283018868,
+      "config": {
+        "alpha": 3.5938137e-05,
+        "batch_size": 256,
+        "depth": 3,
+        "learning_rate_init": 0.27825594,
+        "width": 25
+      },
+      "time": 0.000423
+    },
+    {
+      "trial": 6,
+      "cost": -0.6475027746947836,
+      "best_cost": -0.6475027746947836,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 64,
+        "depth": 1,
+        "learning_rate_init": 0.07742637,
+        "width": 101
+      },
+      "time": 0.000365
+    },
+    {
+      "trial": 7,
+      "cost": -0.5,
+      "best_cost": -0.6475027746947836,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 256,
+        "depth": 2,
+        "learning_rate_init": 3.5938137e-05,
+        "width": 25
+      },
+      "time": 0.000346
+    },
+    {
+      "trial": 8,
+      "cost": -0.6952830188679245,
+      "best_cost": -0.6952830188679245,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 40,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 256
+      },
+      "time": 0.000399
+    },
+    {
+      "trial": 9,
+      "cost": -0.6563263041065484,
+      "best_cost": -0.6952830188679245,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 64,
+        "depth": 3,
+        "learning_rate_init": 3.5938137e-05,
+        "width": 64
+      },
+      "time": 0.000326
+    },
+    {
+      "trial": 10,
+      "cost": -0.6120976692563818,
+      "best_cost": -0.6952830188679245,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 64,
+        "depth": 1,
+        "learning_rate_init": 0.0059948424,
+        "width": 256
+      },
+      "time": 0.000329
+    },
+    {
+      "trial": 11,
+      "cost": -0.586126526082131,
+      "best_cost": -0.6952830188679245,
+      "config": {
+        "alpha": 0.016681006,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 1024
+      },
+      "time": 0.000384
+    },
+    {
+      "trial": 12,
+      "cost": -0.6810765815760267,
+      "best_cost": -0.6952830188679245,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000339
+    },
+    {
+      "trial": 13,
+      "cost": -0.7105993340732519,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000333
+    },
+    {
+      "trial": 14,
+      "cost": -0.6598779134295227,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 406
+      },
+      "time": 0.000342
+    },
+    {
+      "trial": 15,
+      "cost": -0.6162597114317425,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 0.016681006,
+        "batch_size": 25,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000227
+    },
+    {
+      "trial": 16,
+      "cost": -0.6315760266370699,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 10,
+        "depth": 1,
+        "learning_rate_init": 0.021544347,
+        "width": 406
+      },
+      "time": 0.000341
+    },
+    {
+      "trial": 17,
+      "cost": -0.6563263041065484,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 101,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 161
+      },
+      "time": 0.000238
+    },
+    {
+      "trial": 18,
+      "cost": -0.6468923418423973,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 40,
+        "depth": 1,
+        "learning_rate_init": 0.0004641589,
+        "width": 64
+      },
+      "time": 0.000402
+    },
+    {
+      "trial": 19,
+      "cost": -0.6657602663706992,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 0.0021544348,
+        "batch_size": 25,
+        "depth": 2,
+        "learning_rate_init": 0.021544347,
+        "width": 645
+      },
+      "time": 0.000358
+    },
+    {
+      "trial": 20,
+      "cost": -0.5,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 1,
+        "batch_size": 6,
+        "depth": 3,
+        "learning_rate_init": 0.00012915497,
+        "width": 161
+      },
+      "time": 0.000386
+    },
+    {
+      "trial": 21,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 3.5938137e-05,
+        "batch_size": 101,
+        "depth": 2,
+        "learning_rate_init": 0.021544347,
+        "width": 406
+      },
+      "time": 0.000336
+    },
+    {
+      "trial": 22,
+      "cost": -0.6475027746947836,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000313
+    },
+    {
+      "trial": 23,
+      "cost": -0.6887902330743618,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000301
+    },
+    {
+      "trial": 24,
+      "cost": -0.6970033296337403,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000315
+    },
+    {
+      "trial": 25,
+      "cost": -0.6468923418423973,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 645
+      },
+      "time": 0.000198
+    },
+    {
+      "trial": 26,
+      "cost": -0.6492230854605994,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 406
+      },
+      "time": 0.000357
+    },
+    {
+      "trial": 27,
+      "cost": -0.6816870144284128,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 3.5938137e-05,
+        "batch_size": 25,
+        "depth": 3,
+        "learning_rate_init": 0.0016681006,
+        "width": 1024
+      },
+      "time": 0.000199
+    },
+    {
+      "trial": 28,
+      "cost": -0.6610987791342953,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 0.0021544348,
+        "batch_size": 6,
+        "depth": 1,
+        "learning_rate_init": 0.0059948424,
+        "width": 161
+      },
+      "time": 0.000222
+    },
+    {
+      "trial": 29,
+      "cost": -0.6563263041065484,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 40,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 406
+      },
+      "time": 0.000321
+    },
+    {
+      "trial": 30,
+      "cost": -0.5,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 1,
+        "batch_size": 25,
+        "depth": 3,
+        "learning_rate_init": 0.07742637,
+        "width": 256
+      },
+      "time": 0.000357
+    },
+    {
+      "trial": 31,
+      "cost": -0.6091564927857935,
+      "best_cost": -0.7105993340732519,
+      "config": {
+        "alpha": 0.0021544348,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.021544347,
+        "width": 645
+      },
+      "time": 0.000349
+    },
+    {
+      "trial": 32,
+      "cost": -0.7170921198668146,
+      "best_cost": -0.7170921198668146,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000203
+    },
+    {
+      "trial": 33,
+      "cost": -0.7194228634850166,
+      "best_cost": -0.7194228634850166,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 1024
+      },
+      "time": 0.000357
+    },
+    {
+      "trial": 34,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7194228634850166,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 1024
+      },
+      "time": 0.000402
+    },
+    {
+      "trial": 35,
+      "cost": -0.6716426193118756,
+      "best_cost": -0.7194228634850166,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 1024
+      },
+      "time": 0.000193
+    },
+    {
+      "trial": 36,
+      "cost": -0.7288568257491677,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000326
+    },
+    {
+      "trial": 37,
+      "cost": -0.5,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 1,
+        "learning_rate_init": 1,
+        "width": 1024
+      },
+      "time": 0.00026
+    },
+    {
+      "trial": 38,
+      "cost": -0.6445615982241953,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 3,
+        "learning_rate_init": 3.5938137e-05,
+        "width": 16
+      },
+      "time": 0.000355
+    },
+    {
+      "trial": 39,
+      "cost": -0.5,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.27825594,
+        "width": 645
+      },
+      "time": 0.000354
+    },
+    {
+      "trial": 40,
+      "cost": -0.6716426193118756,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 1024
+      },
+      "time": 0.000251
+    },
+    {
+      "trial": 41,
+      "cost": -0.6751942286348502,
+      "best_cost": -0.7288568257491677,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 16,
+        "depth": 3,
+        "learning_rate_init": 0.0004641589,
+        "width": 406
+      },
+      "time": 0.000322
+    },
+    {
+      "trial": 42,
+      "cost": -0.7460044395116536,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000378
+    },
+    {
+      "trial": 43,
+      "cost": -0.6911209766925639,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000199
+    },
+    {
+      "trial": 44,
+      "cost": -0.701165371809101,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 1024
+      },
+      "time": 0.000349
+    },
+    {
+      "trial": 45,
+      "cost": -0.7224750277469478,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000191
+    },
+    {
+      "trial": 46,
+      "cost": -0.7359600443951165,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 645
+      },
+      "time": 0.00028
+    },
+    {
+      "trial": 47,
+      "cost": -0.7005549389567147,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 1024
+      },
+      "time": 0.000212
+    },
+    {
+      "trial": 48,
+      "cost": -0.6091564927857935,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 1e-05,
+        "width": 64
+      },
+      "time": 0.000275
+    },
+    {
+      "trial": 49,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000341
+    },
+    {
+      "trial": 50,
+      "cost": -0.6533851276359601,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 3.5938137e-05,
+        "batch_size": 6,
+        "depth": 1,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000376
+    },
+    {
+      "trial": 51,
+      "cost": -0.6810765815760267,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 645
+      },
+      "time": 0.000203
+    },
+    {
+      "trial": 52,
+      "cost": -0.6693118756936738,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000243
+    },
+    {
+      "trial": 53,
+      "cost": -0.7118201997780245,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 1024
+      },
+      "time": 0.000368
+    },
+    {
+      "trial": 54,
+      "cost": -0.7218645948945616,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 645
+      },
+      "time": 0.000342
+    },
+    {
+      "trial": 55,
+      "cost": -0.7306881243063263,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 406
+      },
+      "time": 0.000341
+    },
+    {
+      "trial": 56,
+      "cost": -0.6475027746947836,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 406
+      },
+      "time": 0.000173
+    },
+    {
+      "trial": 57,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000388
+    },
+    {
+      "trial": 58,
+      "cost": -0.6498335183129855,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 40
+      },
+      "time": 0.000192
+    },
+    {
+      "trial": 59,
+      "cost": -0.660488346281909,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 3.5938137e-05,
+        "width": 406
+      },
+      "time": 0.000176
+    },
+    {
+      "trial": 60,
+      "cost": -0.6615982241953385,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 406
+      },
+      "time": 0.000415
+    },
+    {
+      "trial": 61,
+      "cost": -0.6192008879023307,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 256,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 161
+      },
+      "time": 0.00025
+    },
+    {
+      "trial": 62,
+      "cost": -0.7206437291897891,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 645
+      },
+      "time": 0.000341
+    },
+    {
+      "trial": 63,
+      "cost": -0.7112097669256382,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 645
+      },
+      "time": 0.000378
+    },
+    {
+      "trial": 64,
+      "cost": -0.6952830188679245,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 645
+      },
+      "time": 0.000207
+    },
+    {
+      "trial": 65,
+      "cost": -0.6663706992230854,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 16,
+        "depth": 2,
+        "learning_rate_init": 0.00012915497,
+        "width": 645
+      },
+      "time": 0.000199
+    },
+    {
+      "trial": 66,
+      "cost": -0.5483906770255272,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 0.12915497,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000324
+    },
+    {
+      "trial": 67,
+      "cost": -0.6982241953385128,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000347
+    },
+    {
+      "trial": 68,
+      "cost": -0.6923418423973363,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000216
+    },
+    {
+      "trial": 69,
+      "cost": -0.7005549389567147,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 645
+      },
+      "time": 0.000175
+    },
+    {
+      "trial": 70,
+      "cost": -0.7218645948945616,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 101
+      },
+      "time": 0.000346
+    },
+    {
+      "trial": 71,
+      "cost": -0.6881798002219757,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 25,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 64
+      },
+      "time": 0.00036
+    },
+    {
+      "trial": 72,
+      "cost": -0.6498335183129855,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.021544347,
+        "width": 645
+      },
+      "time": 0.000183
+    },
+    {
+      "trial": 73,
+      "cost": -0.7223640399556048,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000374
+    },
+    {
+      "trial": 74,
+      "cost": -0.6439511653718091,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 101
+      },
+      "time": 0.000191
+    },
+    {
+      "trial": 75,
+      "cost": -0.7271365149833517,
+      "best_cost": -0.7460044395116536,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000335
+    },
+    {
+      "trial": 76,
+      "cost": -0.7542175360710321,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000339
+    },
+    {
+      "trial": 77,
+      "cost": -0.6751942286348502,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000485
+    },
+    {
+      "trial": 78,
+      "cost": -0.6510543840177581,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 161,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000342
+    },
+    {
+      "trial": 79,
+      "cost": -0.6952830188679245,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 101
+      },
+      "time": 0.000367
+    },
+    {
+      "trial": 80,
+      "cost": -0.6829078801331854,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 256
+      },
+      "time": 0.000461
+    },
+    {
+      "trial": 81,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 161
+      },
+      "time": 0.00033
+    },
+    {
+      "trial": 82,
+      "cost": -0.7212541620421753,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000205
+    },
+    {
+      "trial": 83,
+      "cost": -0.6374583795782464,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 101
+      },
+      "time": 0.000206
+    },
+    {
+      "trial": 84,
+      "cost": -0.7401220865704772,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000226
+    },
+    {
+      "trial": 85,
+      "cost": -0.6751942286348502,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000338
+    },
+    {
+      "trial": 86,
+      "cost": -0.6740843507214207,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 0.00027825593,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 161
+      },
+      "time": 0.000288
+    },
+    {
+      "trial": 87,
+      "cost": -0.6822974472807991,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 256
+      },
+      "time": 0.000367
+    },
+    {
+      "trial": 88,
+      "cost": -0.646281908990011,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 161
+      },
+      "time": 0.00033
+    },
+    {
+      "trial": 89,
+      "cost": -0.6899001109877914,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 5.994842e-07,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 101
+      },
+      "time": 0.000343
+    },
+    {
+      "trial": 90,
+      "cost": -0.7094894561598224,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 3.5938137e-05,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 256
+      },
+      "time": 0.000189
+    },
+    {
+      "trial": 91,
+      "cost": -0.6120976692563818,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 64,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 40
+      },
+      "time": 0.000303
+    },
+    {
+      "trial": 92,
+      "cost": -0.6923418423973363,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 10,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 161
+      },
+      "time": 0.000195
+    },
+    {
+      "trial": 93,
+      "cost": -0.7164816870144284,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 406
+      },
+      "time": 0.00036
+    },
+    {
+      "trial": 94,
+      "cost": -0.7531076581576026,
+      "best_cost": -0.7542175360710321,
+      "config": {
+        "alpha": 7.742637e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000243
+    },
+    {
+      "trial": 95,
+      "cost": -0.7560488346281908,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000258
+    },
+    {
+      "trial": 96,
+      "cost": -0.6734739178690344,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000182
+    },
+    {
+      "trial": 97,
+      "cost": -0.6699223085460599,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 256
+      },
+      "time": 0.000335
+    },
+    {
+      "trial": 98,
+      "cost": -0.6952830188679245,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 4.641589e-06,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0016681006,
+        "width": 406
+      },
+      "time": 0.000196
+    },
+    {
+      "trial": 99,
+      "cost": -0.6433407325194228,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 6,
+        "depth": 2,
+        "learning_rate_init": 0.0059948424,
+        "width": 406
+      },
+      "time": 0.000221
+    },
+    {
+      "trial": 100,
+      "cost": -0.7365704772475028,
+      "best_cost": -0.7560488346281908,
+      "config": {
+        "alpha": 1e-08,
+        "batch_size": 4,
+        "depth": 2,
+        "learning_rate_init": 0.0004641589,
+        "width": 406
+      },
+      "time": 0.00035
+    }
+  ],
+  "final_best_cost": -0.7560488346281908,
+  "final_best_config": {
+    "alpha": 1e-08,
+    "batch_size": 4,
+    "depth": 2,
+    "learning_rate_init": 0.0016681006,
+    "width": 406
+  },
+  "wall_time_seconds": 2.0238
+}

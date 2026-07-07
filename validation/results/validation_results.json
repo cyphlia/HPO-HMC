@@ -1,0 +1,115 @@
+{
+  "symplectic_conservation": [
+    {
+      "eps": 0.001,
+      "mean_dH": 2.1649779249332823,
+      "std_dH": 1.9147837861976769,
+      "eps_sq": 1e-06
+    },
+    {
+      "eps": 0.002,
+      "mean_dH": 6.263901822616117,
+      "std_dH": 5.891386287386053,
+      "eps_sq": 4e-06
+    },
+    {
+      "eps": 0.005,
+      "mean_dH": 58.474136918893144,
+      "std_dH": 65.31361095344256,
+      "eps_sq": 2.5e-05
+    },
+    {
+      "eps": 0.01,
+      "mean_dH": 557.1761517071341,
+      "std_dH": 708.3381386921623,
+      "eps_sq": 0.0001
+    },
+    {
+      "eps": 0.02,
+      "mean_dH": 1600.8223846754652,
+      "std_dH": 3287.8758261943913,
+      "eps_sq": 0.0004
+    },
+    {
+      "eps": 0.05,
+      "mean_dH": 34412.021154201895,
+      "std_dH": 40111.471842456194,
+      "eps_sq": 0.0025000000000000005
+    }
+  ],
+  "detailed_balance": [
+    {
+      "temperature": 0.1,
+      "acceptance_rate": 0.0,
+      "n_accepted": 0,
+      "n_proposed": 100
+    },
+    {
+      "temperature": 1.0,
+      "acceptance_rate": 0.0,
+      "n_accepted": 0,
+      "n_proposed": 100
+    },
+    {
+      "temperature": 10.0,
+      "acceptance_rate": 0.0,
+      "n_accepted": 0,
+      "n_proposed": 100
+    },
+    {
+      "temperature": 100.0,
+      "acceptance_rate": 0.01,
+      "n_accepted": 1,
+      "n_proposed": 100
+    },
+    {
+      "temperature": 1000000000.0,
+      "acceptance_rate": 0.01,
+      "n_accepted": 1,
+      "n_proposed": 100
+    }
+  ],
+  "convergence_rates": {
+    "A": {
+      "min": 0.27534228350434986,
+      "final": 0.27534228350434986,
+      "n_epochs": 40
+    },
+    "B": {
+      "min": 0.36742118426731657,
+      "final": 0.36742118426731657,
+      "n_epochs": 10
+    },
+    "C": {
+      "min": 0.1792119698865073,
+      "final": 0.3207502237388066,
+      "n_epochs": 40
+    }
+  },
+  "optimizer_benchmark": {
+    "SGD (lr=0.01)": {
+      "best_val": 0.05284810811281204,
+      "final_val": 0.06155883680496897
+    },
+    "SGD (lr=0.001)": {
+      "best_val": 0.11271056000675474,
+      "final_val": 0.11271056000675474
+    },
+    "Adam (lr=0.001)": {
+      "best_val": 0.029930101175393378,
+      "final_val": 0.10881839426500457
+    },
+    "Adam (lr=0.01)": {
+      "best_val": 0.06456551062209266,
+      "final_val": 0.19507389409201487
+    },
+    "AdamW (lr=0.001)": {
+      "best_val": 0.031842805977378576,
+      "final_val": 0.11636993288993835
+    },
+    "HHD-ABBO (C)": {
+      "best_val": 0.1792119698865073,
+      "final_val": 0.3207502237388066
+    }
+  }
+}

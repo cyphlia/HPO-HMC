@@ -1,0 +1,447 @@
+{
+  "alpha": 0.05,
+  "n_datasets": 11,
+  "n_optimizers": 5,
+  "friedman_test": {
+    "chi2_statistic": 18.981818,
+    "p_value": 0.00079244,
+    "significant": true
+  },
+  "nemenyi_test": {
+    "critical_difference": 1.839217
+  },
+  "average_ranks": {
+    "Random Search": 3.6364,
+    "Optuna TPE": 1.3636,
+    "Method A (HHD)": 4.0909,
+    "Method B (ABBO)": 2.8182,
+    "Method C (Unified)": 3.0909
+  },
+  "rank_matrix": {
+    "hpobench/australian": {
+      "Random Search": 2.0,
+      "Optuna TPE": 3.0,
+      "Method A (HHD)": 5.0,
+      "Method B (ABBO)": 1.0,
+      "Method C (Unified)": 4.0
+    },
+    "hpobench/blood_transfusion": {
+      "Random Search": 3.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 4.0,
+      "Method B (ABBO)": 5.0,
+      "Method C (Unified)": 2.0
+    },
+    "hpobench/vehicle": {
+      "Random Search": 4.0,
+      "Optuna TPE": 2.0,
+      "Method A (HHD)": 3.0,
+      "Method B (ABBO)": 5.0,
+      "Method C (Unified)": 1.0
+    },
+    "hpobench/segment": {
+      "Random Search": 3.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 5.0,
+      "Method B (ABBO)": 4.0,
+      "Method C (Unified)": 2.0
+    },
+    "hpolib/naval_propulsion": {
+      "Random Search": 5.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 4.0,
+      "Method B (ABBO)": 2.0,
+      "Method C (Unified)": 3.0
+    },
+    "hpolib/parkinsons_telemonitoring": {
+      "Random Search": 3.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 2.0,
+      "Method B (ABBO)": 4.0,
+      "Method C (Unified)": 5.0
+    },
+    "hpolib/protein_structure": {
+      "Random Search": 5.0,
+      "Optuna TPE": 2.0,
+      "Method A (HHD)": 3.0,
+      "Method B (ABBO)": 1.0,
+      "Method C (Unified)": 4.0
+    },
+    "hpolib/slice_localization": {
+      "Random Search": 5.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 4.0,
+      "Method B (ABBO)": 3.0,
+      "Method C (Unified)": 2.0
+    },
+    "nasbench201/cifar10": {
+      "Random Search": 3.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 5.0,
+      "Method B (ABBO)": 2.0,
+      "Method C (Unified)": 4.0
+    },
+    "nasbench201/cifar100": {
+      "Random Search": 3.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 5.0,
+      "Method B (ABBO)": 2.0,
+      "Method C (Unified)": 4.0
+    },
+    "nasbench201/imagenet": {
+      "Random Search": 4.0,
+      "Optuna TPE": 1.0,
+      "Method A (HHD)": 5.0,
+      "Method B (ABBO)": 2.0,
+      "Method C (Unified)": 3.0
+    }
+  },
+  "pairwise_significance": {
+    "Random Search vs Optuna TPE": {
+      "rank_difference": 2.2727,
+      "significant": true
+    },
+    "Random Search vs Method A (HHD)": {
+      "rank_difference": 0.4545,
+      "significant": false
+    },
+    "Random Search vs Method B (ABBO)": {
+      "rank_difference": 0.8182,
+      "significant": false
+    },
+    "Random Search vs Method C (Unified)": {
+      "rank_difference": 0.5455,
+      "significant": false
+    },
+    "Optuna TPE vs Method A (HHD)": {
+      "rank_difference": 2.7273,
+      "significant": true
+    },
+    "Optuna TPE vs Method B (ABBO)": {
+      "rank_difference": 1.4545,
+      "significant": false
+    },
+    "Optuna TPE vs Method C (Unified)": {
+      "rank_difference": 1.7273,
+      "significant": false
+    },
+    "Method A (HHD) vs Method B (ABBO)": {
+      "rank_difference": 1.2727,
+      "significant": false
+    },
+    "Method A (HHD) vs Method C (Unified)": {
+      "rank_difference": 1.0,
+      "significant": false
+    },
+    "Method B (ABBO) vs Method C (Unified)": {
+      "rank_difference": 0.2727,
+      "significant": false
+    }
+  },
+  "results_mean_std": {
+    "hpobench": {
+      "australian": {
+        "Random Search": {
+          "mean": -0.956314,
+          "std": 0.00083,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -0.954559,
+          "std": 0.002365,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -0.953451,
+          "std": 0.008008,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -0.957191,
+          "std": 0.004719,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -0.953894,
+          "std": 0.002302,
+          "n_seeds": 5
+        }
+      },
+      "blood_transfusion": {
+        "Random Search": {
+          "mean": -0.743529,
+          "std": 0.010002,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -0.752497,
+          "std": 0.00913,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -0.740444,
+          "std": 0.006961,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -0.734073,
+          "std": 0.009971,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -0.747059,
+          "std": 0.00502,
+          "n_seeds": 5
+        }
+      },
+      "vehicle": {
+        "Random Search": {
+          "mean": -0.968095,
+          "std": 0.003768,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -0.970403,
+          "std": 0.005128,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -0.96884,
+          "std": 0.003386,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -0.964014,
+          "std": 0.002697,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -0.970894,
+          "std": 0.003062,
+          "n_seeds": 5
+        }
+      },
+      "segment": {
+        "Random Search": {
+          "mean": -0.969971,
+          "std": 0.001166,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -0.972595,
+          "std": 0.0017,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -0.968222,
+          "std": 0.002508,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -0.969096,
+          "std": 0.001934,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -0.971137,
+          "std": 0.002827,
+          "n_seeds": 5
+        }
+      }
+    },
+    "hpolib": {
+      "naval_propulsion": {
+        "Random Search": {
+          "mean": 0.000178,
+          "std": 8.5e-05,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": 4.6e-05,
+          "std": 2.1e-05,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": 0.000117,
+          "std": 4.9e-05,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": 7e-05,
+          "std": 2.8e-05,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": 7e-05,
+          "std": 2.8e-05,
+          "n_seeds": 5
+        }
+      },
+      "parkinsons_telemonitoring": {
+        "Random Search": {
+          "mean": 0.011317,
+          "std": 0.001975,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": 0.008521,
+          "std": 0.000801,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": 0.009709,
+          "std": 0.002543,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": 0.012684,
+          "std": 0.003031,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": 0.014097,
+          "std": 0.005212,
+          "n_seeds": 5
+        }
+      },
+      "protein_structure": {
+        "Random Search": {
+          "mean": 0.257146,
+          "std": 0.01118,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": 0.228121,
+          "std": 0.006819,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": 0.238459,
+          "std": 0.006641,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": 0.222767,
+          "std": 0.002224,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": 0.239031,
+          "std": 0.006421,
+          "n_seeds": 5
+        }
+      },
+      "slice_localization": {
+        "Random Search": {
+          "mean": 0.000581,
+          "std": 0.000124,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": 0.000271,
+          "std": 7.8e-05,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": 0.000418,
+          "std": 0.000105,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": 0.000397,
+          "std": 9.2e-05,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": 0.000318,
+          "std": 0.000106,
+          "n_seeds": 5
+        }
+      }
+    },
+    "nasbench201": {
+      "cifar10": {
+        "Random Search": {
+          "mean": -91.0784,
+          "std": 0.07613,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -91.4856,
+          "std": 0.199112,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -90.872,
+          "std": 0.474198,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -91.3296,
+          "std": 0.221032,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -91.0512,
+          "std": 0.380672,
+          "n_seeds": 5
+        }
+      },
+      "cifar100": {
+        "Random Search": {
+          "mean": -71.884,
+          "std": 0.339034,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -72.368,
+          "std": 0.76122,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -71.0,
+          "std": 0.765036,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -72.144,
+          "std": 0.859153,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -71.368,
+          "std": 0.803054,
+          "n_seeds": 5
+        }
+      },
+      "imagenet": {
+        "Random Search": {
+          "mean": -45.366667,
+          "std": 0.63526,
+          "n_seeds": 5
+        },
+        "Optuna TPE": {
+          "mean": -46.706667,
+          "std": 0.386667,
+          "n_seeds": 5
+        },
+        "Method A (HHD)": {
+          "mean": -44.746667,
+          "std": 0.554817,
+          "n_seeds": 5
+        },
+        "Method B (ABBO)": {
+          "mean": -45.913333,
+          "std": 0.726208,
+          "n_seeds": 5
+        },
+        "Method C (Unified)": {
+          "mean": -45.693333,
+          "std": 0.716597,
+          "n_seeds": 5
+        }
+      }
+    }
+  },
+  "reference": "Demšar, J. (2006). Statistical Comparisons of Classifiers over Multiple Data Sets. JMLR 7:1–30."
+}
