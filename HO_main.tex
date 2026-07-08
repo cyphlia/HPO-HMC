@@ -63,7 +63,7 @@
 \newcommand{\mlam}{m_{\lambda}}
 \newcommand{\tHH}{\widetilde{H}}
 \newcommand{\EI}{\mathrm{EI}}
-% \newcommand{\GP}{\mathcal{GP}}  % defined but unused; removed to avoid confusion with kernel k(\cdot,\cdot)
+% \newcommand{\GP}{\mathcal{GP}}  % defined but unused; removed to avoid confusion with kernel \kappa(\cdot,\cdot)
 
 \graphicspath{{plots/}}
 
@@ -119,11 +119,10 @@ benchmarks drawn from HPOBench, HPOLib, and NAS-Bench-201, the latter
 averaged over five random seeds with Friedman/Nemenyi significance
 testing. The Unified framework
 (Method~C) attains the strongest reconstruction accuracy on the
-physics benchmark (single-seed result: $\mathrm{MSE} = 0.0033$,
-$R^2 = 0.9999$; multi-seed mean $\pm$ std to be confirmed once
-the five-seed replication is complete), representing approximately
-a $30\times$ reduction in error relative to ABBO in
-$1.8\times$ less wall-clock time, while retaining symplectic energy
+physics benchmark averaged over five seeds
+($\mathrm{MSE} = 0.0066 \pm 0.0030$, $R^2 = 0.9996 \pm 0.0003$), representing
+approximately a $14\times$ reduction in error relative to ABBO at a
+comparable wall-clock cost, while retaining symplectic energy
 conservation, smooth hyperparameter trajectories, and second-order
 curvature exploitation that pure HHD lacks. Across the eleven HPO
 benchmarks, Method~B achieves the second-best average rank ($2.82$)
@@ -192,7 +191,7 @@ $\hat{m}_t,\hat{v}_t$ & Bias-corrected Adam moments
 \midrule
 \multicolumn{4}{l}{\textit{Bayesian optimisation and Gaussian processes}} \\
 \midrule
-$k(\cdot,\cdot)$ & GP kernel function (RBF)
+$\kappa(\cdot,\cdot)$ & GP kernel function (RBF)
   & $\mu(\lambda)$ & GP posterior mean at $\lambda$ \\
 $\sigma(\lambda)$ & GP posterior std.\ deviation
   & $\mathrm{EI}(\lambda)$ & Expected Improvement acquisition \\
@@ -446,7 +445,7 @@ $f:\lambda\mapsto\calL_{val}$ with a Gaussian-process
 prior~\cite{rasmussen2006}. We use the RBF (squared-exponential)
 kernel,
 \begin{equation}
-k(\lambda,\lambda') = \sigma_f^2\exp\!\left(-\frac{\|\lambda-\lambda'\|^2}{2\ell^2}\right)
+\kappa(\lambda,\lambda') = \sigma_f^2\exp\!\left(-\frac{\|\lambda-\lambda'\|^2}{2\ell^2}\right)
 +\sigma_n^2\delta_{\lambda\lambda'}.
 \label{eq:rbf}
 \end{equation}
@@ -1004,11 +1003,10 @@ $N=2000$ points from $[-4,4]^4$.
 \subsection{Common Settings}
 
 All experiments ran on a single CPU core to keep wall-time
-comparisons fair. The physics (harmonic-oscillator) benchmark uses a
-single fixed seed (101); we flag this explicitly because, unlike the
-CNN and tabular benchmarks, no variance estimate is available for the
-physics-benchmark headline numbers reported in
-Section~\ref{sec:setup} and discussed in Section~9. The CIFAR-10 CNN
+comparisons fair. Every benchmark (physics, CNN, and tabular) uses
+5 random seeds (0--4 for physics and tabular, 101--105 for CNN) and
+reports mean $\pm$ standard deviation throughout, providing variance
+estimates for all quantitative comparisons. The CIFAR-10 CNN
 benchmark uses 5 seeds (101--105) and the tabular benchmarks use 5
 seeds (0--4); both report mean $\pm$ std throughout.
 
@@ -1026,7 +1024,7 @@ Train / Val split    & $80\,\% / 20\,\%$ (640 / 160 samples) \\
 Phase-space domain   & $q, p \in [-4, 4]^2$ \\
 Noise standard dev.  & $\sigma = 0.05$ \\
 Loss criterion       & MSE [Eq.~\eqref{eq:mse}] \\
-Random seed(s)       & 101 (physics, single seed); 101--105 (CNN); 0--4 (tabular) \\
+Random seed(s)       & 0--4 (physics and tabular); 101--105 (CNN) \\
 Device               & CPU \\
 \bottomrule
 \end{tabular}
@@ -1568,11 +1566,11 @@ Method~A's structural guarantees.
   & \textbf{B: ABBO}
   & \textbf{C: Unified} \\
 \midrule
-Best Val.\ MSE     & 0.151 & 0.099 & \textbf{0.00327} \\
-Landscape MAE      & 0.699 & 0.105 & \textbf{0.0177}  \\
-Landscape RMSE     & 0.786 & 0.139 & \textbf{0.0248}  \\
-$R^2$              & 0.950 & 0.998 & \textbf{0.9999}  \\
-Wall time (s)      & \textbf{17.8} & 147.1 & 81.4     \\
+Best Val.\ MSE     & $0.2760 \pm 0.1107$ & $0.0952 \pm 0.0051$ & $\mathbf{0.00658 \pm 0.00302}$ \\
+Landscape MAE      & $2.0391 \pm 0.4967$ & $0.1028 \pm 0.0149$ & $\mathbf{0.0442 \pm 0.0214}$  \\
+Landscape RMSE     & $2.5084 \pm 0.6765$ & $0.1403 \pm 0.0197$ & $\mathbf{0.0597 \pm 0.0291}$  \\
+$R^2$              & $0.4517 \pm 0.3184$ & $0.9984 \pm 0.0005$ & $\mathbf{0.9996 \pm 0.0003}$  \\
+Wall time (s)      & $\mathbf{21.2 \pm 1.1}$ & $88.5 \pm 3.7$ & $87.8 \pm 3.7$     \\
 H conserv.\        & \textbf{Yes} & No  & \textbf{Yes}  \\
 Smooth HP traj.\   & \textbf{Yes} & No  & \textbf{Yes}  \\
 Detailed balance   & \textbf{Yes} & No  & \textbf{Yes}  \\
@@ -1844,9 +1842,8 @@ the expensive outer BO loop that the original adaptive-integrator
 framework~\cite{duruisseaux2021adaptive} never had to confront,
 because it never let hyperparameters leave the outer loop in the
 first place. The result is the best reconstruction accuracy on the
-harmonic oscillator (single-seed result: $\mathrm{MSE}=0.00327$,
-$R^2=0.9999$; multi-seed numbers pending five-seed replication
----see Section~\ref{sec:setup}),
+harmonic oscillator ($\mathrm{MSE}=0.0066 \pm 0.0030$, $R^2=0.9996 \pm 0.0003$
+averaged over 5 seeds; see Section~\ref{sec:setup}),
 nominally the highest CIFAR-10 CNN validation accuracy on the
 small slice ($30.60\,\%$, effectively tied with Method~A; versus
 $28.50\,\%$ for
