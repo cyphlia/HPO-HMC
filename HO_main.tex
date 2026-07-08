@@ -63,7 +63,7 @@
 \newcommand{\mlam}{m_{\lambda}}
 \newcommand{\tHH}{\widetilde{H}}
 \newcommand{\EI}{\mathrm{EI}}
-\newcommand{\GP}{\mathcal{GP}}
+% \newcommand{\GP}{\mathcal{GP}}  % defined but unused; removed to avoid confusion with kernel k(\cdot,\cdot)
 
 \graphicspath{{plots/}}
 
@@ -119,17 +119,28 @@ benchmarks drawn from HPOBench, HPOLib, and NAS-Bench-201, the latter
 averaged over five random seeds with Friedman/Nemenyi significance
 testing. The Unified framework
 (Method~C) attains the strongest reconstruction accuracy on the
-physics benchmark in a single-seed comparison
-($\mathrm{MSE} = 0.0033$, $R^2 = 0.9999$), a
-$30\times$ reduction in error relative to ABBO obtained in
+physics benchmark (single-seed result: $\mathrm{MSE} = 0.0033$,
+$R^2 = 0.9999$; multi-seed mean $\pm$ std to be confirmed once
+the five-seed replication is complete), representing approximately
+a $30\times$ reduction in error relative to ABBO in
 $1.8\times$ less wall-clock time, while retaining symplectic energy
 conservation, smooth hyperparameter trajectories, and second-order
 curvature exploitation that pure HHD lacks. Across the eleven HPO
-benchmarks, Method~C achieves the best average rank ($2.18$), ahead
-of Optuna's Tree-structured Parzen Estimator ($2.64$), random search
-($3.55$), and both of its constituent frameworks taken alone. On the
-CIFAR-10 slice (5 seeds), Method~C reaches $30.60\,\%$ validation accuracy,
-exceeding ABBO's $28.50\,\%$ at a comparable wall-clock cost to pure HHD. Taken
+benchmarks, Method~B achieves the second-best average rank ($2.82$)
+and Method~C the third ($3.09$), both ahead of Optuna's
+Tree-structured Parzen Estimator ($1.36$) only on specific subsets;
+overall Optuna TPE achieves the best average rank ($1.36$), followed
+by Method~B ($2.82$), Method~C ($3.09$), random search ($3.64$),
+and Method~A ($4.09$). The Friedman test across 11 datasets is
+significant ($p=7.9\times10^{-4}$), and the Nemenyi CD at
+$\alpha=0.05$ is $1.84$---Optuna TPE is significantly better than
+Method~A and random search, but not distinguishable from Methods~B
+or~C at this significance level.
+On the CIFAR-10 small-slice benchmark (5 seeds), Method~C is
+nominally the strongest among wall-time-comparable methods
+($30.60\,\%$), though its interval overlaps Method~A ($30.90\,\%$);
+the two are treated as effectively tied on this small validation set.
+Taken
 together, these results extend the variational-integrator
 perspective on optimisation from the weight space alone to the joint
 weight–hyperparameter phase space, establishing a structured,
@@ -1102,7 +1113,7 @@ EMA decay                        & 0.995 \\
 \end{tabular}
 \end{table}
 
-\subsection{CNN Classification Setup (CIFAR-10)}
+\subsection{CNN Classification Setup (CIFAR-10 Small Slice)}
 
 To evaluate generalisation beyond physics benchmarks, we applied
 each method to train a CNN on a subset of CIFAR-10. We emphasise
@@ -1207,10 +1218,9 @@ to Method~C's advantage.
 \caption{Ablation study results: mean best validation MSE on the
          harmonic oscillator and average rank across 4 tabular
          benchmarks (5~seeds, mean $\pm$ std).
-         The dominant signal is the catastrophic failure of
-         \textbf{C-noLBFGS}, confirming L-BFGS as the critical
-         convergence engine; the HMC phase contributes selectively
-         on harder, multi-modal problems (see text).}
+         Bold marks the lowest (best) value in each column;
+         Method~C (full) is the proposed configuration but is not
+         the best per-column value---see discussion below.}
 \label{tab:ablation}
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{lcc}
@@ -1234,14 +1244,24 @@ The single unambiguous finding is the catastrophic degradation
 caused by removing L-BFGS\@. \textbf{C-noLBFGS} produces a
 harmonic-oscillator MSE of $0.240$---roughly $\mathbf{36\times}$
 worse than the full method---and the highest average tabular rank
-($4.73$), placing it last on both metrics simultaneously.
+($4.73$), placing it last on \emph{both} metrics simultaneously.
 Without plateau-triggered curvature refinement, Adam and HMC
 explore the loss landscape but never achieve the fine-grained
-descent required for tight convergence.  The remaining four
-variants all stay within a factor of~$2$ of Method~C on the
-physics benchmark, confirming that L-BFGS carries the
-precision budget while the other phases contribute to
-exploration and warmup.
+descent required for tight convergence.
+
+Contrary to a simple ``more components is better'' story, however,
+three of the four remaining ablations---\textbf{C-noHMC} ($0.00326$),
+\textbf{C-noAdam} ($0.00475$), and \textbf{C-noPlateauDetect}
+($0.00323$)---all attain a \emph{lower} (better) mean HO-MSE than
+the full Method~C ($0.00658$), with C-noPlateauDetect roughly
+$2\times$ better and C-noAdam also clearly improving upon the
+full pipeline (removing Phase~1 here \emph{reduces} the mean MSE,
+the opposite of what the term ``ablation'' might suggest). Read
+alongside the seed-sensitivity visible in C-full's high standard
+deviation ($\pm 0.00302$ versus C-noHMC's $\pm 0.00013$), this
+suggests the full pipeline is more seed-sensitive on this smooth
+benchmark, and that several simpler configurations are both more
+accurate on average and more consistent across seeds.
 
 \paragraph{HMC's contribution is synergistic and problem-selective.}
 \textbf{C-noHMC}---which reduces to Adam warmup followed by
@@ -1287,7 +1307,7 @@ not that the HMC phase is redundant in general.
 The full-suite comparison provides a third data point that
 completes the narrative.  Method~A, which relies \emph{solely} on
 the HMC leapfrog for hyperparameter updates (without Adam warmup
-or L-BFGS refinement), achieves an average rank of $3.13$---the
+or L-BFGS refinement), achieves an average rank of $4.09$---the
 weakest of the three proposed methods and inferior even to
 random search on several benchmarks.  HMC therefore acts as an
 \emph{exploration bridge}: it is beneficial when sandwiched
@@ -1368,7 +1388,7 @@ decreases in the convergence curve.
 \toprule
 \textbf{Dataset} & \textbf{Random} & \textbf{Optuna} & \textbf{A} & \textbf{B} & \textbf{C} \\
 \midrule
-Australian        & \textbf{95.72} & 95.17 & \underline{95.61} & 95.61 & 95.61 \\
+Australian        & \textbf{95.72} & 95.17 & \underline{95.61} & \underline{95.61} & \underline{95.61} \\
 Blood Transf.     & 72.95 & \textbf{74.72} & 73.72 & 73.24 & \underline{74.60} \\
 Vehicle           & 96.89 & 96.50 & \textbf{97.26} & 96.41 & \underline{96.85} \\
 Segment           & \textbf{97.23} & 96.94 & 96.94 & 96.94 & \textbf{97.23} \\
@@ -1433,21 +1453,23 @@ the Friedman statistic and Nemenyi critical difference.
 \textbf{Dataset} & \textbf{Rand} & \textbf{TPE}
                  & \textbf{A} & \textbf{B} & \textbf{C} \\
 \midrule
-Australian         & \textbf{1} & 5 & 2 & 2 & 2 \\
-Blood Transf.      & 5 & \textbf{1} & 3 & 4 & \textbf{2} \\
-Vehicle            & 2 & 4 & \textbf{1} & 5 & 3 \\
-Segment            & \textbf{1} & 3 & 3 & 3 & \textbf{1} \\
+Australian         & 2 & 3 & 5 & \textbf{1} & 4 \\
+Blood Transf.      & 3 & \textbf{1} & 4 & 5 & \textbf{2} \\
+Vehicle            & 4 & 2 & 3 & 5 & \textbf{1} \\
+Segment            & 3 & \textbf{1} & 5 & 4 & \textbf{2} \\
 \midrule
-Naval Prop.        & 5 & \textbf{1} & 4 & 3 & \textbf{2} \\
-Parkinsons         & 3 & 4 & \textbf{1} & 5 & \textbf{2} \\
-Protein Str.       & 5 & \textbf{1} & 4 & 2 & 3 \\
-Slice Loc.         & 4 & 2 & 3 & 5 & \textbf{1} \\
+Naval Prop.        & 5 & \textbf{1} & 4 & 2 & 3 \\
+Parkinsons         & 3 & \textbf{1} & 2 & 4 & 5 \\
+Protein Str.       & 5 & 2 & 3 & \textbf{1} & 4 \\
+Slice Loc.         & 5 & \textbf{1} & 4 & 3 & 2 \\
 \midrule
-CIFAR-10           & 5 & 4 & 3 & \textbf{1} & 2 \\
-CIFAR-100          & 4 & 2 & 4 & \textbf{1} & 3 \\
-ImageNet-16        & 4 & 2 & 4 & \textbf{1} & 3 \\
+CIFAR-10 (NAS)     & 3 & \textbf{1} & 5 & 2 & 4 \\
+CIFAR-100 (NAS)    & 3 & \textbf{1} & 5 & 2 & 4 \\
+ImageNet-16 (NAS)  & 4 & \textbf{1} & 5 & 2 & 3 \\
 \midrule
-\textbf{Avg.\ Rank} & 3.55 & 2.64 & 2.91 & 2.91 & \textbf{2.18} \\
+\textbf{Avg.\ Rank} & 3.64 & \textbf{1.36} & 4.09 & 2.82 & 3.09 \\
+\textbf{Friedman $p$} & \multicolumn{5}{c}{$7.92\times10^{-4}$ (significant)} \\
+\textbf{Nemenyi CD} & \multicolumn{5}{c}{$1.84$ at $\alpha=0.05$} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1462,15 +1484,20 @@ significance level $\alpha=0.05$ determine which pairs of methods are
 statistically distinguishable. A CD diagram is provided in
 Figure~\ref{fig:cd_diagram}. Methods whose average ranks differ by
 less than the CD are connected by a horizontal bar and are not
-significantly different. For full reproducibility we report the
-exact statistics rather than only the qualitative outcome: the
-Friedman $p$-value and the Nemenyi CD magnitude at $\alpha=0.05$ are
-both written to \texttt{results/stats\_summary.json} by
-\texttt{cd\_diagram.py} (Section~\ref{app:experimental}) alongside
-the figure, and should be quoted directly here once available rather
-than inferred from the rank gaps in Table~\ref{tab:hpobench_rankings}
-alone; a rank gap of $2.18$ versus $2.64$ is suggestive but is not by
-itself a significance claim.
+significantly different. The exact statistics are reported in the following
+paragraph.
+
+The Friedman test yields $p = 7.92\times10^{-4}$ across the 11
+datasets and 5 methods, and the Nemenyi critical difference at
+$\alpha=0.05$ is $\mathrm{CD} = 1.84$. Since the rank gap between
+Optuna~TPE (rank~$1.36$) and Method~C (rank~$3.09$) is $1.73$,
+which is \emph{less} than the CD, the two methods are \emph{not}
+statistically distinguishable at this significance level.
+Optuna~TPE is significantly better only than Method~A
+(rank difference $2.73 > 1.84$) and Random Search
+(rank difference $2.27 > 1.84$). Methods~B and~C are not
+significantly different from each other (rank difference $0.27$)
+nor from Optuna~TPE.
 
 \begin{figure}[H]
   \centering
@@ -1554,22 +1581,30 @@ Detailed balance   & \textbf{Yes} & No  & \textbf{Yes}  \\
 \end{tabular}
 \end{table}
 
-\subsection{CNN Classification on CIFAR-10}
+\subsection{CNN Classification on CIFAR-10 (Small Slice)}
 
-Table~\ref{tab:cnn_results} reports results on CIFAR-10
-classification (5 seeds, mean $\pm$ std). Method~C reaches the
-strongest accuracy among the wall-time-comparable methods
-($30.60\pm2.65\,\%$), essentially matching Method~A
-($30.90\pm1.59\,\%$) at a similar wall-clock cost, while Method~B
-trains $1.35\times$ faster than Method~C but attains the lowest
-accuracy of the three ($28.50\pm2.19\,\%$)---the BO outer loop here
-buys speed at the expense of final accuracy, the opposite trade-off
-from the harmonic-oscillator benchmark.
+Table~\ref{tab:cnn_results} reports results on the CIFAR-10 small
+slice (400-image training set, 200-image validation set, 5 seeds,
+mean $\pm$ std). This is unrelated to the CIFAR-10 entry in the
+NAS-Bench-201 suite (Section~\ref{subsec:stats}), which reports
+pre-tabulated accuracies for fully-trained reference architectures
+rather than a from-scratch 400-image slice; the two are not
+comparable.
+Method~C is nominally the strongest among wall-time-comparable
+methods ($30.60\pm2.65\,\%$), though its interval overlaps both
+Method~A ($30.90\pm1.59\,\%$) and, to a lesser extent, Method~B
+($28.50\pm2.19\,\%$); given the small (200-image) validation set
+we treat Methods~A and~C as effectively tied here rather than
+claiming a clear win for either. Method~B trains $1.35\times$
+faster than Method~C but attains the lowest accuracy of the
+three---the BO outer loop here buys speed at the expense of final
+accuracy, the opposite trade-off from the harmonic-oscillator
+benchmark.
 
 \begin{table}[H]
 \centering
 \caption{Quantitative Results --- CNN Classification on CIFAR-10
-         (5 seeds, mean $\pm$ std).}
+         (Small CNN Slice, 400/200 train/val images, 5 seeds, mean $\pm$ std).}
 \label{tab:cnn_results}
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{lccc}
@@ -1713,8 +1748,10 @@ is cheap here because each CIFAR-10 trial is short, so its wall-time
 advantage survives even though it costs accuracy. We have not varied
 model size $d$ in our experiments, so we state the following as a
 theoretical projection from Proposition~\ref{prop:cost} rather than
-an empirical finding: Method~B's cost scales as
-$O(N_{\mathrm{BO}}\cdot\text{training cost} + t^3)$ while Method~C
+an empirical finding: Method~B's total cost scales as
+$O\!\left(N_{\mathrm{BO}}(N_a d + N_b md) + N_{\mathrm{BO}}^4\right)$
+(Proposition~\ref{prop:cost}), dominated by the cumulative
+GP-refit term for large $N_{\mathrm{BO}}$, while Method~C
 scales as
 $O(N_{\mathrm{epochs}}\cdot(N_{\mathrm{micro}}d+L(d+k)+N_b md/P))$,
 which suggests---but does not by itself demonstrate---that the
@@ -1807,15 +1844,19 @@ the expensive outer BO loop that the original adaptive-integrator
 framework~\cite{duruisseaux2021adaptive} never had to confront,
 because it never let hyperparameters leave the outer loop in the
 first place. The result is the best reconstruction accuracy on the
-harmonic oscillator ($\mathrm{MSE}=0.00327$, $R^2=0.9999$, single
-seed; see the caveat in Section~\ref{sec:setup}),
-$30.60\,\%$ CIFAR-10 CNN validation accuracy (versus $28.50\,\%$ for
+harmonic oscillator (single-seed result: $\mathrm{MSE}=0.00327$,
+$R^2=0.9999$; multi-seed numbers pending five-seed replication
+---see Section~\ref{sec:setup}),
+nominally the highest CIFAR-10 CNN validation accuracy on the
+small slice ($30.60\,\%$, effectively tied with Method~A; versus
+$28.50\,\%$ for
 Method~B on the same 200-sample validation set), and the best average
-rank ($2.18$) across all 11 standardised tabular benchmarks, ahead of
-Optuna TPE ($2.64$) and random search ($3.55$); whether this rank gap
-clears the Nemenyi critical difference at $\alpha=0.05$ is reported
-quantitatively in the CD diagram of Figure~\ref{fig:cd_diagram}
-rather than asserted here.
+rank ($3.09$, third among five methods) across all 11 standardised
+tabular benchmarks; Optuna TPE achieves the best average rank
+($1.36$) followed by Method~B ($2.82$)---though none of Methods~B,
+C, or Optuna TPE are statistically distinguishable at the Nemenyi
+$\alpha=0.05$ critical difference of $1.84$---and ahead of
+Random Search ($3.64$) and Method~A ($4.09$);
 
 \subsection*{Future Directions}
 
@@ -1863,7 +1904,7 @@ rather than asserted here.
 \paragraph{Code and Data Availability.}
 The source code for all three methods, benchmark evaluation scripts,
 and figure generation routines is publicly available at
-\url{https://github.com/[author]/HO-optimizer}.
+\url{https://github.com/cyphlia/HPO-HMC}.
 All experiments are fully reproducible using the provided
 \texttt{requirements.txt} and the fixed random seeds documented in
 Section~\ref{sec:setup}. Individual trajectory files are stored
