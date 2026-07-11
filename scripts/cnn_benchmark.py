@@ -31,6 +31,10 @@ from torchvision import datasets, transforms
 from scipy.optimize import minimize
 from scipy.stats import norm
 
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import config
 from hamiltonian import HyperparamState
 from symplectic_solver import HamiltonianMCMC

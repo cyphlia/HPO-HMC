@@ -533,6 +533,7 @@ class ImprovedUnifiedTrainer:
                     self.model = HamiltonianNN(
                         n_layers=n_layers, n_neurons=n_neurons,
                         dropout=hp.get("dropout", 0.1),
+                        input_dim=self.input_dim,
                     ).to(self.device)
                     self.model.frozen_hps = ["n_layers", "n_neurons"]
                 self.model.load_state_dict(self._best_state)

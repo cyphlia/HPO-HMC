@@ -107,6 +107,7 @@ def finite_diff_hp_grads(model, hp_state, batch, criterion, base_loss):
                     n_layers=dec["n_layers"],
                     n_neurons=dec["n_neurons"],
                     dropout=dec["dropout"],
+                    input_dim=model.input_dim if hasattr(model, "input_dim") else 2,
                 ).to(device)
                 tmp.eval()
                 with torch.no_grad():

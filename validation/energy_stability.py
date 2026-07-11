@@ -3,6 +3,7 @@ Theorem 1 & 4: Energy Conservation and Stability Analysis.
 Implements Modified Hamiltonian monitoring and Leapfrog stability checks.
 """
 import sys, os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 import numpy as np

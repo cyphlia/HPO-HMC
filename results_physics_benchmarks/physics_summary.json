@@ -1,44 +1,165 @@
 {
   "summary": {
-    "henon_heiles": {
-      "C": {
-        "mean": 2.1114098131656647,
+    "harmonic": {
+      "A": {
+        "mean": 1.6636775548641498,
         "std": 0.0,
         "n_seeds": 1,
         "values": [
-          2.1114098131656647
+          1.6636775548641498
+        ]
+      },
+      "B": {
+        "mean": 0.1250485714811545,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          0.1250485714811545
+        ]
+      },
+      "C": {
+        "mean": 0.002981338184326887,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          0.002981338184326887
+        ]
+      }
+    },
+    "henon_heiles": {
+      "A": {
+        "mean": 5.439722739733183,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          5.439722739733183
+        ]
+      },
+      "B": {
+        "mean": 2.5916543190295878,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          2.5916543190295878
+        ]
+      },
+      "C": {
+        "mean": 0.45775337288012874,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          0.45775337288012874
         ]
       }
     },
     "double_well": {
-      "C": {
-        "mean": 0.4376199543476105,
+      "A": {
+        "mean": 17.762139320373535,
         "std": 0.0,
         "n_seeds": 1,
         "values": [
-          0.4376199543476105
+          17.762139320373535
+        ]
+      },
+      "B": {
+        "mean": 22.516451065356915,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          22.516451065356915
+        ]
+      },
+      "C": {
+        "mean": 0.1898911543763601,
+        "std": 0.0,
+        "n_seeds": 1,
+        "values": [
+          0.1898911543763601
         ]
       }
     }
   },
   "all_results": [
     {
+      "system": "harmonic",
+      "method": "A",
+      "seed": 0,
+      "final_val_loss": 1.6636775548641498,
+      "best_val_loss": 1.6636775548641498,
+      "wall_time_s": 5.68,
+      "n_epochs": 1
+    },
+    {
+      "system": "harmonic",
+      "method": "B",
+      "seed": 0,
+      "final_val_loss": 0.1250485714811545,
+      "best_val_loss": 0.1250485714811545,
+      "wall_time_s": 34.09,
+      "n_epochs": 1
+    },
+    {
+      "system": "harmonic",
+      "method": "C",
+      "seed": 0,
+      "final_val_loss": 0.002981338184326887,
+      "best_val_loss": 0.002981338184326887,
+      "wall_time_s": 5.18,
+      "n_epochs": 1
+    },
+    {
+      "system": "henon_heiles",
+      "method": "A",
+      "seed": 0,
+      "final_val_loss": 5.439722739733183,
+      "best_val_loss": 5.439722739733183,
+      "wall_time_s": 3.59,
+      "n_epochs": 1
+    },
+    {
+      "system": "henon_heiles",
+      "method": "B",
+      "seed": 0,
+      "final_val_loss": 2.5916543190295878,
+      "best_val_loss": 2.5916543190295878,
+      "wall_time_s": 31.85,
+      "n_epochs": 1
+    },
+    {
       "system": "henon_heiles",
       "method": "C",
       "seed": 0,
-      "final_val_loss": 2.1114098131656647,
-      "best_val_loss": 2.1114098131656647,
-      "wall_time_s": 18.37,
-      "n_epochs": 20
+      "final_val_loss": 0.45775337288012874,
+      "best_val_loss": 0.45775337288012874,
+      "wall_time_s": 5.12,
+      "n_epochs": 1
+    },
+    {
+      "system": "double_well",
+      "method": "A",
+      "seed": 0,
+      "final_val_loss": 17.762139320373535,
+      "best_val_loss": 17.762139320373535,
+      "wall_time_s": 3.47,
+      "n_epochs": 1
+    },
+    {
+      "system": "double_well",
+      "method": "B",
+      "seed": 0,
+      "final_val_loss": 22.516451065356915,
+      "best_val_loss": 22.516451065356915,
+      "wall_time_s": 33.46,
+      "n_epochs": 1
     },
     {
       "system": "double_well",
       "method": "C",
       "seed": 0,
-      "final_val_loss": 0.4376199543476105,
-      "best_val_loss": 0.4376199543476105,
-      "wall_time_s": 15.17,
-      "n_epochs": 20
+      "final_val_loss": 0.1898911543763601,
+      "best_val_loss": 0.1898911543763601,
+      "wall_time_s": 6.24,
+      "n_epochs": 1
     }
   ]
 }

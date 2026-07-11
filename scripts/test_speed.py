@@ -1,5 +1,10 @@
 """Quick timing test: Method A seed=0 with reduced config."""
 import time
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import config
 
 print(f"Train subset:  {config.CNN_TRAIN_SUBSET}")

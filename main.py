@@ -35,6 +35,11 @@ import os
 import sys
 import time
 
+# Inject subdirectory paths to sys.path so we can import modules seamlessly
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'evaluation')))
+
 import numpy as np
 import torch
 

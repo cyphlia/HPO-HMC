@@ -34,6 +34,10 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import torch
 
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import config
 from data_generator import (
     generate_hamiltonian_data,
@@ -148,7 +152,8 @@ def run_single(
 
     elapsed = time.time() - t0
 
-    val_losses = history.get("val_loss", [])
+    val_key = "best_val_loss" if method_key == "B" else "val_loss"
+    val_losses = history.get(val_key, [])
     final_val = float(val_losses[-1]) if val_losses else float("inf")
     best_val  = float(min(val_losses)) if val_losses else float("inf")
 

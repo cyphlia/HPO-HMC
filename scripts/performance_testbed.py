@@ -45,7 +45,8 @@ from copy import deepcopy
 warnings.filterwarnings("ignore")
 
 # Ensure project root is on path
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import config
 from hamiltonian import HamiltonianNN, HyperparamState, HamiltonianSystem

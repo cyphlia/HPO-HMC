@@ -3,17 +3,18 @@ import tarfile
 import requests
 
 def compile_latex():
-    # 1. Create a tarball (.tar.bz2) containing ieee_paper.tex and all plot images
-    tarball_name = "latex_project.tar.bz2"
-    main_tex = "ieee_paper.tex"
-    plots_dir = "plots"
+    # Detect directories dynamically relative to script location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    tarball_name = os.path.join(script_dir, "latex_project.tar.bz2")
+    main_tex = os.path.join(script_dir, "ieee_paper.tex")
+    plots_dir = os.path.abspath(os.path.join(script_dir, "..", "plots"))
     
     print("Creating tarball...")
     with tarfile.open(tarball_name, "w:bz2") as tar:
         # Add the main tex file
         if os.path.exists(main_tex):
-            tar.add(main_tex)
-            print(f"Added {main_tex}")
+            tar.add(main_tex, arcname="ieee_paper.tex")
+            print(f"Added {main_tex} as ieee_paper.tex")
         else:
             print(f"Error: {main_tex} not found!")
             return
@@ -23,8 +24,8 @@ def compile_latex():
             for file in os.listdir(plots_dir):
                 file_path = os.path.join(plots_dir, file)
                 if os.path.isfile(file_path):
-                    tar.add(file_path)
-                    print(f"Added {file_path}")
+                    tar.add(file_path, arcname=os.path.join("plots", file))
+                    print(f"Added {file_path} as plots/{file}")
         else:
             print(f"Warning: {plots_dir} directory not found!")
             
@@ -41,7 +42,7 @@ def compile_latex():
     for host in hosts:
         url = f"{host}/data"
         params = {
-            "target": main_tex,
+            "target": "ieee_paper.tex",
             "command": "pdflatex",
             "force": "true"
         }
@@ -49,14 +50,14 @@ def compile_latex():
         print(f"\nSending compilation request to {url}...")
         try:
             with open(tarball_name, "rb") as f:
-                files = {"file": (tarball_name, f, "application/x-bzip2")}
+                files = {"file": (os.path.basename(tarball_name), f, "application/x-bzip2")}
                 # latexonline expects multipart form data with the file under key 'file'
                 response = requests.post(url, params=params, files=files, timeout=120)
                 
             print(f"Response status code: {response.status_code}")
             
             if response.status_code == 200:
-                output_pdf = "ieee_paper.pdf"
+                output_pdf = os.path.join(script_dir, "ieee_paper.pdf")
                 with open(output_pdf, "wb") as pdf_file:
                     pdf_file.write(response.content)
                 print(f"Success! Compiled PDF saved as: {output_pdf}")

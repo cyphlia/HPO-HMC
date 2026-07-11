@@ -41,6 +41,10 @@ from typing import Any, Dict, List, Tuple
 import numpy as np
 import torch
 
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import config
 from data_generator import generate_hamiltonian_data
 from hybrid_hhd_abbo_improved import ImprovedUnifiedTrainer

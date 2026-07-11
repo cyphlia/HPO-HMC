@@ -23,6 +23,10 @@ import torch
 import torch.nn as nn
 from typing import Dict, Optional, Tuple
 
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import config
 from hamiltonian import HamiltonianNN
 
