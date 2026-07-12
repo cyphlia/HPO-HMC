@@ -15,6 +15,7 @@ One full leapfrog trajectory (L sub-steps):
 
 from __future__ import annotations
 
+import math
 import numpy as np
 import torch
 import torch.nn as nn
@@ -176,17 +177,47 @@ class LeapfrogIntegrator:
     n_steps      : L - number of leapfrog sub-steps
     mass_theta   : inertia of the weight sub-system
     mass_lambda  : inertia of the hyperparameter sub-system
+    grad_clip    : max L2 norm for the weight-gradient vector used in each
+                   momentum half/full-step (None disables clipping).
+
+                   BUGFIX CONTEXT: before the temperature-scaling fix in
+                   HamiltonianMCMC, "always-accept" mode (T=1e9) didn't
+                   actually behave that way (see that class's docstring),
+                   which accidentally limited how far theta/lambda could
+                   wander. Now that acceptance genuinely approaches 100%,
+                   long runs (e.g. 80 epochs) can occasionally accumulate
+                   large enough gradients that theta or log_lr diverges to
+                   inf, and inf - inf in the finite-difference HP-gradient
+                   computation produces nan, which then corrupts hp_state
+                   permanently and crashes optimizer construction downstream.
+                   Clipping the gradient norm used inside the leapfrog step
+                   (mirroring the grad-clipping already used in the Adam
+                   phases elsewhere in this codebase) keeps individual
+                   leapfrog steps bounded and prevents this divergence at
+                   the source, rather than only detecting it after the fact.
     """
 
-    def __init__(self, step_size=0.01, n_steps=5, mass_theta=1.0, mass_lambda=0.1):
+    def __init__(self, step_size=0.01, n_steps=5, mass_theta=1.0, mass_lambda=0.1,
+                 grad_clip: float = 10.0):
         self.eps       = step_size
         self.L         = n_steps
         self.m_theta   = mass_theta
         self.m_lambda  = mass_lambda
+        self.grad_clip = grad_clip
+
+    def _clip_grads_(self, wg: Dict[str, torch.Tensor]):
+        if not self.grad_clip:
+            return
+        total_norm = math.sqrt(sum(float((g ** 2).sum()) for g in wg.values()) + 1e-12)
+        if total_norm > self.grad_clip:
+            scale = self.grad_clip / (total_norm + 1e-12)
+            for n in wg:
+                wg[n] = wg[n] * scale
 
     def _mom_step(self, model, w_mom, hp_state, batch, criterion, coeff):
         """Momentum update for both theta and lambda."""
         loss, wg = compute_loss_and_grads(model, batch, criterion)
+        self._clip_grads_(wg)
         hg = finite_diff_hp_grads(model, hp_state, batch, criterion, loss)
         for n in w_mom:
             w_mom[n] -= coeff * wg[n] / self.m_theta
@@ -221,20 +252,73 @@ class HamiltonianMCMC:
     Uses the leapfrog trajectory as the proposal. Accepts with
     probability min(1, exp(-dH)), which preserves the target
     distribution. Recommended acceptance rate: 60-80%.
+
+    momentum_refresh
+    -----------------
+    Controls how much of the momentum survives between proposals.
+
+      momentum_refresh = 1.0 (default, ORIGINAL BEHAVIOUR)
+        Momentum is fully resampled ~N(0, m) before every proposal. This
+        is correct HMC, but for T=1e9 "optimisation mode" (always-accept)
+        it means every proposal starts from a fresh random direction with
+        no memory of previous progress -- the trajectory has no way to
+        accumulate a directed descent, so it behaves like a noisy random
+        walk around the loss landscape rather than an optimizer. This is
+        why Method A's *final* epoch is often much worse than its *best*
+        epoch (see train_hamiltonian.py's lack of checkpointing, fixed
+        separately below): the dynamics wander away from good regions
+        with nothing pulling them back.
+
+      momentum_refresh < 1.0 (e.g. 0.05-0.2)
+        Partial momentum refresh (Generalized HMC / Horowitz 1991):
+            p <- sqrt(1 - alpha) * p_prev + sqrt(alpha) * fresh_noise
+        so momentum persists across proposals and can accumulate real
+        directed velocity, similar in spirit to momentum/Nesterov SGD,
+        while still being derived correctly from the Hamiltonian
+        formalism. On REJECTION, momentum is negated (p <- -p) rather
+        than discarded -- this is required for detailed balance to still
+        hold under partial refresh (Horowitz 1991); without it, rejected
+        proposals would bias the chain.
     """
 
     def __init__(self, step_size=0.005, n_leapfrog=5,
-                 mass_theta=1.0, mass_lambda=0.1, temperature=1.0):
+                 mass_theta=1.0, mass_lambda=0.1, temperature=1.0,
+                 momentum_refresh: float = 1.0):
         self.leapfrog    = LeapfrogIntegrator(step_size, n_leapfrog, mass_theta, mass_lambda)
         self.m_theta     = mass_theta
         self.m_lambda    = mass_lambda
         self.temperature = temperature
         self.n_acc       = 0
         self.n_prop      = 0
+        self.momentum_refresh = float(np.clip(momentum_refresh, 0.0, 1.0))
+        self._w_mom      = None   # persistent weight momenta (None until first proposal)
 
     def _kinetic_theta(self, w_mom):
         return sum(float((p ** 2).sum()) / (2.0 * self.m_theta)
                    for p in w_mom.values())
+
+    def _refresh_momenta(self, model, hp_state):
+        """Full resample (alpha=1) or partial refresh (alpha<1) of momenta."""
+        alpha = self.momentum_refresh
+        fresh_w = {
+            n: torch.randn_like(p) * float(np.sqrt(self.m_theta))
+            for n, p in model.named_parameters()
+        }
+        if self._w_mom is None or alpha >= 1.0:
+            self._w_mom = fresh_w
+            hp_state.randomise_momenta(self.m_lambda)
+        else:
+            a = float(np.sqrt(alpha))
+            b = float(np.sqrt(1.0 - alpha))
+            for n in self._w_mom:
+                self._w_mom[n] = b * self._w_mom[n] + a * fresh_w[n]
+            frozen_hps = getattr(hp_state, "frozen_hps", [])
+            for k in hp_state.momenta:
+                if k in frozen_hps:
+                    continue
+                fresh_p = torch.randn(1) * float(np.sqrt(self.m_lambda))
+                hp_state.momenta[k] = b * hp_state.momenta[k] + a * fresh_p
+        return self._w_mom
 
     def propose(self, model, hp_state, batch, criterion, current_loss):
         """
@@ -246,31 +330,68 @@ class HamiltonianMCMC:
         saved_w  = deepcopy(model.state_dict())
         saved_hp = hp_state.snapshot()
 
-        # Fresh momenta
-        w_mom = {
-            n: torch.randn_like(p) * float(np.sqrt(self.m_theta))
-            for n, p in model.named_parameters()
-        }
-        hp_state.randomise_momenta(self.m_lambda)
+        w_mom = self._refresh_momenta(model, hp_state)
 
         H_init = (self._kinetic_theta(w_mom)
                   + hp_state.kinetic_energy(self.m_lambda)
-                  + current_loss / self.temperature)
+                  + current_loss)
 
-        # Leapfrog trajectory
+        # Leapfrog trajectory (mutates w_mom / hp_state.momenta in place)
         proposed_loss = self.leapfrog.integrate(model, w_mom, hp_state, batch, criterion)
 
         H_prop = (self._kinetic_theta(w_mom)
                   + hp_state.kinetic_energy(self.m_lambda)
-                  + proposed_loss / self.temperature)
+                  + proposed_loss)
 
-        # Metropolis-Hastings acceptance
-        if np.random.random() < np.exp(min(0, -(H_prop - H_init))):
+        # SAFETY GUARD (new): a proposal that produced nan/inf -- e.g. from
+        # weights or a hyperparameter (log_lr) diverging during the leapfrog
+        # trajectory, which then makes the finite-difference HP-gradient
+        # compute inf - inf = nan -- must never be accepted, no matter what
+        # temperature says. Accepting a corrupted state doesn't just make
+        # this proposal bad, it permanently poisons hp_state/theta for every
+        # future proposal (this is what previously crashed Method C with a
+        # "nan learning rate" error partway through an 80-epoch run: the
+        # temperature-scaling fix above made acceptance genuinely near 100%,
+        # which occasionally let a nan-loss proposal through). Gradient
+        # clipping in LeapfrogIntegrator (above) reduces how often this state
+        # is reached at all; this guard makes sure it's never accepted if it
+        # is reached.
+        proposal_is_finite = np.isfinite(proposed_loss) and np.isfinite(H_prop)
+
+        # Metropolis-Hastings acceptance: min(1, exp(-dH/T)) (Eq. eq:mh).
+        # BUGFIX: temperature must scale the *entire* delta-H at the
+        # acceptance step, not just the loss term before H is composed.
+        # The previous version divided only `current_loss`/`proposed_loss`
+        # by temperature before summing with the (unscaled) kinetic terms,
+        # which are what the leapfrog dynamics actually evolve under (the
+        # gradients driving position/momentum updates are never scaled by
+        # temperature). At T=1e9 that made the loss term ~0 inside H, but
+        # left the acceptance criterion fully exposed to whatever kinetic
+        # energy drift the leapfrog trajectory picked up -- so instead of
+        # "always accept" (the documented "optimisation mode"), it produced
+        # acceptance rates of 25-45%, rejecting perfectly good loss-improving
+        # proposals purely because of a kinetic-energy mismatch that a true
+        # high-temperature limit is supposed to make irrelevant.
+        accept = proposal_is_finite and (
+            np.random.random() < np.exp(min(0, -(H_prop - H_init) / self.temperature))
+        )
+        if accept:
             self.n_acc += 1
+            self._w_mom = w_mom
             return True, proposed_loss
         else:
             model.load_state_dict(saved_w)
             hp_state.restore(saved_hp)
+            if self.momentum_refresh < 1.0:
+                # Negate momentum on rejection (Generalized HMC / Horowitz 1991)
+                # -- required for detailed balance under partial refresh.
+                self._w_mom = {n: -p for n, p in w_mom.items()}
+                frozen_hps = getattr(hp_state, "frozen_hps", [])
+                for k in hp_state.momenta:
+                    if k not in frozen_hps:
+                        hp_state.momenta[k] = -hp_state.momenta[k]
+            else:
+                self._w_mom = None  # next call resamples fresh, as before
             return False, current_loss
 
     @property

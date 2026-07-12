@@ -34,14 +34,12 @@ import argparse
 import os
 import sys
 import time
-
+import numpy as np
+import torch
 # Inject subdirectory paths to sys.path so we can import modules seamlessly
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'scripts')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), 'evaluation')))
-
-import numpy as np
-import torch
 
 import config
 from train_hamiltonian import HamiltonianTrainer
@@ -159,14 +157,17 @@ def run_harmonic_comparison(args, device):
 
 
 def run_single_harmonic(args, device):
-    """Run a single method on harmonic oscillator."""
+    """Run a single method on harmonic oscillator. Returns (method_key, save_dir)
+    so the caller can avoid mixing this run's results with stale results from
+    other methods left over in results_hybrid/ or results_unified_improved/
+    (see BUGFIX note in main() below)."""
     method_map = {
-        "pure": ("Method A: Pure HHD", HamiltonianTrainer, "results_hamiltonian"),
-        "hybrid": ("Method B: Hybrid BO", HybridAdamBFGSTrainer, "results_hybrid"),
-        "improved": ("Method C: Unified HHD-ABBO", ImprovedUnifiedTrainer, "results_unified_improved"),
+        "pure":     ("A", "Method A: Pure HHD", HamiltonianTrainer, "results_hamiltonian"),
+        "hybrid":   ("B", "Method B: Hybrid BO", HybridAdamBFGSTrainer, "results_hybrid"),
+        "improved": ("C", "Method C: Unified HHD-ABBO", ImprovedUnifiedTrainer, "results_unified_improved"),
     }
 
-    name, cls, save_dir = method_map[args.method]
+    key, name, cls, save_dir = method_map[args.method]
     print(f"\n--- {name} ---")
 
     if args.method == "hybrid":
@@ -194,6 +195,7 @@ def run_single_harmonic(args, device):
         trainer.train(n_samples=args.n_samples, n_warmup=args.warmup, n_hamilton=args.epochs)
 
     trainer.save(save_dir)
+    return key, save_dir
 
 
 def run_physics_task(args, device, task: str):
@@ -316,11 +318,23 @@ def main():
     if args.task in ("harmonic", "both"):
         if args.compare:
             run_harmonic_comparison(args, device)
+            from evaluate import evaluate_harmonic
+            evaluate_harmonic()
         else:
-            run_single_harmonic(args, device)
-
-        from evaluate import evaluate_harmonic
-        evaluate_harmonic()
+            # BUGFIX: previously this branch called evaluate_harmonic() with
+            # no arguments, which unconditionally reads results_hamiltonian/,
+            # results_hybrid/, AND results_unified_improved/ from disk and
+            # prints a 3-way comparison table -- even though only ONE method
+            # was actually just trained. Any leftover results from a
+            # different previous run silently appeared in the table, with
+            # nothing to indicate they weren't from this run. Now we only
+            # evaluate the method that was actually just trained, and say so.
+            method_key, save_dir = run_single_harmonic(args, device)
+            print(f"\n  [NOTE] Only Method {method_key} was trained this run; "
+                  f"evaluating {save_dir} in isolation (not a 3-way comparison, "
+                  f"even if other results_* directories exist on disk).")
+            from evaluate import evaluate_harmonic
+            evaluate_harmonic(results_dirs={method_key: save_dir})
 
     if args.task in ("cnn", "both"):
         from cnn_benchmark import run_cnn_benchmark

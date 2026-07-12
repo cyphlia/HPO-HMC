@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 import os
 import time
+from copy import deepcopy
 
 import numpy as np
 import torch
@@ -37,13 +38,28 @@ class HamiltonianTrainer:
         hyperparam_space=None,
         init_hyperparams=None,
         mass_theta: float = 1.0,
-        mass_lambda: float = 0.1,
+        mass_lambda: float = None,  # defaults to config.MASS_LAMBDA (matches Method C)
         step_size: float = 0.01,
         n_leapfrog: int = 5,
         temperature: float = 1.0,
         device: str = "cpu",
         input_dim: int = 2,
+        momentum_refresh: float = 1.0,
     ):
+        """
+        momentum_refresh: see HamiltonianMCMC docstring in symplectic_solver.py.
+        Kept at 1.0 (original full-resample behaviour) by default; set below
+        1.0 to enable persistent-momentum (Generalized HMC). Testing showed
+        persistent momentum is only a clear win when combined with a real
+        (non-1e9) temperature -- see MOMENTUM_AND_TEMPERATURE_NOTES.md.
+
+        mass_lambda: previously hardcoded to 0.1, silently ignoring
+        config.MASS_LAMBDA (=5.0) even when the caller didn't override it.
+        Method C's trainer already used a None-fallback pattern for this;
+        Method A now matches it for consistency.
+        """
+        if mass_lambda is None:
+            mass_lambda = config.MASS_LAMBDA
         self.device = device
         self.input_dim = input_dim
         hp_space = hyperparam_space or config.HYPERPARAM_SPACE
@@ -52,15 +68,19 @@ class HamiltonianTrainer:
         self.hp_state = HyperparamState(hp_init, hp_space)
         self.ham_sys  = HamiltonianSystem(mass_theta, mass_lambda)
         self.mcmc     = HamiltonianMCMC(step_size, n_leapfrog, mass_theta,
-                                        mass_lambda, temperature)
+                                        mass_lambda, temperature,
+                                        momentum_refresh=momentum_refresh)
         self.criterion = nn.MSELoss()
         self.model     = self._build_model()
 
         self.history = {
-            "train_loss": [], "val_loss": [],
+            "train_loss": [], "val_loss": [], "best_val_loss": [],
             "acceptance_rate": [],
             "hyperparams": {k: [] for k in hp_init},
         }
+        self._best_val   = float("inf")
+        self._best_state = None
+        self._best_hp    = None
 
     def _build_model(self):
         hp = self.hp_state.decode()
@@ -117,8 +137,19 @@ class HamiltonianTrainer:
 
             tl = self._evaluate(train_loader)
             vl = self._evaluate(val_loader)
+
+            # ----- Best-Model Checkpointing (was missing; Methods B & C
+            # already do this, which is why their reported "Best Val Loss"
+            # always equals the metric of the model actually saved/scored,
+            # while Method A's did not -- see evaluate.py / README notes). -----
+            if vl < self._best_val:
+                self._best_val   = vl
+                self._best_state = deepcopy(self.model.state_dict())
+                self._best_hp    = self.hp_state.snapshot()
+
             self.history["train_loss"].append(tl)
             self.history["val_loss"].append(vl)
+            self.history["best_val_loss"].append(self._best_val)
             self.history["acceptance_rate"].append(self.mcmc.acceptance_rate)
             for k in self.hp_state.values:
                 self.history["hyperparams"][k].append(
@@ -128,7 +159,24 @@ class HamiltonianTrainer:
                 tag = "ACC" if acc else "REJ"
                 print(f"    Ep {epoch:3d}/{n_hamilton} [{tag}] | "
                       f"Train: {tl:.5f} | Val: {vl:.5f} | "
+                      f"Best: {self._best_val:.5f} | "
                       f"Acc: {self.mcmc.acceptance_rate:.1%}")
+
+        # ----- Restore best checkpoint before returning/saving -----
+        if self._best_state is not None:
+            self.model.load_state_dict(self._best_state)
+            if self._best_hp is not None:
+                self.hp_state.restore(self._best_hp)
+            final_val = self._evaluate(val_loader)
+            final_tr  = self._evaluate(train_loader)
+            print(f"  [Method A] Restored best checkpoint "
+                  f"(val={self._best_val:.6f}, re-eval={final_val:.6f})")
+            self.history["val_loss"].append(final_val)
+            self.history["best_val_loss"].append(self._best_val)
+            self.history["train_loss"].append(final_tr)
+            self.history["acceptance_rate"].append(self.history["acceptance_rate"][-1])
+            for k in self.hp_state.values:
+                self.history["hyperparams"][k].append(self.history["hyperparams"][k][-1])
 
         self.train_time = time.time() - t0
         return self.history
