@@ -99,6 +99,33 @@ HPOBENCH_OPTIMIZERS = [
 HPOBENCH_RESULTS_DIR = "results_hpobench"
 
 # --------------------------------------------------------------------------- #
+#  Fashion-MNIST Deep MLP Testbed Settings
+# --------------------------------------------------------------------------- #
+FMNIST_HP_SPACE = {
+    "log_lr"         : (-5.0, -1.0),       # lr: 1e-5 to 0.1
+    "dropout"        : (0.0,  0.7),        # dropout probability
+    "log_wd"         : (-6.0, -1.0),       # weight decay: 1e-6 to 0.1
+    "n_hidden"       : (64.0, 512.0),      # hidden layer width (continuous, rounded)
+    "n_layers"       : (1.0,  5.0),        # number of hidden layers (continuous, rounded)
+}
+
+FMNIST_INIT_HP = {
+    "log_lr"         : -3.0,       # lr = 0.001
+    "dropout"        : 0.2,
+    "log_wd"         : -4.0,       # wd = 1e-4
+    "n_hidden"       : 256.0,
+    "n_layers"       : 3.0,
+}
+
+FMNIST_TRAIN_SUBSET  = 5000
+FMNIST_TEST_SUBSET   = 2000
+FMNIST_WARMUP_EPOCHS = 5
+FMNIST_HMC_EPOCHS    = 10
+FMNIST_TRAIN_EPOCHS  = 15         # epochs per trial for baselines
+FMNIST_BO_TRIALS     = 20
+FMNIST_BATCH_SIZE    = 128
+
+# --------------------------------------------------------------------------- #
 #  I/O Directories
 # --------------------------------------------------------------------------- #
 RESULTS_DIR = "results"

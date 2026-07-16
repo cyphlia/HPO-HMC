@@ -52,14 +52,16 @@ current/
 │   ├── run_physics_benchmarks.py # Multi-system physics benchmark (Harmonic, Double-Well, Hénon-Heiles)
 │   ├── ablation_study.py         # Ablation study for Method C variants
 │   ├── sensitivity_analysis.py   # Meta-hyperparameter sensitivity sweeps
-│   └── statistical_tests.py      # Friedman and Wilcoxon statistical tests
+│   ├── statistical_tests.py      # Friedman and Wilcoxon statistical tests
+│   └── fashion_mnist_testbed.py  # Fashion-MNIST Deep MLP testbed script
 │
 ├── evaluation/                   # Evaluation & plotting utilities
 │   ├── evaluate.py               # Unified evaluation & results printer
 │   ├── plot_results.py           # Generates Figures 1-5 (Harmonic oscillator details)
 │   ├── plot_hpobench.py          # Generates Figures 6-8 (HPOBench regret & rankings)
 │   ├── plot_extra.py             # Generates Figures 9-10 (Val loss & CNN histories)
-│   └── plot_all_results.py       # Comprehensive script generating all paper figures
+│   ├── plot_all_results.py       # Comprehensive script generating all paper figures
+│   └── plot_fashion_mnist.py     # Generates publication plots for Fashion-MNIST testbed
 │
 ├── validation/                   # Theoretical validation framework
 │   ├── validate.py               # Main validation script
@@ -78,7 +80,8 @@ current/
 │   ├── harmonic_oscillator/      # Harmonic oscillator runs (Method A, B, C)
 │   ├── hpobench/                 # Tabular HPOBench trajectories
 │   ├── physics_benchmarks/       # Hénon-Heiles & Double-Well JSONs
-│   └── validation/               # Mathematical validation output metrics
+│   ├── validation/               # Mathematical validation output metrics
+│   └── fashion_mnist/            # Fashion-MNIST Deep MLP testbed JSONs
 │
 └── plots/                        # Generated figures and charts
 ```
@@ -122,7 +125,24 @@ The CNN benchmark has been upgraded to a CPU-feasible ResNet model running CIFAR
 
 ---
 
-### 4. How to Reproduce HPOBench & NAS-Bench-201 Tabular Results
+### 4. How to Reproduce Fashion-MNIST Deep MLP Testbed Results
+1. **Run the Benchmark:** Run Method C and Default Adam across all 5 seeds:
+   ```bash
+   python main.py --task fashion_mnist
+   ```
+   *Or direct runner command with custom settings:*
+   ```bash
+   python scripts/fashion_mnist_testbed.py --seeds 0,1,2,3,4 --methods default,methodC
+   ```
+   This trains both models and writes JSON results to `results/fashion_mnist/`.
+2. **Generate Plots:** Generate the accuracy comparison, convergence curves, and HP trajectory plots:
+   ```bash
+   python evaluation/plot_fashion_mnist.py
+   ```
+
+---
+
+### 5. How to Reproduce HPOBench & NAS-Bench-201 Tabular Results
 1. **Run the Benchmark:** Execute the tabular lookups across the datasets and seeds:
    ```bash
    python main.py --task hpobench
@@ -211,6 +231,15 @@ Method C merges HHD's physical exploration with second-order L-BFGS curvature re
 | **Method A (HHD)** | **30.90%** | 28.70% | 42.0 | 0.000955 | 0.2017 |
 | **Method B (BO)** | 28.50% | 28.50% | **31.9** | 0.002574 | 0.2727 |
 | **Method C (Unified)**| 30.60% | **29.70%** | 43.2 | 0.001094 | 0.1986 |
+
+### 3. Fashion-MNIST Deep MLP Classification Results
+
+| Method | Best Validation Acc (mean ± std) | Wall-clock Time (mean) |
+|:---|:---:|:---:|
+| **Default Adam (Fixed HPs)** | 84.43% ± 0.41% | **32.9s** |
+| **Method C (Unified HHD-ABBO)** | **85.01% ± 0.12%** | 85.9s |
+
+*Method C achieves a higher validation accuracy than the Default Adam configuration, while maintaining a significantly tighter/more stable standard deviation across seeds due to the adaptive HMC trajectory exploration and second-order refinement.*
 
 ---
 

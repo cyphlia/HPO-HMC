@@ -66,7 +66,8 @@ def parse_args():
 
     p.add_argument("--task", type=str, default="harmonic",
                    choices=["harmonic", "cnn", "testbed", "hpobench", "both",
-                            "henon_heiles", "double_well", "physics_all"],
+                            "henon_heiles", "double_well", "physics_all",
+                            "fashion_mnist"],
                    help="Benchmark task")
     p.add_argument("--method", type=str, default="improved",
                    choices=["pure", "hybrid", "improved"],
@@ -298,6 +299,11 @@ def main():
     if args.task == "hpobench":
         from hpobench_benchmark import run_full_hpobench_pipeline
         run_full_hpobench_pipeline()
+        return
+
+    if args.task == "fashion_mnist":
+        from fashion_mnist_testbed import run_full_testbed
+        run_full_testbed()
         return
 
     if args.task in ("henon_heiles", "double_well"):
