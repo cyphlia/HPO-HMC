@@ -54,7 +54,7 @@ warnings.filterwarnings("ignore")
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-RESULTS_DIR = Path("results_ablation")
+RESULTS_DIR = Path("results/ablation")
 
 ABLATION_VARIANTS = {
     "C-full": {

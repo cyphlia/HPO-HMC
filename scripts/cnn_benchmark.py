@@ -485,8 +485,8 @@ def run_cnn_benchmark(
             traceback.print_exc()
 
     # Save detailed results
-    os.makedirs("results_cnn", exist_ok=True)
-    with open("results_cnn/cifar10_benchmark_results.json", "w") as f:
+    os.makedirs("results/cnn", exist_ok=True)
+    with open("results/cnn/cifar10_benchmark_results.json", "w") as f:
         json.dump({m: runs for m, runs in all_runs.items()}, f, indent=2)
 
     # Summary table: mean ± std
@@ -516,10 +516,10 @@ def run_cnn_benchmark(
 
     print("=" * 70)
 
-    with open("results_cnn/cifar10_summary.json", "w") as f:
+    with open("results/cnn/cifar10_summary.json", "w") as f:
         json.dump(summary, f, indent=2)
 
-    # Also save to results_cnn/benchmark_results.json for evaluate.py
+    # Also save to results/cnn/benchmark_results.json for evaluate.py
     # To keep evaluate.py compatible, we write a simplified version of summary 
     # that maps method names exactly as evaluate.py expects
     legacy_format = {}
@@ -548,10 +548,10 @@ def run_cnn_benchmark(
             },
             "acc_history": best_run["acc_history"]
         }
-    with open("results_cnn/benchmark_results.json", "w") as f:
+    with open("results/cnn/benchmark_results.json", "w") as f:
         json.dump(legacy_format, f, indent=2)
 
-    print("  [OK] Summary saved to results_cnn/cifar10_summary.json and benchmark_results.json")
+    print("  [OK] Summary saved to results/cnn/cifar10_summary.json and benchmark_results.json")
     return summary
 
 

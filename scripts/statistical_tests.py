@@ -63,7 +63,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-RESULTS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "results_hpobench"
+RESULTS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / ".." / "results" / "hpobench"
 PLOTS_DIR = Path(os.path.dirname(os.path.abspath(__file__))) / "plots"
 
 OPTIMIZERS = [
@@ -572,7 +572,7 @@ def run_statistical_tests(alpha: float = 0.05, output_dir: str = None):
     print("=" * 70)
 
     # Step 1: Load data
-    print("\n[Step 1] Loading per-seed results from results_hpobench/ ...")
+    print("\n[Step 1] Loading per-seed results from results/hpobench/ ...")
     results = load_final_best_costs()
 
     total_datasets = sum(len(d) for d in results.values())

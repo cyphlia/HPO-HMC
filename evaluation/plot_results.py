@@ -72,18 +72,57 @@ def predict_mesh(model, qm, pm):
 _, _, mesh = generate_hamiltonian_data(n_samples=500)
 qm, pm, H_true = mesh
 
-hA = load_json("results_hamiltonian/history.json")
-hB = load_json("results_hybrid/history.json")
-hC = load_json("results_unified_improved/history.json")
-cnn = load_json("results_cnn/benchmark_results.json")
+hA = load_json("results/harmonic_oscillator/method_a/history.json")
+hB = load_json("results/harmonic_oscillator/method_b/history.json")
+hC = load_json("results/harmonic_oscillator/method_c/history.json")
+cnn = load_json("results/cnn/benchmark_results.json")
 
-mA = load_model_from_dir("results_hamiltonian")
-mB = load_model_from_dir("results_hybrid")
-mC = load_model_from_dir("results_unified_improved")
+mA = load_model_from_dir("results/harmonic_oscillator/method_a")
+mB = load_model_from_dir("results/harmonic_oscillator/method_b")
+mC = load_model_from_dir("results/harmonic_oscillator/method_c")
 
 H_A = predict_mesh(mA, qm, pm)
 H_B = predict_mesh(mB, qm, pm)
 H_C = predict_mesh(mC, qm, pm)
+
+# ═══════════════════════════════════════════════════════════════
+# FIGURE 0 — DATASET VISUALISATION
+# ═══════════════════════════════════════════════════════════════
+print("Plotting Figure 0: Dataset Visualisation...")
+fig0 = plt.figure(figsize=(16, 5))
+gs0 = GridSpec(1, 3, figure=fig0, width_ratios=[1.2, 1, 1])
+
+# 0a: 3D energy surface
+ax0_1 = fig0.add_subplot(gs0[0], projection="3d")
+surf0 = ax0_1.plot_surface(qm, pm, H_true, cmap="coolwarm", linewidth=0, alpha=0.9, antialiased=True)
+ax0_1.set_xlabel("q (position)"); ax0_1.set_ylabel("p (momentum)"); ax0_1.set_zlabel("H (energy)")
+ax0_1.set_title("True Hamiltonian\n$H(q,p) = p^2/2m + \\frac{1}{2}kq^2$")
+ax0_1.view_init(elev=25, azim=-50)
+fig0.colorbar(surf0, ax=ax0_1, shrink=0.5, pad=0.08, label="Energy")
+
+# 0b: Contour (2D view)
+ax0_2 = fig0.add_subplot(gs0[1])
+cf0 = ax0_2.contourf(qm, pm, H_true, levels=25, cmap="coolwarm")
+ax0_2.set_xlabel("q (position)"); ax0_2.set_ylabel("p (momentum)")
+ax0_2.set_title("Energy Contours")
+ax0_2.set_aspect("equal")
+fig0.colorbar(cf0, ax=ax0_2, label="H")
+
+# 0c: 640 sampled training points coloured by H
+ax0_3 = fig0.add_subplot(gs0[2])
+train_loader_800, _, _ = generate_hamiltonian_data(n_samples=800, seed=101)
+X_tr, H_tr = train_loader_800.dataset.tensors
+sc = ax0_3.scatter(X_tr[:, 0].numpy(), X_tr[:, 1].numpy(), c=H_tr[:, 0].numpy(), cmap="coolwarm", edgecolor='none', alpha=0.8)
+ax0_3.set_xlabel("q (position)"); ax0_3.set_ylabel("p (momentum)")
+ax0_3.set_title("640 Training Points")
+ax0_3.set_aspect("equal")
+fig0.colorbar(sc, ax=ax0_3, label="H")
+
+fig0.suptitle("Dataset Visualisation", fontsize=15, fontweight="bold", y=1.02)
+plt.tight_layout()
+plt.savefig(f"{OUT}/0_dataset_visualisation.png")
+plt.close()
+
 
 # ═══════════════════════════════════════════════════════════════
 # FIGURE 1 — TESTBED

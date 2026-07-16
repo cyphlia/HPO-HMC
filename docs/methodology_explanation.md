@@ -1,76 +1,76 @@
 # Methodology Explanation: HHD, ABBO, and the Unified Curriculum
 
-This document provides an in-depth analysis of the experimental design, the limitations identified in Method A (Pure HHD), and the architectural motivation behind Method C (Unified HHD-ABBO).
+This document provides an in-depth analysis of the experimental design, the limitations identified in HHD-HMC (Pure HHD), and the architectural motivation behind HHD-Unified (Unified HHD-ABBO).
 
 ---
 
-## 1. Why Did We Test Method A and Method B on the CNN/MNIST Model?
+## 1. Why Did We Test HHD-HMC and Hybrid ABBO on the CNN/CIFAR-10 Model?
 
-Transitioning the benchmarks from a simple synthetic environment (the Harmonic Oscillator) to a Convolutional Neural Network (CNN) on MNIST was critical for validating the framework under realistic deep learning conditions.
+Transitioning the benchmarks from a simple synthetic environment (the Harmonic Oscillator) to a Convolutional Neural Network (CNN) on CIFAR-10 was critical for validating the framework under realistic deep learning conditions.
 
 ### A. Dimensionality and Landscape Complexity
 - **Harmonic Oscillator:** Represents a low-dimensional (2D), smooth, perfectly quadratic energy surface governed by:
   $$H(q,p) = \frac{p^2}{2m} + \frac{1}{2}kq^2$$
   While ideal for testing mathematical properties (such as symplectic energy conservation and leapfrog trajectory tracking), it does not reflect the complexity of real-world neural network optimization.
-- **CNN MNIST Testbed:** The loss landscape of a convolutional network is high-dimensional, highly non-convex, and contains many saddle points, local minima, and narrow, "stiff" valleys. Testing on MNIST evaluates if HMC co-evolution can scale to larger parameter spaces and navigate chaotic, non-quadratic potentials.
+- **CNN CIFAR-10 Testbed:** The loss landscape of a convolutional network is high-dimensional, highly non-convex, and contains many saddle points, local minima, and narrow, "stiff" valleys. Testing on CIFAR-10 evaluates if HMC co-evolution can scale to larger parameter spaces and navigate chaotic, non-quadratic potentials.
 
 ### B. Enforcing Regularization Pressure
-To make the hyperparameter search challenging and realistic, we deliberately enforced overfitting pressure on the MNIST model by restricting the dataset:
+To make the hyperparameter search challenging and realistic, we deliberately enforced overfitting pressure on the CIFAR-10 model by restricting the dataset:
 - **Reduced Training Subset:** Configured with only 5,000 training samples (down from 60,000) and 1,000 validation samples.
 - **Regularization Challenge:** This limited data forces the network to overfit unless the hyperparameters (specifically the continuous dropout rate and learning rate) are tuned optimally. It directly evaluates whether the algorithms can dynamically find the correct balance between capacity and regularization.
 
 ### C. Different Computational Paradigms
-- **Method A (Pure HHD)** co-evolves network weights and hyperparameters *simultaneously* in a single phase space inside a single training run (intra-epoch updates).
-- **Method B (Hybrid BO)** runs an *outer loop* of Bayesian Optimization (using a Gaussian Process surrogate) to select static hyperparameters, requiring a complete re-initialization and full training of a new network for each of the 15 trials.
-- Evaluating both on MNIST compares their wall-clock scaling, sample requirements, and search efficiency when training real neural network layers.
+- **HHD-HMC (Pure HHD)** co-evolves network weights and hyperparameters *simultaneously* in a single phase space inside a single training run (intra-epoch updates).
+- **Hybrid ABBO (Hybrid BO)** runs an *outer loop* of Bayesian Optimization (using a Gaussian Process surrogate) to select static hyperparameters, requiring a complete re-initialization and full training of a new network for each of the 15 trials.
+- Evaluating both on CIFAR-10 compares their wall-clock scaling, sample requirements, and search efficiency when training real neural network layers.
 
 ---
 
-## 2. Faults and Limitations of Method A (Pure HHD)
+## 2. Faults and Limitations of HHD-HMC (Pure HHD)
 
 While theoretically elegant due to its continuous trajectories and symplectic conservation properties, Pure HHD suffers from several empirical limitations when applied to non-convex landscapes:
 
 ### A. Lack of Second-Order Curvature Exploitation
-Method A uses first-order gradients (via backpropagation for weights and finite differences for hyperparameters) to update the phase space. 
+HHD-HMC uses first-order gradients (via backpropagation for weights and finite differences for hyperparameters) to update the phase space. 
 - In flat regions (saddle points or plateaus), first-order gradients become extremely small, causing HMC exploration to stall.
-- Method A has no mechanism (like Hessian approximations or quasi-Newton steps) to exploit local curvature and accelerate convergence along narrow valleys.
+- HHD-HMC has no mechanism (like Hessian approximations or quasi-Newton steps) to exploit local curvature and accelerate convergence along narrow valleys.
 
 ### B. Stochastic Instability and Oscillatory Accuracy
 HMC is an MCMC sampler that explores the probability distribution defined by the Boltzmann factor $\exp(-H/T)$. 
 - Because HMC is inherently stochastic, the hyperparameters continuously wander and oscillate.
-- Even if the model reaches a highly accurate state (e.g., 97.80% validation accuracy at epoch 14), late-stage HMC momentum can cause the hyperparameters to drift away, resulting in a lower accuracy (e.g., 97.00%) at the final epoch. It lacks a convergence lock.
+- Even if the model reaches a highly accurate state (e.g., 30.60% validation accuracy at epoch 14), late-stage HMC momentum can cause the hyperparameters to drift away, resulting in a lower accuracy (e.g., 28.50%) at the final epoch. It lacks a convergence lock.
 
 ### C. Step-Size Sensitivity and Symplectic Collapse
 - The leapfrog integration step-size ($\epsilon$) is a highly sensitive constant. If $\epsilon$ is too large, the discrete approximation of Hamiltonian dynamics breaks down (symplectic discretization error $O(\epsilon^2)$ grows too large), leading to massive rejection rates.
-- If $\epsilon$ is too small, exploration in the hyperparameter phase space slows down to a crawl. Method A has no adaptive control to balance this trade-off dynamically.
+- If $\epsilon$ is too small, exploration in the hyperparameter phase space slows down to a crawl. HHD-HMC has no adaptive control to balance this trade-off dynamically.
 
 ### D. Costly Structural Hyperparameter Relaxations
-- To optimize discrete architecture values (like `n_layers` and `n_neurons`) continuously, Method A uses continuous relaxations. 
+- To optimize discrete architecture values (like `n_layers` and `n_neurons`) continuously, HHD-HMC uses continuous relaxations. 
 - Computing gradients for these structures requires rebuilding the model topology at $n \pm 10\%$, copying compatible weights, and calculating a finite-difference surrogate gradient. This process is noisy, computationally heavy, and can lead to capacity collapse (e.g., the model shrinking its hidden layers down to 16 neurons to temporarily minimize loss, ruining long-term capacity).
 
 ---
 
-## 3. The Need for Method C (Unified HHD-ABBO)
+## 3. The Need for HHD-Unified (Unified HHD-ABBO)
 
-Method C was designed to resolve the limitations of Method A while avoiding the prohibitive computational cost of Method B (which requires training 15 separate networks from scratch). It merges the physical search paradigm of HHD with the convergence speed of second-order optimization into a single **three-phase epoch curriculum**:
+HHD-Unified was designed to resolve the limitations of HHD-HMC while avoiding the prohibitive computational cost of Hybrid ABBO (which requires training 15 separate networks from scratch). It merges the physical search paradigm of HHD with the convergence speed of second-order optimization into a single **three-phase epoch curriculum**:
 
 ### A. Phase 1: Guided Initialization (Adam Warm-up)
 - Random initialization in a high-dimensional physical phase space is highly unstable. 
-- Method C runs a dedicated first-order Adam warm-up with cosine learning rate annealing. This quickly guides the network weights down to a low-curvature basin before HMC co-evolution begins, preventing chaotic initial trajectories.
+- HHD-Unified runs a dedicated first-order Adam warm-up with cosine learning rate annealing. This quickly guides the network weights down to a low-curvature basin before HMC co-evolution begins, preventing chaotic initial trajectories.
 
 ### B. Phase 2: Stable, Constrained HMC Exploration
-- To prevent network capacity collapse, Method C **freezes structural hyperparameters** (`n_layers` and `n_neurons`) after the warm-up, allowing only the continuous regularization and learning rate parameters (`log_lr`, `dropout`, `log_batch_size`) to co-evolve.
+- To prevent network capacity collapse, HHD-Unified **freezes structural hyperparameters** (`n_layers` and `n_neurons`) after the warm-up, allowing only the continuous regularization and learning rate parameters (`log_lr`, `dropout`, `log_batch_size`) to co-evolve.
 - It integrates an **adaptive step-size controller** that monitors the MCMC acceptance rate and gradient norms. If the acceptance rate drops below 40% (indicating discretization error/instability), it reduces $\epsilon$. If it exceeds 80%, it increases $\epsilon$ to accelerate exploration.
 
 ### C. Phase 3: Curvature-Exploiting Polish (L-BFGS)
-- To overcome HMC stagnation, Method C continuously monitors training loss. If it detects a local plateau, it pauses HMC and triggers a sequence of **L-BFGS updates with a strong Wolfe line search**. 
+- To overcome HMC stagnation, HHD-Unified continuously monitors training loss. If it detects a local plateau, it pauses HMC and triggers a sequence of **L-BFGS updates with a strong Wolfe line search**. 
 - L-BFGS approximates the inverse Hessian, allowing the model to exploit second-order curvature information and converge rapidly along narrow valleys.
-- **Dedicated Final Polish:** At the end of the entire training run, Method C restores the best state found during HMC and executes a final 100-step L-BFGS polish. This locks in the optimal hyperparameters and converges the weights perfectly, achieving an actual validation loss of **`0.003270`** (compared to Method B's `0.021804`).
+- **Dedicated Final Polish:** At the end of the entire training run, HHD-Unified restores the best state found during HMC and executes a final 100-step L-BFGS polish. This locks in the optimal hyperparameters and converges the weights perfectly, achieving an actual validation loss of **`0.003270`** (compared to Hybrid ABBO's `0.021804`).
 
 ### D. Direct Computational Savings
-By co-evolving and polishing the model in a single, unified curriculum, Method C eliminates the need for an outer Bayesian Optimization loop:
-- **Method B (ABBO):** Requires $15 \times$ independent training runs (totaling hundreds of epochs).
-- **Method C (Unified HHD-ABBO):** Achieves better/comparable final model accuracy in a **single run**, running **over 3.2x faster in wall-clock time** than Method B on the CNN Testbed.
+By co-evolving and polishing the model in a single, unified curriculum, HHD-Unified eliminates the need for an outer Bayesian Optimization loop:
+- **Hybrid ABBO (ABBO):** Requires $15 \times$ independent training runs (totaling hundreds of epochs).
+- **HHD-Unified (Unified HHD-ABBO):** Achieves better/comparable final model accuracy in a **single run**, running **over 3.2x faster in wall-clock time** than Hybrid ABBO on the CNN Testbed.
 
 ---
 
@@ -104,12 +104,12 @@ The Simple Harmonic Oscillator serves as the ground-truth physical system to tes
 
 ---
 
-### B. MNIST CNN Setup
-The MNIST CNN benchmark represents a high-dimensional image classification task configured to enforce optimization difficulty.
+### B. CIFAR-10 CNN Setup
+The CIFAR-10 CNN benchmark represents a high-dimensional image classification task configured to enforce optimization difficulty.
 
 1. **Subsampling Configuration:**
-   - **MNIST Training Set:** Subsampled to 5,000 images (down from the standard 60,000) to introduce severe overfitting pressure and evaluate regularization.
-   - **MNIST Test/Validation Set:** 1,000 images.
+   - **CIFAR-10 Training Set:** Subsampled to 5,000 images (down from the standard 60,000) to introduce severe overfitting pressure and evaluate regularization.
+   - **CIFAR-10 Test/Validation Set:** 1,000 images.
    - **Batch Size:** 64 (fixed).
 
 2. **Network Architecture:**
@@ -135,7 +135,7 @@ The MNIST CNN benchmark represents a high-dimensional image classification task 
 ## 5. Formulation of Algorithms A and B on the CNN Testbed
 
 ### A. Algorithm A (Pure HHD) Formulation
-Method A co-evolves the network weights $\theta$ and the hyperparameters $\lambda$ inside a joint continuous phase space.
+HHD-HMC co-evolves the network weights $\theta$ and the hyperparameters $\lambda$ inside a joint continuous phase space.
 
 1. **Phase-Space Initialization:**
    - Hyperparameters are continuous relaxed variables: $\lambda = [\log(\text{lr}), \text{dropout}]$ initialized at $[-3.0, 0.2]$.
@@ -161,7 +161,7 @@ Method A co-evolves the network weights $\theta$ and the hyperparameters $\lambd
 ---
 
 ### B. Algorithm B (Hybrid BO - ABBO) Formulation
-Method B treats HPO as a decoupled, black-box optimization problem, separating the outer hyperparameter selection loop from the inner model training.
+Hybrid ABBO treats HPO as a decoupled, black-box optimization problem, separating the outer hyperparameter selection loop from the inner model training.
 
 1. **Outer GP Loop Formulation:**
    - A Gaussian Process (GP) surrogate model is constructed to model the validation accuracy surface over the search bounds: $\log(\text{lr}) \in [-4.0, -1.0]$ and $\text{dropout} \in [0.0, 0.5]$.
@@ -185,14 +185,14 @@ Method B treats HPO as a decoupled, black-box optimization problem, separating t
 ## 6. Walkthrough of Model and Hyperparameter Tuning Loops
 
 ### A. Step-by-Step Tuning Walkthrough: Algorithm A (Pure HHD)
-Method A updates both the weights $\theta$ and the hyperparameters $\lambda$ concurrently in a unified training pipeline.
+HHD-HMC updates both the weights $\theta$ and the hyperparameters $\lambda$ concurrently in a unified training pipeline.
 
 1. **Initialize Phase Space:**
    - Initialize network weights randomly. Set initial learning rate ($10^{-3}$) and dropout ($0.2$).
 2. **Pre-stabilization (Warm-up):**
    - Train the weights $\theta$ for 5 epochs using Adam, keeping learning rate and dropout frozen. This settles the random weights into a stable basin.
 3. **Co-Evolution Loop (For each of the 15 epochs):**
-   - **Step 1: Batch Retrieval:** Retrieve a single batch $(X_b, y_b)$ from the MNIST training set.
+   - **Step 1: Batch Retrieval:** Retrieve a single batch $(X_b, y_b)$ from the CIFAR-10 training set.
    - **Step 2: Momentum Sampling:** Draw fresh momentum vectors:
      - For weights: $p_\theta \sim \mathcal{N}(0, I)$
      - For hyperparameters: $p_\lambda \sim \mathcal{N}(0, I)$
@@ -212,7 +212,7 @@ Method A updates both the weights $\theta$ and the hyperparameters $\lambda$ con
 ---
 
 ### B. Step-by-Step Tuning Walkthrough: Algorithm B (Hybrid BO)
-Method B tunes hyperparameters in an outer loop via surrogate modeling, and trains model weights in an inner loop.
+Hybrid ABBO tunes hyperparameters in an outer loop via surrogate modeling, and trains model weights in an inner loop.
 
 1. **Construct GP Surrogate:**
    - Initialize a Gaussian Process prior over the 2D hyperparameter space ($\log(\text{lr}), \text{dropout}$).
@@ -305,7 +305,7 @@ Because tabular/lookup benchmarks are black-box and have no model weights $\thet
 
 ## 9. How to Use the Unified HHD-ABBO Optimizer (Algorithm C) on Any New Neural Network
 
-To use Method C's self-tuning capabilities on any new PyTorch neural network and dataset, developers can follow a modular implementation pattern:
+To use HHD-Unified's self-tuning capabilities on any new PyTorch neural network and dataset, developers can follow a modular implementation pattern:
 
 ### Step 1: Define Your Model & Hyperparameter Space
 Ensure your custom model (`nn.Module`) has parameterized layers that can be dynamically updated. For instance, dropout rates must map to `nn.Dropout` layer parameters, and learning rate must map to the optimizer.

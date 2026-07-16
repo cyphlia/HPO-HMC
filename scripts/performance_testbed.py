@@ -229,7 +229,7 @@ def print_comparison_table(results: dict):
 #  Plotting
 # =========================================================================== #
 
-def plot_testbed_results(results, mesh_data, output_dir="results_testbed"):
+def plot_testbed_results(results, mesh_data, output_dir="results/testbed"):
     """Generate comparison plots."""
     import matplotlib
     matplotlib.use("Agg")
@@ -413,7 +413,7 @@ def run_testbed():
         print(f"  Plotting failed: {e}")
 
     # Save results (without numpy arrays)
-    save_dir = "results_testbed"
+    save_dir = "results/testbed"
     os.makedirs(save_dir, exist_ok=True)
     save_results = {}
     for k, v in results.items():

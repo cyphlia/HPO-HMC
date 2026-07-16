@@ -17,7 +17,7 @@ For each combination:
 
 Outputs:
   - plots/sensitivity_2x2.pdf  (2×2 grid, one panel per HP)
-  - results_ablation/sensitivity_results.json
+  - results/ablation/sensitivity_results.json
 
 Usage:
   python sensitivity_analysis.py
@@ -50,7 +50,7 @@ from hybrid_hhd_abbo_improved import ImprovedUnifiedTrainer
 
 warnings.filterwarnings("ignore")
 
-RESULTS_DIR = Path("results_ablation")
+RESULTS_DIR = Path("results/ablation")
 PLOTS_DIR   = Path("plots")
 
 # Default sweep values for each meta-HP

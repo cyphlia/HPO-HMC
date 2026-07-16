@@ -35,8 +35,8 @@ plt.rcParams.update({
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
-RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'results_hpobench')
-PLOTS_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'plots')
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'results', 'hpobench')
+PLOTS_DIR   = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'plots')
 
 OPTIMIZERS = [
     'RandomSearch',

@@ -13,6 +13,9 @@ env/
 # Scratch / temp files
 scratch/
 
+# Backup directory (large, contains copies of all old results)
+_backup/
+
 # Compiled LaTeX artifacts
 *.aux
 *.log
@@ -34,6 +37,9 @@ latex_project.tar.bz2
 *.pdf
 !cs23b1019_report.pdf
 
+# Model checkpoints (large binary)
+results/**/*.pt
+
 # SMAC output (large)
 smac3_output/
 
@@ -47,3 +53,4 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+

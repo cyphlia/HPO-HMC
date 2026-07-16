@@ -129,14 +129,14 @@ def run_harmonic_comparison(args, device):
         device=device,
     )
     trainerA.train(n_samples=args.n_samples, n_warmup=args.warmup, n_hamilton=args.epochs)
-    trainerA.save("results_hamiltonian")
+    trainerA.save("results/harmonic_oscillator/method_a")
 
     # Method B: Hybrid BO
     print("\n--- Method B: Hybrid BO ---")
     set_seeds(args.seed)
     trainerB = HybridAdamBFGSTrainer(n_bo_trials=15)
     trainerB.train(n_samples=args.n_samples)
-    trainerB.save("results_hybrid")
+    trainerB.save("results/harmonic_oscillator/method_b")
 
     # Method C: Unified
     print("\n--- Method C: Unified HHD-ABBO ---")
@@ -150,7 +150,7 @@ def run_harmonic_comparison(args, device):
         device=device,
     )
     trainerC.train(n_samples=args.n_samples, n_warmup=args.warmup, n_hamilton=args.epochs)
-    trainerC.save("results_unified_improved")
+    trainerC.save("results/harmonic_oscillator/method_c")
 
     elapsed = time.time() - t_total
     print(f"\n  Total comparison time: {elapsed:.1f}s")
@@ -162,9 +162,9 @@ def run_single_harmonic(args, device):
     other methods left over in results_hybrid/ or results_unified_improved/
     (see BUGFIX note in main() below)."""
     method_map = {
-        "pure":     ("A", "Method A: Pure HHD", HamiltonianTrainer, "results_hamiltonian"),
-        "hybrid":   ("B", "Method B: Hybrid BO", HybridAdamBFGSTrainer, "results_hybrid"),
-        "improved": ("C", "Method C: Unified HHD-ABBO", ImprovedUnifiedTrainer, "results_unified_improved"),
+        "pure":     ("A", "Method A: Pure HHD", HamiltonianTrainer, "results/harmonic_oscillator/method_a"),
+        "hybrid":   ("B", "Method B: Hybrid BO", HybridAdamBFGSTrainer, "results/harmonic_oscillator/method_b"),
+        "improved": ("C", "Method C: Unified HHD-ABBO", ImprovedUnifiedTrainer, "results/harmonic_oscillator/method_c"),
     }
 
     key, name, cls, save_dir = method_map[args.method]
@@ -209,11 +209,11 @@ def run_physics_task(args, device, task: str):
 
     TASK_CFG = {
         "harmonic":     {"gen_fn": generate_hamiltonian_data,    "input_dim": 2,
-                         "name": "Harmonic Oscillator",          "save_dir": "results_hamiltonian"},
+                         "name": "Harmonic Oscillator",          "save_dir": "results/harmonic_oscillator/method_a"},
         "henon_heiles": {"gen_fn": generate_henon_heiles_data,   "input_dim": 4,
-                         "name": "H\u00e9non-Heiles",             "save_dir": "results_henon_heiles"},
+                         "name": "H\u00e9non-Heiles",             "save_dir": "results/physics_benchmarks/henon_heiles"},
         "double_well":  {"gen_fn": generate_double_well_data,    "input_dim": 2,
-                         "name": "Double-Well",                  "save_dir": "results_double_well"},
+                         "name": "Double-Well",                  "save_dir": "results/physics_benchmarks/double_well"},
     }
     cfg = TASK_CFG[task]
     print(f"\n{'=' * 70}")

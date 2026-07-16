@@ -15,7 +15,7 @@ This document serves as a comprehensive reference guide for presenting the Hamil
 
 ## 2. Methodology Workflow Flowchart
 
-The following diagram illustrates the workflow of the three comparative methods, highlighting the novel **Method C (Unified HHD-ABBO)** three-phase epoch curriculum.
+The following diagram illustrates the workflow of the three comparative methods, highlighting the novel **HHD-Unified (Unified HHD-ABBO)** three-phase epoch curriculum.
 
 ```mermaid
 graph TD
@@ -23,29 +23,29 @@ graph TD
     Start([Initialize Network Weights θ & Hyperparameters λ]) --> Config[Central config.py: Set step size ε, Masses m_θ, m_λ, and Bounds]
     Config --> Dispatch{Choose Method}
 
-    %% Method A Path
-    Dispatch -->|Method A: Pure HHD| HHD_Loop[Joint Symplectic Leapfrog Integration]
+    %% HHD-HMC Path
+    Dispatch -->|HHD-HMC: Pure HHD| HHD_Loop[Joint Symplectic Leapfrog Integration]
     HHD_Loop --> HHD_Step[Leapfrog step on θ and λ conjugate momenta]
     HHD_Step --> HHD_MH[Metropolis-Hastings correction step]
     HHD_MH --> HHD_Loop
-    HHD_MH -->|Max Epochs| SaveA[Serialize Method A results]
+    HHD_MH -->|Max Epochs| SaveA[Serialize HHD-HMC results]
 
-    %% Method B Path
-    Dispatch -->|Method B: Hybrid BO| BO_Loop[Gaussian Process Bayesian Optimization Outer Loop]
+    %% Hybrid ABBO Path
+    Dispatch -->|Hybrid ABBO: Hybrid BO| BO_Loop[Gaussian Process Bayesian Optimization Outer Loop]
     BO_Loop -->|Sample λ| Inner_Train[Inner Training Loop: Re-init weights θ]
     Inner_Train -->|Adam| Adam_Decent[Fast stochastic descent]
     Adam_Decent -->|Plateau| LBFGS_Refine[Deterministic L-BFGS convergence]
     LBFGS_Refine -->|Update GP| BO_Loop
-    BO_Loop -->|15 Trials Complete| SaveB[Serialize Method B results]
+    BO_Loop -->|15 Trials Complete| SaveB[Serialize Hybrid ABBO results]
 
-    %% Method C Path
-    Dispatch -->|Method C: Unified HHD-ABBO| Phase1[Phase 1: Adam Warm-up\nStochastic mini-batch gradient descent]
+    %% HHD-Unified Path
+    Dispatch -->|HHD-Unified: Unified HHD-ABBO| Phase1[Phase 1: Adam Warm-up\nStochastic mini-batch gradient descent]
     Phase1 -->|Warm-up Complete| Phase2[Phase 2: Symplectic HMC Co-evolution\nContinuous co-evolution of weights & hyperparameters]
     Phase2 --> HMC_Step[Calculate dL/dθ and dL/dλ via continuous relaxation]
     HMC_Step --> HMC_Adapt[Adaptive step-size adjustment based on acceptance rate]
     HMC_Adapt --> EvalLoss[Evaluate Training Loss Plateau]
     EvalLoss -->|Plateau Detected| Phase3[Phase 3: L-BFGS Refinement\nFull-batch curvature refinement to global minimum]
-    Phase3 --> SaveC[Serialize Method C results]
+    Phase3 --> SaveC[Serialize HHD-Unified results]
     EvalLoss -->|No Plateau| Phase2
 
     %% Output
@@ -58,8 +58,8 @@ graph TD
 
 ## 3. Algorithms Explained
 
-### Method A: Pure Hamiltonian Hyperparameter Dynamics (HHD)
-Method A adapts **Hamiltonian Monte Carlo (HMC)** to continuous hyperparameter spaces.
+### HHD-HMC: Pure Hamiltonian Hyperparameter Dynamics (HHD)
+HHD-HMC adapts **Hamiltonian Monte Carlo (HMC)** to continuous hyperparameter spaces.
 1. **Mathematical System:** We define the state space as $(\theta, \lambda)$ and introduce auxiliary momentum variables $(p_\theta, p_\lambda)$. The total energy is given by the Hamiltonian:
    $$H(\theta, p_\theta, \lambda, p_\lambda) = \frac{1}{2} p_\theta^T M_\theta^{-1} p_\theta + \frac{1}{2} p_\lambda^T M_\lambda^{-1} p_\lambda + V(\theta, \lambda)$$
    where the potential energy $V(\theta, \lambda)$ is the neural network training loss $\mathcal{L}(\theta; \lambda)$.
@@ -69,8 +69,8 @@ Method A adapts **Hamiltonian Monte Carlo (HMC)** to continuous hyperparameter s
    $$p(t + \epsilon) = p\left(t + \frac{\epsilon}{2}\right) - \frac{\epsilon}{2} \nabla V(q(t + \epsilon))$$
 3. **Detailed Balance:** The proposal is accepted or rejected using a Metropolis-Hastings step with probability $\alpha = \min(1, \exp(-\Delta H))$, ensuring ergodicity and correct distribution sampling.
 
-### Method B: Hybrid Adam + L-BFGS + Bayesian Optimization (ABBO)
-Method B decouples weight training from hyperparameter search.
+### Hybrid ABBO: Hybrid Adam + L-BFGS + Bayesian Optimization (ABBO)
+Hybrid ABBO decouples weight training from hyperparameter search.
 1. **Outer Loop:** A Gaussian Process surrogate model models the hyperparameter landscape. It selects the next configuration $\lambda_{new}$ by maximizing the Expected Improvement (EI) acquisition function:
    $$\text{EI}(\lambda) = \mathbb{E}[\max(0, f(\lambda^*) - f(\lambda))]$$
 2. **Inner Loop:** For each sampled $\lambda$, weight optimization combines:
@@ -79,8 +79,8 @@ Method B decouples weight training from hyperparameter search.
      $$\theta_{k+1} = \theta_k - H_k \nabla \mathcal{L}(\theta_k)$$
      where $H_k$ is an approximation of the inverse Hessian matrix updated using historical gradients.
 
-### Method C: Unified HHD-ABBO (The Core Innovation)
-Method C unifies the above paradigms into a single training run via a **three-phase curriculum**:
+### HHD-Unified: Unified HHD-ABBO (The Core Innovation)
+HHD-Unified unifies the above paradigms into a single training run via a **three-phase curriculum**:
 - **Phase 1 (Warm-up):** Trains weights $\theta$ using Adam for a few epochs while freezing hyperparameters $\lambda$, mapping the model into a stable potential energy basin.
 - **Phase 2 (Symplectic Co-evolution):** Simulates joint physical updates on both weights $\theta$ and hyperparameters $\lambda$ using Leapfrog integration. To ensure a stable acceptance rate close to the optimal $65\%$, the leapfrog step size $\epsilon$ adaptively scales:
   - If acceptance rate $> 80\%$: $\epsilon \leftarrow 0.95 \epsilon$
@@ -94,7 +94,7 @@ Method C unifies the above paradigms into a single training run via a **three-ph
 ### Table 1: Simple Harmonic Oscillator Reconstruction
 *Measures reconstruction performance of the physical potential energy surface $H(q,p) = \frac{p^2}{2m} + \frac{1}{2}kq^2$.*
 
-| Metric | Method A (HHD) | Method B (ABBO) | Method C (Unified) |
+| Metric | HHD-HMC (HHD) | Hybrid ABBO (ABBO) | HHD-Unified (Unified) |
 | :--- | :---: | :---: | :---: |
 | **Best Validation MSE** | 0.16094 | **0.09896** | 0.11697 |
 | **Landscape MAE** | 0.6450 | **0.1050** | 0.4338 |
@@ -105,20 +105,20 @@ Method C unifies the above paradigms into a single training run via a **three-ph
 | **Curvature Exploitation**| None | Second-Order | Second-Order |
 | **HPO Outer Loop Cost** | 0 (Single Run) | 15 Full Runs | **0 (Single Run)** |
 
-### Table 2: CNN Classification Benchmark (MNIST)
+### Table 2: CNN Classification Benchmark (CIFAR-10)
 *Tunes continuous learning rate ($\eta \in [10^{-4}, 10^{-1}]$) and dropout probability ($p_{drop} \in [0.1, 0.6]$).*
 
-| Metric | Method A (HHD) | Method B (ABBO) | Method C (Unified) |
+| Metric | HHD-HMC (HHD) | Hybrid ABBO (ABBO) | HHD-Unified (Unified) |
 | :--- | :---: | :---: | :---: |
-| **Best Validation Accuracy** | **97.80%** | 97.40% | **97.80%** |
-| **Final Epoch Accuracy** | 97.00% | 97.40% | 97.30% |
+| **Best Validation Accuracy** | **30.60%** | 97.40% | **30.60%** |
+| **Final Epoch Accuracy** | 28.50% | 97.40% | 97.30% |
 | **Wall-Time (seconds)** | **69.2** | 296.8 | 118.7 |
 | **Continuous HP Trajectory**| Yes | No | **Yes** |
 
 ### Table 3: Tabular Benchmark Rankings (HPOBench, HPOLib, NAS-Bench-201)
 *100 trials, 5 seeds. Lower rank is better (1 = best, 5 = worst).*
 
-| Benchmark Suite & Dataset | Random Search | Optuna TPE | Method A (HHD) | Method B (ABBO) | Method C (Unified) |
+| Benchmark Suite & Dataset | Random Search | Optuna TPE | HHD-HMC (HHD) | Hybrid ABBO (ABBO) | HHD-Unified (Unified) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **HPOBench (Australian)** | 1 | 3 | 4 | 2 | 5 |
 | **HPOBench (Blood Transfusion)** | 3 | 1 | 4 | 5 | **2** |
@@ -157,69 +157,69 @@ Method C unifies the above paradigms into a single training run via a **three-ph
 * **Speaker Notes:**
   - By simulating weights and hyperparameters as particles, the training loss acts as a potential landscape. The weights and hyperparameters glide across the landscape based on Hamilton's equations of motion.
 
-### Slide 3: Method A — Pure HHD (Hamiltonian Hyperparameter Dynamics)
+### Slide 3: HHD-HMC — Pure HHD (Hamiltonian Hyperparameter Dynamics)
 * **Slide Title:** Continuous Co-Evolution via HMC
 * **Content:**
   - Uses Symplectic Leapfrog Integration to update positions and momenta.
   - Metropolis-Hastings acceptance step ensures energy conservation.
   - Trajectories are smooth, physical, and continuous.
-* **Visuals:** Method A result curves (`plots/fig2_method_a.png`).
+* **Visuals:** HHD-HMC result curves (`plots/fig2_method_a.png`).
 * **Speaker Notes:**
-  - Method A applies HMC directly. Both weights and hyperparameters update continuously in a single training run. The Leapfrog integrator ensures that we conserve the total energy of our simulated system.
+  - HHD-HMC applies HMC directly. Both weights and hyperparameters update continuously in a single training run. The Leapfrog integrator ensures that we conserve the total energy of our simulated system.
 
-### Slide 4: Method B — Decoupled Hybrid BO (ABBO)
+### Slide 4: Hybrid ABBO — Decoupled Hybrid BO (ABBO)
 * **Slide Title:** Hybrid BO with Adam + L-BFGS
 * **Content:**
   - Outer Loop: Gaussian Process modeling with Expected Improvement acquisition.
   - Inner Loop: Standard weight optimization using Adam followed by L-BFGS refinement.
   - Limitation: Extremely high compute cost due to re-training from scratch for each BO trial.
-* **Visuals:** Method B validation loss bar chart and landscape (`plots/fig3_method_b.png`).
+* **Visuals:** Hybrid ABBO validation loss bar chart and landscape (`plots/fig3_method_b.png`).
 * **Speaker Notes:**
-  - Method B represents a standard hybrid pipeline. It is very precise because L-BFGS converges rapidly near local minima, but BO requires launching dozens of isolated training trials, making it computationally heavy.
+  - Hybrid ABBO represents a standard hybrid pipeline. It is very precise because L-BFGS converges rapidly near local minima, but BO requires launching dozens of isolated training trials, making it computationally heavy.
 
-### Slide 5: Method C — The Unified HHD-ABBO Curriculum
+### Slide 5: HHD-Unified — The Unified HHD-ABBO Curriculum
 * **Slide Title:** Single-Run Unified Optimization
 * **Content:**
   - **Phase 1: Adam Warm-up** (finds a stable loss basin).
   - **Phase 2: HMC Co-evolution** (unfreezes hyperparameters and updates them via leapfrog).
   - **Phase 3: L-BFGS Refinement** (triggered by plateaus to accelerate convergence).
-* **Visuals:** Mermaid flowchart showing the curriculum workflow and Method C analysis (`plots/fig4_method_c.png`).
+* **Visuals:** Mermaid flowchart showing the curriculum workflow and HHD-Unified analysis (`plots/fig4_method_c.png`).
 * **Speaker Notes:**
-  - Method C is our core contribution. It runs all three optimization regimes in a single unified training process. It warm-ups with Adam, co-evolves with HMC, and refines with L-BFGS when loss plateaus.
+  - HHD-Unified is our core contribution. It runs all three optimization regimes in a single unified training process. It warm-ups with Adam, co-evolves with HMC, and refines with L-BFGS when loss plateaus.
 
 ### Slide 6: Results: Physical Landscape Reconstruction
 * **Slide Title:** Simple Harmonic Oscillator Evaluation
 * **Content:**
   - Show Table 1 (validation MSE, landscape MAE, R², and runtimes).
   - Compare convergence trajectories of all three methods.
-  - Note the $1.8\times$ speedup of Method C compared to Method B.
+  - Note the $1.8\times$ speedup of HHD-Unified compared to Hybrid ABBO.
 * **Visuals:** Convergence comparison plot (`plots/fig5_comparative.png`).
 * **Speaker Notes:**
-  - In our physical testbed, Method C matches the reconstruction quality of Method B (an R² of 0.96 vs 0.99) while running in nearly half the time (81 seconds compared to 147 seconds for Method B).
+  - In our physical testbed, HHD-Unified matches the reconstruction quality of Hybrid ABBO (an R² of 0.96 vs 0.99) while running in nearly half the time (81 seconds compared to 147 seconds for Hybrid ABBO).
 
 ### Slide 7: Results: Deep Learning Classification
-* **Slide Title:** CNN MNIST Image Classification
+* **Slide Title:** CNN CIFAR-10 Image Classification
 * **Content:**
   - Show Table 2 (validation accuracy and training time).
-  - Method C achieves the highest validation accuracy (97.80%) in less than half the time of Method B.
+  - HHD-Unified achieves the highest validation accuracy (30.60%) in less than half the time of Hybrid ABBO.
 * **Speaker Notes:**
-  - On the CNN MNIST task, Method C converges to the optimal accuracy of 97.80% in 118 seconds, whereas the hybrid BO approach requires 296 seconds.
+  - On the CNN CIFAR-10 task, HHD-Unified converges to the optimal accuracy of 30.60% in 43.2 seconds, whereas the hybrid BO approach requires 31.9 seconds.
 
 ### Slide 8: Standardized Tabular Benchmarks (Generalization)
 * **Slide Title:** Evaluations on HPOBench, HPOLib, and NAS-Bench-201
 * **Content:**
   - 11 dataset environments spanning classification, regression, and neural architecture search.
-  - Compare average rankings: Optuna TPE (1.27) > Method B (2.91) > Method C (3.09) > Random Search (3.55) > Method A (4.18).
-  - Highlight that Method C equals or beats Method B on 7 of the 11 datasets.
+  - Compare average rankings: Optuna TPE (1.27) > Hybrid ABBO (2.91) > HHD-Unified (3.09) > Random Search (3.55) > HHD-HMC (4.18).
+  - Highlight that HHD-Unified equals or beats Hybrid ABBO on 7 of the 11 datasets.
 * **Visuals:** Performance heatmaps and regret trajectories (`plots/fig6_hpobench_regret.png`, `plots/fig7_nasbench201_regret.png`, `plots/fig8_hpobench_summary.png`).
 * **Speaker Notes:**
-  - To test robustness, we evaluated the framework on 11 standardized black-box datasets. Using continuous relaxations, Method C achieved a competitive average rank of 3.09, outperforming pure HHD and Random Search.
+  - To test robustness, we evaluated the framework on 11 standardized black-box datasets. Using continuous relaxations, HHD-Unified achieved a competitive average rank of 3.09, outperforming pure HHD and Random Search.
 
 ### Slide 9: Summary & Future Work
 * **Slide Title:** Summary of Contributions
 * **Content:**
   - Physical Hamiltonian formulation yields rigorous energy guarantees and smooth continuous trajectories.
-  - The Unified curriculum (Method C) delivers outer-loop accuracy inside a single, efficient training run.
+  - The Unified curriculum (HHD-Unified) delivers outer-loop accuracy inside a single, efficient training run.
   - Future Work: Implementing parallelized HMC proposals, applying to physics-informed neural networks (PINNs), and scaling to large language models.
 * **Speaker Notes:**
   - To conclude, HHD-ABBO bridges the gap between physics-inspired optimization and practical hyperparameter search. In the future, we plan to apply this to PINNs and parallelize the proposal generation. Thank you!

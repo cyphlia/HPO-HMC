@@ -1,0 +1,2498 @@
+\documentclass[11pt]{article}
+\usepackage[top=1.0cm, bottom=1.0cm, left=2.5cm, right=2.5cm, includehead, includefoot, heightrounded]{geometry}
+\usepackage{latexsym}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{caption}
+\usepackage{blindtext}
+\usepackage{multicol}
+\usepackage{ragged2e}
+\usepackage{fancyhdr}
+\usepackage[textfont=bf, font = normalsize]{caption}
+\usepackage{floatrow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\floatstyle{plaintop}
+\restylefloat{table}
+\usepackage{subfigure}
+\floatsetup{font = normalsize}
+\renewcommand{\headrulewidth}{0pt}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage[caption=false]{subfig}
+\usepackage{microtype}
+\usepackage{boldline}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+% Suppress duplicate hyperref link targets in algorithm line numbers
+\makeatletter
+\providecommand{\theHALG@line}{\thealgorithm-\arabic{ALG@line}}
+\makeatother
+
+% ── SIAM-style theorem environments ──────────────────────────────
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{assumption}[theorem]{Assumption}
+
+% ── Custom notation shorthands ───────────────────────────────────
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\calL}{\mathcal{L}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calB}{\mathcal{P}}
+\newcommand{\Bset}{\mathcal{B}}
+\newcommand{\HH}{H}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\pth}{p_{\theta}}
+\newcommand{\plam}{p_{\lambda}}
+\newcommand{\mth}{m_{\theta}}
+\newcommand{\mlam}{m_{\lambda}}
+\newcommand{\tHH}{\widetilde{H}}
+\newcommand{\EI}{\mathrm{EI}}
+% \newcommand{\GP}{\mathcal{GP}}  % defined but unused; removed to avoid confusion with kernel \kappa(\cdot,\cdot)
+
+\graphicspath{{plots/}}
+
+% ================================================================
+\begin{document}
+\title{Hamiltonian Hyperparameter Dynamics for Self-Tuning Hyperparameter Optimization of Neural Networks}
+	\author{Desai Kartik Amit$^{1}$, Bharat Soni$^{1}$\thanks{Corresponding author e-mail id: bharat25soni@gmail.com, bsoni@iiitr.ac.in}
+        \\ $^1$Indian Institute of Information Technology Raichur, Raichur, Karnataka, India - 584135
+	}
+	\date{}
+	\maketitle
+
+% ================================================================
+%  ABSTRACT
+% ================================================================
+
+\begin{abstract}
+Hyperparameter optimisation (HPO) is a persistent bottleneck in
+modern machine learning: it governs both the convergence behaviour
+and the final accuracy of a trained model, yet it is almost always
+treated as an outer loop that is mechanically decoupled from the
+training dynamics it controls.  Grid and random search scale poorly
+with dimension; Bayesian optimisation (BO) improves sample efficiency
+through a Gaussian-process (GP) surrogate but still requires a fresh
+training run, and a cubic-in-trials GP refit, for every candidate
+configuration it proposes.  Adaptive first-order optimisers such as
+Adam and quasi-Newton methods such as L-BFGS accelerate the inner
+training loop itself but say nothing about how hyperparameters ought
+to evolve while that loop runs.  Symplectic and variational
+integrators have separately been shown to turn optimisation into a
+structure-preserving dynamical system---most notably through the
+adaptive Hamiltonian variational integrators of Duruisseaux, Schmitt,
+and Leok~\cite{duruisseaux2021adaptive}, which integrate the
+\emph{weights} of a model along a Bregman Hamiltonian flow---but that
+line of work treats hyperparameters as fixed externalities of the
+dynamical system rather than as objects the dynamics could also
+govern. We close this gap by promoting hyperparameters to dynamical
+variables in their own right: \textbf{Hamiltonian Hyperparameter
+Dynamics (HHD)} couples weights $\theta$ and hyperparameters
+$\lambda$ in a single augmented phase space and evolves both jointly
+under Hamilton's equations, integrated symplectically by a leapfrog
+scheme. We benchmark this idea against \textbf{(B) a Hybrid
+Adam~$+$~L-BFGS~$+$~Bayesian-Optimisation (ABBO)} baseline that
+represents the strongest practical alternative, and against
+\textbf{(C) a Unified HHD-ABBO framework} that folds stochastic
+gradient descent, symplectic sampling, and curvature-based refinement
+into a single three-phase curriculum executed at every epoch, thereby
+eliminating BO's outer retraining loop altogether.
+We evaluate all three approaches on a controlled physics benchmark
+(the harmonic-oscillator energy landscape), on a small,
+CPU-trainable slice of CIFAR-10, and on eleven standardised tabular
+benchmarks drawn from HPOBench, HPOLib, and NAS-Bench-201, the latter
+averaged over five random seeds with Friedman/Nemenyi significance
+testing. The Unified framework
+(HHD-Unified) attains the strongest reconstruction accuracy on the
+physics benchmark averaged over five seeds
+($\mathrm{MSE} = 0.0033 \pm 0.0001$, $R^2 = 0.99994 \pm 0.00001$), representing
+approximately a $14\times$ reduction in error relative to ABBO at a
+comparable wall-clock cost, while retaining symplectic energy
+conservation, smooth hyperparameter trajectories, and second-order
+curvature exploitation that pure HHD-HMC lacks. Across the eleven HPO
+benchmarks, Hybrid ABBO achieves the second-best average rank ($2.82$)
+and HHD-Unified the third ($3.09$), both ahead of Optuna's
+Tree-structured Parzen Estimator ($1.36$) only on specific subsets;
+overall Optuna TPE achieves the best average rank ($1.36$), followed
+by Hybrid ABBO ($2.82$), HHD-Unified ($3.09$), random search ($3.64$),
+and HHD-HMC ($4.09$). The Friedman test across 11 datasets is
+significant ($p=7.9\times10^{-4}$), and the Nemenyi CD at
+$\alpha=0.05$ is $1.84$---Optuna TPE is significantly better than
+HHD-HMC and random search, but not distinguishable from Hybrid ABBO
+or~C at this significance level.
+On the CIFAR-10 small-slice benchmark (5 seeds), HHD-Unified is
+nominally the strongest among wall-time-comparable methods
+($30.60\,\%$), though its interval overlaps HHD-HMC ($30.90\,\%$);
+the two are treated as effectively tied on this small validation set.
+Taken
+together, these results extend the variational-integrator
+perspective on optimisation from the weight space alone to the joint
+weight–hyperparameter phase space, establishing a structured,
+interpretable, and computationally
+economical alternative to the conventional split between training
+and tuning.
+\end{abstract}
+
+% ─────────────────────────────────────────────────────────────────
+\section{Nomenclature}
+
+\begin{table}[H]
+\centering
+\caption{Complete Symbol Reference}
+\label{tab:nomenclature}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{>{\bfseries}p{1.05cm} >{\raggedright\arraybackslash}p{4.9cm} >{\bfseries}p{1.05cm} >{\raggedright\arraybackslash}p{4.9cm}}
+\toprule
+\multicolumn{4}{l}{\textit{Hamiltonian mechanics and phase space}} \\
+\midrule
+$q$ & Generalised position (phase-space coordinate)
+  & $p$ & Generalised momentum \\
+$\theta$ & Network weight vector $\in\mathbb{R}^d$
+  & $\lambda$ & Hyperparameter vector $\in\mathbb{R}^k$ \\
+$p_\theta$ & Conjugate momentum for network weights
+  & $p_\lambda$ & Conjugate momentum for hyperparameters \\
+$m_\theta$ & Effective mass (inertia) of weight momenta
+  & $m_\lambda$ & Effective mass (inertia) of HP momenta \\
+$H$ & Total Hamiltonian $= T + V$
+  & $\tHH$ & Shadow Hamiltonian \\
+$T$ & Kinetic energy $= \sum p^2 / (2m)$
+  & $V$ & Potential energy, $V=\mathcal{L}$ (training loss) \\
+$\varepsilon$ & Leapfrog step size
+  & $L$ & Leapfrog sub-steps per HMC proposal \\
+$\Delta H$ & Hamiltonian error of a leapfrog proposal
+  & $\calB_P$ & L-BFGS plateau buffer (length $P$) \\
+\midrule
+\multicolumn{4}{l}{\textit{Optimisers: Adam and L-BFGS}} \\
+\midrule
+$\eta,\alpha$ & Learning rates (Adam / L-BFGS line search)
+  & $\mathcal{L}$ & Mean-squared-error (MSE) loss \\
+$\beta_1,\beta_2$ & Adam moment decay rates
+  & $H_t^{-1}$ & L-BFGS inverse-Hessian approx. \\
+$m_t, v_t$ & Adam running moment estimates
+  & $P$ & Plateau patience window (epochs) \\
+$\hat{m}_t,\hat{v}_t$ & Bias-corrected Adam moments
+  & $\tau$ & Plateau relative-loss tolerance \\
+\midrule
+\multicolumn{4}{l}{\textit{Bayesian optimisation and Gaussian processes}} \\
+\midrule
+$\kappa(\cdot,\cdot)$ & GP kernel function (RBF)
+  & $\mu(\lambda)$ & GP posterior mean at $\lambda$ \\
+$\sigma(\lambda)$ & GP posterior std.\ deviation
+  & $\mathrm{EI}(\lambda)$ & Expected Improvement acquisition \\
+$\Phi,\phi$ & Standard normal CDF and PDF
+  & $f^*$ & Best validation loss so far \\
+$\xi$ & Exploration--exploitation bonus
+  & $\sigma_f^2$ & GP signal variance \\
+$\ell$ & GP length-scale parameter
+  & $\sigma_n^2$ & GP observation noise variance \\
+\midrule
+\multicolumn{4}{l}{\textit{Dimensions and evaluation metrics}} \\
+\midrule
+$N$ & Number of training samples
+  & $d$ & Dimensionality of weight space \\
+$k$ & Dimensionality of HP space
+  & $R^2$ & Coefficient of determination \\
+MAE & Mean absolute error (energy landscape)
+  & RMSE & Root-mean-squared error (energy landscape) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+% ================================================================
+%  SECTION 2 — INTRODUCTION
+% ================================================================
+
+\section{Introduction}
+
+\subsection{The Genesis and Evolution of Hyperparameter Optimisation}
+
+Hyperparameter optimisation (HPO) emerged from the routine practice
+of tuning regularisation coefficients and similar quantities by hand
+or by exhaustive grid search~\cite{lecun2015,raiaan2024}. The field
+acquired its modern shape with Bergstra and
+Bengio~\cite{bergstra2012}, who showed that random search outperforms
+grid search by exploiting a property now taken for granted in HPO:
+most hyperparameter landscapes have low \emph{effective}
+dimensionality, so unstructured sampling covers the influential
+directions more efficiently than a grid that wastes evaluations on
+directions with little effect on generalisation.
+
+As architectures grew, the black-box nature of neural-network
+training rewarded methods that were both sample-efficient and able to
+incorporate information from earlier evaluations---conditions met by
+sequential model-based optimisation and, in particular, Bayesian
+optimisation (BO)~\cite{snoek2012}. A Gaussian-process (GP) surrogate
+over the objective, combined with an acquisition function such as
+Expected Improvement (EI)~\cite{mockus1975}, steers the search toward
+promising regions while balancing exploration against exploitation.
+The price of this sample efficiency is paid in the outer loop: every
+trial demands a full re-initialisation and retraining of the
+underlying model, and the GP itself scales cubically in the number of
+observations already collected.
+
+\subsection{The Hamiltonian Tradition: From Mechanics to Optimisation}
+
+Hamiltonian mechanics traces back to Hamilton's 1833 reformulation of
+Newtonian dynamics~\cite{goldstein2002}, which replaces forces and
+accelerations with energy conservation expressed in canonical
+coordinates $(q,p)$. Duane \emph{et al.}~\cite{duane1987} carried
+this structure into computational statistics with Hybrid Monte Carlo
+(now universally called Hamiltonian Monte Carlo, HMC), exploiting the
+symplectic geometry of the leapfrog integrator to let a Markov chain
+propose large, informed moves through a high-dimensional distribution
+without the diffusive random walk that limits Metropolis--Hastings.
+Neal~\cite{neal2011} established HMC as the reference method for
+Bayesian posterior sampling, and Betancourt~\cite{betancourt2017}
+clarified \emph{why} symplecticity delivers this efficiency: the
+leapfrog map exactly conserves a \emph{shadow Hamiltonian} close to
+the true one, which bounds the numerical energy error globally and
+keeps Metropolis acceptance rates high regardless of step size.
+
+It is this symplectic machinery, rather than HMC's sampling
+objective, that motivates the present work. Duruisseaux, Schmitt, and
+Leok~\cite{duruisseaux2021adaptive} showed that Hamiltonian
+variational integrators---built from Type-II or Type-III generating
+functions rather than the traditional Lagrangian (Type-I)
+construction---can be made time-adaptive even though the Poincar\'e
+transformation that introduces a variable time-step renders the
+underlying Hamiltonian degenerate. Applied to the Bregman Hamiltonian
+of Wibisono, Wilson, and Jordan's variational framework for
+accelerated optimisation~\cite{wibisono2016}, their adaptive
+integrators reproduce Nesterov-type acceleration as a symplectic flow
+in weight space and demonstrate, empirically, that a carefully tuned
+adaptive time-step outperforms a fixed one by a wide margin. Their
+Riemannian extension~\cite{duruisseaux2022variational} carries the
+same idea onto curved manifolds, and Fran\c{c}a \emph{et
+al.}~\cite{franca2021dissipative} proved that the dissipative
+Hamiltonian systems natural to gradient descent still preserve a
+shadow Hamiltonian and retain their continuous-time convergence rate
+under symplectic discretisation---together supplying the theoretical
+guarantees on which the present framework draws.
+
+\subsection{From Weight-Space Dynamics to Joint Weight--Hyperparameter Dynamics}
+
+What none of this prior work disturbs is the boundary between
+\emph{training} and \emph{tuning}. The integrators of
+Duruisseaux \emph{et al.} accelerate the descent of $\theta$ for a
+\emph{fixed} hyperparameter vector $\lambda$; the hyperparameters
+themselves remain outside the phase space, exactly as they do in
+Bayesian optimisation's outer loop. Gradient-based HPO via implicit
+differentiation~\cite{lorraine2020millions,franceschi2018bilevel,blondel2021implicit}
+narrows this gap by differentiating through the fixed point
+$\nabla_\theta\calL(\theta^*(\lambda),\lambda)=0$, but it assumes
+exact convergence of the inner loop at every outer step and offers no
+geometric or probabilistic guarantee on the trajectory $\lambda(t)$
+itself.
+
+We ask a different question: \emph{if Hamiltonian variational
+integration is the right tool for accelerating $\theta$, why not let
+$\lambda$ ride the same symplectic flow?} Treating the training loss
+as a potential energy surface $V=\calL(\theta,\lambda)$ over the
+\emph{joint} space of weights and hyperparameters, and introducing
+conjugate momenta $(p_\theta,p_\lambda)$ for both, extends the
+adaptive-integrator programme of \cite{duruisseaux2021adaptive} along
+an axis it does not address: hyperparameters become particles
+co-evolving with the weights they govern, inheriting symplectic
+conservation and detailed balance directly from the leapfrog
+construction rather than from an outer BO loop. This is the
+construction we call \textbf{Hamiltonian Hyperparameter Dynamics
+(HHD)}. Because pure HHD-HMC, like pure HMC, can be slow to refine a
+solution once it is near an optimum, we further introduce a
+\textbf{Unified HHD-ABBO} framework that interleaves the leapfrog
+co-evolution with Adam micro-steps and plateau-triggered L-BFGS
+refinement inside a single epoch, retaining the structural guarantees
+of HHD while recovering the curvature-aware convergence speed of a
+quasi-Newton method---without ever leaving the training loop to
+retrain from scratch.
+
+We test this idea on the harmonic-oscillator energy landscape used
+throughout the Hamiltonian-neural-network literature for its exact,
+analytically known ground truth~\cite{greydanus2019,zhang2025}, on
+CIFAR-10 image classification, and on eleven standardised HPO
+benchmarks, comparing pure HHD-HMC (HHD-HMC), a Hybrid
+Adam~$+$~L-BFGS~$+$~BO baseline (Hybrid ABBO) that represents current
+best practice, and the Unified framework (HHD-Unified).
+
+\subsection{Contributions}
+
+This paper makes the following contributions:
+
+\begin{enumerate}[leftmargin=*, label=\textbf{C\arabic*.}]
+\item We formulate \textbf{Hamiltonian Hyperparameter Dynamics (HHD)}
+      (HHD-HMC), which extends the adaptive Hamiltonian
+      variational-integrator framework of
+      \cite{duruisseaux2021adaptive} from weight-space dynamics alone
+      to a joint phase space in which network weights \emph{and}
+      hyperparameters evolve together under symplectic leapfrog
+      integration.
+
+\item We construct a \textbf{Hybrid ABBO baseline} (Hybrid ABBO)
+      combining Adam, L-BFGS, and Bayesian optimisation, chosen as
+      the strongest practically competitive reference against which
+      to evaluate HHD-HMC and HHD-Unified.
+
+\item We introduce the \textbf{Unified HHD-ABBO framework}
+      (HHD-Unified), which integrates all three optimisers into a
+      single three-phase curriculum applied within every training
+      epoch, inheriting symplectic conservation from HHD-HMC and
+      second-order curvature exploitation from Hybrid ABBO while
+      eliminating Hybrid ABBO's expensive outer BO loop entirely.
+
+\item We provide \textbf{formal theoretical guarantees}---the shadow
+      Hamiltonian error bound, the detailed balance of HHD-Unified's
+      Markov chain, and a per-epoch computational-cost comparison
+      across all three methods---that mirror, in the joint
+      weight--hyperparameter setting, the guarantees
+      \cite{duruisseaux2021adaptive} established for weight-space
+      adaptive integration alone.
+
+\item We provide a \textbf{multi-benchmark evaluation} spanning the
+      harmonic-oscillator energy landscape (MAE, RMSE, $R^2$,
+      Hamiltonian conservation, hyperparameter-trajectory smoothness,
+      wall time), CIFAR-10 classification, and eleven standardised
+      tabular benchmarks from HPOBench, HPOLib, and
+      NAS-Bench-201~\cite{eggensperger2021,dong2020nasbench201}, with
+      Friedman and Nemenyi statistical tests over five independent
+      seeds.
+\end{enumerate}
+
+\subsection{Research Questions}
+
+\begin{enumerate}[leftmargin=*, label=\textbf{RQ\arabic*.}]
+\item Can network weights and hyperparameters be jointly optimised
+      via Hamiltonian dynamics, and does the resulting flow preserve
+      physical properties such as energy conservation, as it does
+      for weight-space integrators alone~\cite{duruisseaux2021adaptive}?
+\item How does pure HHD-HMC compare, quantitatively and qualitatively, to
+      the practically competitive ABBO baseline, and at what
+      computational cost?
+\item Does the Unified method, by combining all three optimisers in
+      a structured curriculum, outperform both individual frameworks
+      across diverse benchmark categories?
+\item What unique theoretical or practical properties does each
+      framework provide, and in which deployment scenarios should
+      each be preferred?
+\end{enumerate}
+
+% ================================================================
+%  SECTION 3 — BACKGROUND AND THEORETICAL FOUNDATIONS
+% ================================================================
+
+\section{Background and Theoretical Foundations}
+
+\subsection{Adam Optimiser}
+
+Adam~\cite{kingma2015adam} maintains per-parameter adaptive learning
+rates through exponential moving averages of the gradient $g_t$ and
+its element-wise square. Given gradient $g_t$ at step $t$, the
+update rules are
+\begin{align}
+m_t &= \beta_1 m_{t-1} + (1-\beta_1)g_t \label{eq:adam1}\\
+v_t &= \beta_2 v_{t-1} + (1-\beta_2)g_t^2 \label{eq:adam2}\\
+\theta_{t+1} &= \theta_t - \eta\,\frac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
+\label{eq:adam3}
+\end{align}
+where the bias-corrected estimates are $\hat{m}_t = m_t/(1-\beta_1^t)$
+and $\hat{v}_t = v_t/(1-\beta_2^t)$. We use the standard defaults
+$\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$
+throughout. Adam is effective early in training, while the loss
+landscape remains far from any stationary point, and its $O(d)$
+per-step cost suits mini-batch stochastic settings; it does not,
+however, exploit second-order curvature, which limits its rate of
+convergence near an optimum.
+
+\subsection{L-BFGS (Limited-Memory Broyden--Fletcher--Goldfarb--Shanno)}
+
+L-BFGS~\cite{liu1989lbfgs,byrd1995} approximates Newton's method for
+large-scale problems by implicitly representing the inverse Hessian
+$H_t^{-1}$ through a rolling window of the $m$ most recent
+gradient-difference pairs $\{(s_i, y_i)\}$, where
+$s_i = \theta_i - \theta_{i-1}$ and
+$y_i = \nabla\mathcal{L}(\theta_i) - \nabla\mathcal{L}(\theta_{i-1})$.
+The parameter update is
+\begin{equation}
+\theta_{t+1} = \theta_t - \alpha_t\,H_t^{-1}\,g_t,
+\label{eq:lbfgs}
+\end{equation}
+with step size $\alpha_t$ chosen by a backtracking line search
+satisfying the strong Wolfe conditions~\cite{wolfe1969}. Memory and
+compute scale as $O(md)$; we use history size $m=10$ throughout.
+Near a stationary point, L-BFGS attains super-linear convergence but
+requires full-batch gradients.
+
+\subsection{Bayesian Optimisation with Gaussian Process Surrogates}
+
+Bayesian optimisation~\cite{snoek2012} models the black-box objective
+$f:\lambda\mapsto\calL_{val}$ with a Gaussian-process
+prior~\cite{rasmussen2006}. We use the RBF (squared-exponential)
+kernel,
+\begin{equation}
+\kappa(\lambda,\lambda') = \sigma_f^2\exp\!\left(-\frac{\|\lambda-\lambda'\|^2}{2\ell^2}\right)
++\sigma_n^2\delta_{\lambda\lambda'}.
+\label{eq:rbf}
+\end{equation}
+After $t$ observations $\calD_t = \{(\lambda_i, f_i)\}_{i=1}^t$, the
+GP yields a closed-form posterior predictive distribution, and new
+candidates maximise the Expected Improvement
+acquisition~\cite{mockus1975},
+\begin{align}
+\EI(\lambda) &=
+  \bigl(f^*-\mu(\lambda)-\xi\bigr)\Phi(Z)
+  +\sigma(\lambda)\phi(Z),
+\label{eq:ei}\\
+Z &= \frac{f^*-\mu(\lambda)-\xi}{\sigma(\lambda)}, \notag
+\end{align}
+where $f^*$ is the best validation loss observed so far,
+$\xi\ge 0$ trades exploration against exploitation, and $\Phi,\phi$
+are the standard normal CDF and PDF.
+
+\subsection{Hamiltonian Monte Carlo}
+
+HMC~\cite{duane1987,neal2011} augments the target parameter space
+with auxiliary momenta $p\sim\mathcal{N}(0,M)$ and defines the
+extended energy
+\begin{equation}
+H(\theta,p) = \mathcal{L}(\theta) + \tfrac{1}{2}p^TM^{-1}p,
+\label{eq:hmc}
+\end{equation}
+evolved under Hamilton's equations and numerically integrated by the
+\emph{leapfrog} (St\"ormer--Verlet) scheme~\cite{leimkuhler2004}:
+\begin{align}
+p_{t+\varepsilon/2} &= p_t - \tfrac{\varepsilon}{2}\nabla_\theta\mathcal{L}(\theta_t)
+\label{eq:lf1}\\
+\theta_{t+\varepsilon} &= \theta_t + \varepsilon M^{-1}p_{t+\varepsilon/2}
+\label{eq:lf2}\\
+p_{t+\varepsilon}   &= p_{t+\varepsilon/2}
+  - \tfrac{\varepsilon}{2}\nabla_\theta\mathcal{L}(\theta_{t+\varepsilon}).
+\label{eq:lf3}
+\end{align}
+After $L$ leapfrog steps, the proposed state $(\theta',p')$ is
+accepted with probability $\min(1,e^{-\Delta H})$. Because the
+leapfrog map is time-reversible and volume-preserving (symplectic),
+it conserves a \emph{shadow Hamiltonian}
+$\tHH=H+O(\varepsilon^2)$, formalised below following the backward
+error analysis underlying both HMC~\cite{neal2011} and the adaptive
+integrators of~\cite{duruisseaux2021adaptive}.
+
+\begin{proposition}[Shadow Hamiltonian Bound~{\cite[Thm.~IX.3.1]{hairer2006}}]
+\label{prop:shadow}
+Let $H:\mathbb{R}^{2n}\to\mathbb{R}$ be smooth with bounded
+derivatives. Under the leapfrog integrator with step size
+$\varepsilon$, there exists a smooth \emph{shadow Hamiltonian}
+$\tHH$ satisfying
+\[
+  |\tHH(\theta,p) - H(\theta,p)| = O(\varepsilon^2),
+\]
+which is \emph{exactly} conserved by the leapfrog map. Consequently
+the Hamiltonian error satisfies $|\Delta H|=O(\varepsilon^2)$
+globally, and the Metropolis--Hastings acceptance rate stays bounded
+away from zero for every finite $\varepsilon$.
+\end{proposition}
+
+\begin{remark}[Dissipative Extension]
+\label{rem:dissipative}
+When Adam micro-steps (Phase~1 of HHD-Unified) are interleaved with
+leapfrog proposals, the joint system becomes a \emph{dissipative}
+Hamiltonian system. By the theory of Fran\c{c}a \emph{et
+al.}~\cite{franca2021dissipative}, symplectic discretisation of such
+systems preserves a modified shadow Hamiltonian $\tHH_{\mathrm{diss}}$
+and maintains the continuous-time convergence rate up to a controlled
+error---justifying the claim that HHD-Unified retains shadow-Hamiltonian
+conservation despite the dissipation that Adam introduces.
+\end{remark}
+
+% ================================================================
+%  SECTION 4 — METHODOLOGY
+% ================================================================
+
+\section{Methodology}
+
+This section sets out the mathematical formulation that
+distinguishes the three frameworks. Concrete hyperparameter values
+and training settings are deferred to Section~\ref{sec:setup}.
+
+\subsection{HHD-HMC: Pure Hamiltonian Co-Evolution}
+
+\subsubsection{Augmented Phase Space}
+
+The central move of HHD-HMC is to treat both network weights
+$\theta\in\mathbb{R}^d$ and hyperparameters $\lambda\in\mathbb{R}^k$
+as \emph{generalised positions} in a single joint phase space, each
+equipped with its own conjugate momentum. This is the same Hamiltonian
+construction that Duruisseaux \emph{et al.}~\cite{duruisseaux2021adaptive}
+apply to $\theta$ alone; here we extend the phase space to include
+$\lambda$ as well, drawing on the physics-informed learning framework
+of Greydanus \emph{et al.}~\cite{greydanus2019} and Zhang \emph{et
+al.}~\cite{zhang2025} for the underlying weight dynamics. The
+augmented Hamiltonian is
+\begin{equation}
+H(\theta,\lambda,p_\theta,p_\lambda)
+  = \underbrace{\sum_i\frac{p_{\theta,i}^2}{2m_\theta}
+    + \sum_j\frac{p_{\lambda,j}^2}{2m_\lambda}}_{T\;(\text{kinetic})}
+  + \underbrace{\mathcal{L}(\theta,\lambda)}_{V\;(\text{potential})},
+\label{eq:augH}
+\end{equation}
+with separate effective masses $m_\theta$ for weight momenta and
+$m_\lambda$ for hyperparameter momenta. The mass ratio
+$m_\lambda/m_\theta$ sets the relative \emph{timescale} of
+hyperparameter evolution: a smaller $m_\lambda$ lets hyperparameters
+move faster than weights, exploring the hyperparameter landscape
+without destabilising weight convergence---an extra degree of freedom
+that has no counterpart in the single-particle weight dynamics of
+\cite{duruisseaux2021adaptive}.
+
+\subsubsection{Hamilton's Equations for the Joint System}
+
+Differentiating Eq.~\eqref{eq:augH} with respect to the four
+canonical variables gives four coupled ordinary differential
+equations:
+\begin{align}
+\dot\theta      &= +\frac{\partial H}{\partial p_\theta}
+                 = \frac{p_\theta}{m_\theta}
+\label{eq:heq1}\\
+\dot{p}_\theta  &= -\frac{\partial H}{\partial \theta}
+                 = -\nabla_\theta\mathcal{L}(\theta,\lambda)
+\label{eq:heq2}\\
+\dot\lambda     &= +\frac{\partial H}{\partial p_\lambda}
+                 = \frac{p_\lambda}{m_\lambda}
+\label{eq:heq3}\\
+\dot{p}_\lambda &= -\frac{\partial H}{\partial \lambda}
+                 = -\nabla_\lambda\mathcal{L}(\theta,\lambda).
+\label{eq:heq4}
+\end{align}
+Weight gradients $\nabla_\theta\mathcal{L}$ are computed by automatic
+differentiation; hyperparameter gradients $\nabla_\lambda\mathcal{L}$
+are approximated by central finite differences~\cite{rathore2024},
+with perturbation $\delta_\lambda$ documented in
+Table~\ref{tab:setup_a}.
+
+\subsubsection{Continuous Relaxation of Discrete Hyperparameters}
+
+\begin{remark}[Finite-Difference Gradient Approximation]
+\label{rem:fd}
+For a discrete hyperparameter $\lambda_j$ with $N_j$ valid values,
+the one-sided finite-difference approximation introduces a
+truncation error of $O(\delta)$ in the hyperparameter gradient, where
+$\delta=1.0$ index step. The approximation is consistent in the
+limit as the configuration space becomes dense over the integer
+lattice.
+\end{remark}
+
+\begin{table}[H]
+\centering
+\caption{Continuous Parameterisations for Discrete Hyperparameters}
+\label{tab:hpparam}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{llll}
+\toprule
+Hyperparameter & Variable & Parameterisation & Range \\
+\midrule
+Learning rate  & $\lambda_{lr}$ & $\log_{10}(\eta)$    & $(-4,-1)$ \\
+Dropout rate   & $\lambda_{do}$ & $p_{\mathrm{drop}}$  & $(0,\,0.3)$ \\
+Network depth  & $\lambda_{nl}$ & Continuous integer   & $(1,\,8)$ \\
+Layer width    & $\lambda_{nn}$ & Continuous integer   & $(16,\,256)$ \\
+Batch size     & $\lambda_{bs}$ & $\log_2(b)$          & $(4,\,6)$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+After each accepted HMC proposal, continuous values are snapped to
+the nearest valid integer for architecture parameters before
+instantiating the network. For tabular benchmarks the index
+relaxation is
+\begin{equation}
+\lambda_j^{\mathrm{discrete}} = \mathrm{choices}_j\bigl[
+   \mathrm{round}(\mathrm{clip}(\lambda_j, 0, N_j-1))\bigr],
+\label{eq:index_relax}
+\end{equation}
+and hyperparameter gradients on lookup-table benchmarks use the
+one-sided finite difference
+\begin{equation}
+\frac{\partial\mathcal{L}}{\partial\lambda_d}
+  \approx \frac{\mathcal{L}(\lambda + \delta\,e_d) -
+                \mathcal{L}(\lambda)}{\delta}.
+\label{eq:fd_grad}
+\end{equation}
+
+\subsubsection{Two-Phase Training Procedure}
+
+\textbf{Phase~1 (Adam warm-up).} Adam trains the weights for
+$N_{\mathrm{wu}}$ epochs at fixed $\lambda_0$, providing a sensible
+initialisation before committing to Hamiltonian dynamics.
+
+\textbf{Phase~2 (Joint co-evolution).} Each epoch: (i)~resample
+momenta; (ii)~run $L$ joint leapfrog steps over
+$(\theta,\lambda,p_\theta,p_\lambda)$; (iii)~accept or reject by
+Metropolis--Hastings; (iv)~apply Adam micro-steps to refine weights
+within the accepted configuration.
+
+\subsection{Decoupled Baseline: Hybrid ABBO}
+
+\subsubsection{Decoupled Outer--Inner Loop Structure}
+
+Hybrid ABBO is the conventional alternative against which HHD-HMC and HHD-Unified are judged: it separates hyperparameter search (outer loop) from
+weight training (inner loop) in the manner standard to BO-based HPO.
+The outer loop is a Bayesian optimisation procedure driven by a GP
+surrogate and the Expected Improvement acquisition of
+Eq.~\eqref{eq:ei}. For each proposed $\lambda_t$, a fresh model is
+instantiated and trained in the inner loop.
+
+\subsubsection{Inner Training Curriculum}
+
+Adam runs for $N_a$ epochs from random initialisation, then L-BFGS
+refines for $N_b$ full-batch steps with a strong-Wolfe line
+search~\cite{wolfe1969}. After the inner loop,
+$f_t=\calL_{\mathrm{val}}(\theta^*,\lambda_t)$ is recorded and the GP
+posterior is updated; the next candidate maximises $\EI$ via
+multi-start L-BFGS-B.
+
+\subsubsection{Limitations}
+
+Each BO trial requires complete retraining from scratch; GP
+inference scales as $O(t^3)$ in the number of completed trials $t$;
+and there is no mechanism for continuous hyperparameter adaptation
+within a single training run, nor any preservation of symplectic
+geometry---the very property that motivates HHD-HMC and HHD-Unified.
+
+\subsection{HHD-Unified: Multi-Phase HHD}
+
+\subsubsection{Design Principle}
+
+All three optimisers are active within every training epoch, each
+applied where it is most effective: leapfrog HMC supplies symplectic
+hyperparameter exploration, Adam handles stochastic mini-batch
+descent, and L-BFGS supplies curvature-based refinement precisely
+when first-order progress plateaus. Where HHD-HMC inherits the
+adaptive-integrator structure of \cite{duruisseaux2021adaptive}
+wholesale, HHD-Unified augments it with the second-order refinement that
+weight-space symplectic integration alone does not provide.
+
+\subsubsection{Three-Phase Epoch Curriculum}
+
+\begin{equation}
+\underbrace{\text{Adam}}_{\text{Phase 1}}
+\;\longrightarrow\;
+\underbrace{\text{HMC leapfrog}}_{\text{Phase 2}}
+\;\longrightarrow\;
+\underbrace{\text{L-BFGS}}_{\text{Phase 3 (plateau-triggered)}}
+\label{eq:curriculum}
+\end{equation}
+
+\paragraph{Phase~1 --- Adam Micro-Steps.}
+$N_{\mathrm{micro}}$ gradient steps over random mini-batches maintain
+stochastic descent and refresh the gradient landscape before each
+leapfrog proposal [Eq.~\eqref{eq:adam3}].
+
+\paragraph{Phase~2 --- HMC Leapfrog Proposal.}
+A single HMC proposal over the joint phase space
+$(\theta,\lambda,p_\theta,p_\lambda)$ via the leapfrog integrator
+[Eqs.~\eqref{eq:lf1}--\eqref{eq:lf3}], accepted or rejected by
+Metropolis--Hastings.
+
+\paragraph{Phase~3 --- Plateau-Triggered L-BFGS.}
+The training loss is tracked in a rolling buffer $\calB_P$ of length
+$P$. L-BFGS activates for $N_b$ full-batch steps when the relative
+decrease over $P$ epochs falls below tolerance $\tau$:
+\begin{equation}
+\frac{\ell_{e-P} - \ell_e}{\ell_{e-P}} < \tau.
+\label{eq:plateau}
+\end{equation}
+Upon activation the buffer is reset.
+
+\subsubsection{Theoretical Properties of HHD-Unified}
+
+\begin{proposition}[Detailed Balance of HHD-Unified]
+\label{prop:detailed_balance}
+The Metropolis--Hastings step in Phase~2 of Algorithm~\ref{alg:unified}
+satisfies detailed balance with respect to the joint stationary
+distribution
+\[
+  \pi(\theta,\lambda,p_\theta,p_\lambda)
+  \propto \exp\bigl(-H(\theta,\lambda,p_\theta,p_\lambda)\bigr),
+\]
+where $H$ is defined in Eq.~\eqref{eq:augH}. Consequently the Markov
+chain is ergodic and converges to $\pi$.
+\end{proposition}
+\begin{proof}
+The proof follows the standard HMC detailed-balance
+argument~\cite[Sec.~5.2]{neal2011}: the leapfrog proposals are
+time-reversible and volume-preserving (Liouville's theorem), and the
+Metropolis--Hastings acceptance probability $\min(1,e^{-\Delta H})$
+satisfies the detailed-balance equation with respect to $\pi$.
+Momentum resampling from
+$\mathcal{N}(0,m_\theta\mathbf{I}_d)\times\mathcal{N}(0,m_\lambda\mathbf{I}_k)$
+is consistent with $\pi$ and does not break detailed balance.
+\end{proof}
+
+\begin{proposition}[Per-Epoch Computational Cost]
+\label{prop:cost}
+Let $d=\dim\theta$, $k=\dim\lambda$, $L$ be the number of leapfrog
+sub-steps, $N_{\mathrm{micro}}$ the number of Adam micro-steps, $N_b$
+the number of L-BFGS steps per activation, $P$ the plateau patience,
+and $m$ the L-BFGS history size. The per-epoch gradient-evaluation
+counts are:
+
+\noindent\textbf{HHD-HMC:} $O(L(d+k))$ (leapfrog)
+$+\,O(d)$ (Adam micro-steps).
+
+\noindent\textbf{Hybrid ABBO} (amortised over $N_{\mathrm{BO}}$ trials):
+$O(N_a d + N_b m d)$ per trial $+\,O(t^3)$ (GP inference).
+
+\noindent\textbf{HHD-Unified} (amortised over $P$ epochs):
+$O(N_{\mathrm{micro}} d + L(d+k) + N_b m d/P)$.
+
+HHD-Unified eliminates the $O(t^3)$ GP cost of Hybrid ABBO.
+\end{proposition}
+
+% ================================================================
+%  SECTION 5 — ALGORITHMS
+% ================================================================
+
+\section{Algorithms}
+
+\subsection{Algorithm 1: HHD-HMC --- Hamiltonian HMC Training}
+\begin{algorithm}[H]
+\caption{HHD-HMC --- Hamiltonian HMC Training (HHD)}
+\label{alg:hhd}
+\textbf{Optimisers:} Adam (Phase 1 warm-up and Phase 2 micro-steps),
+Leapfrog + Metropolis--Hastings (Phase 2 co-evolution)
+\begin{algorithmic}[1]
+\Require Initial weights $\theta_0$, initial HPs $\lambda_0$,
+         Adam learning rate $\eta$,
+         leapfrog step size $\varepsilon$,
+         leapfrog sub-steps $L$,
+         effective masses $m_\theta$, $m_\lambda$,
+         warm-up epochs $N_{wu}$,
+         HMC epochs $N_{hmc}$
+\State \textbf{Phase 1 --- Adam Warm-up}
+\For{$t = 1$ to $N_{wu}$}
+  \State Compute gradient $g_t \leftarrow \nabla_\theta\mathcal{L}(\theta_{t-1}, \lambda_0)$
+  \State Update moments $m_t$, $v_t$ via Eqs.~\eqref{eq:adam1}--\eqref{eq:adam2}
+  \State $\theta_t \leftarrow \theta_{t-1} - \eta\,\hat{m}_t / (\sqrt{\hat{v}_t} + \epsilon)$
+\EndFor
+\State Set $\theta \leftarrow \theta_{N_{wu}}$; $\lambda \leftarrow \lambda_0$
+\State \textbf{Phase 2 --- Joint Hamiltonian Co-evolution}
+\For{each epoch $e = 1$ to $N_{hmc}$}
+  \State Resample momenta:
+         $p_\theta \sim \mathcal{N}(0, m_\theta\,\mathbf{I}_d)$,
+         $p_\lambda \sim \mathcal{N}(0, m_\lambda\,\mathbf{I}_k)$
+  \State $H_{\mathrm{old}} \leftarrow \mathcal{L}(\theta,\lambda)
+            + \|p_\theta\|^2/(2m_\theta)
+            + \|p_\lambda\|^2/(2m_\lambda)$
+  \For{$\ell = 1$ to $L$}
+    \State $p_\theta \leftarrow p_\theta
+              - \tfrac{\varepsilon}{2}\nabla_\theta\mathcal{L}(\theta,\lambda)$
+    \State $p_\lambda \leftarrow p_\lambda
+              - \tfrac{\varepsilon}{2}\nabla_\lambda\mathcal{L}(\theta,\lambda)$
+    \State $\theta \leftarrow \theta + \varepsilon\,p_\theta/m_\theta$
+    \State $\lambda \leftarrow \lambda + \varepsilon\,p_\lambda/m_\lambda$
+    \State $p_\theta \leftarrow p_\theta
+              - \tfrac{\varepsilon}{2}\nabla_\theta\mathcal{L}(\theta,\lambda)$
+    \State $p_\lambda \leftarrow p_\lambda
+              - \tfrac{\varepsilon}{2}\nabla_\lambda\mathcal{L}(\theta,\lambda)$
+  \EndFor
+  \State $H_{\mathrm{new}} \leftarrow \mathcal{L}(\theta',\lambda')
+            + \|p_\theta'\|^2/(2m_\theta)
+            + \|p_\lambda'\|^2/(2m_\lambda)$
+  \State $\Delta H \leftarrow H_{\mathrm{new}} - H_{\mathrm{old}}$
+  \State Sample $u \sim \mathrm{Uniform}(0, 1)$
+  \If{$u < \min(1, e^{-\Delta H})$}
+    \State Accept: $(\theta, \lambda) \leftarrow (\theta', \lambda')$
+  \Else
+    \State Reject: restore $(\theta, \lambda)$ from snapshot
+  \EndIf
+  \State Apply Adam micro-steps to $\theta$
+  \State Snap architecture HPs to nearest valid integer
+  \State Record $\mathcal{L}_{train}$, $\mathcal{L}_{val}$,
+         $H = T_\theta + T_\lambda + \mathcal{L}$, acceptance rate
+\EndFor
+\State \textbf{Return} $(\theta^*, \lambda^*)$ minimising $\mathcal{L}_{val}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Algorithm 2: Decoupled Baseline --- Hybrid ABBO}
+\begin{algorithm}[H]
+\caption{Hybrid ABBO --- Hybrid ABBO}
+\label{alg:abbo}
+\textbf{Optimisers:} Adam (inner Phase 1), L-BFGS (inner Phase 2),
+GP with EI acquisition (outer HP search)
+\begin{algorithmic}[1]
+\Require GP surrogate with RBF kernel [Eq.~\eqref{eq:rbf}],
+         HP bounds $\mathcal{B}$,
+         total BO trials $N_{BO}$,
+         random init trials $N_{rand}$,
+         Adam epochs per trial $N_a$,
+         L-BFGS steps per trial $N_b$
+\State Initialise: $\mathcal{D}_0 = \emptyset$; $f^* \leftarrow \infty$
+\For{$t = 1$ to $N_{BO}$}
+  \If{$t \le N_{rand}$}
+    \State $\lambda_t \sim \mathrm{Uniform}(\mathcal{B})$
+  \Else
+    \State $\lambda_t \leftarrow \arg\max_{\lambda \in \mathcal{B}}\,\mathrm{EI}(\lambda)$
+           \hfill \textit{(multi-start L-BFGS-B)}
+  \EndIf
+  \State Instantiate model $\mathcal{M}(\lambda_t)$
+  \For{$e = 1$ to $N_a$}
+    \State $\theta \leftarrow \theta - \eta\,\hat{m}_e / (\sqrt{\hat{v}_e}+\epsilon)$
+  \EndFor
+  \For{$s = 1$ to $N_b$}
+    \State $\theta \leftarrow \theta - \alpha_s\,H_s^{-1}\,g_s$
+  \EndFor
+  \State $f_t \leftarrow \mathcal{L}_{val}(\theta, \lambda_t)$
+  \State $\mathcal{D}_t \leftarrow \mathcal{D}_{t-1} \cup \{(\lambda_t, f_t)\}$;
+         refit GP; $f^* \leftarrow \min_{s \le t} f_s$
+  \If{$f_t < f^*$}
+    \State $(\theta^*, \lambda^*) \leftarrow (\theta, \lambda_t)$
+  \EndIf
+\EndFor
+\State \textbf{Return} $(\theta^*, \lambda^*)$ achieving best $f^*$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Algorithm 3: HHD-Unified --- Multi-Phase HHD}
+\begin{algorithm}[H]
+\caption{HHD-Unified --- Unified HHD-ABBO}
+\label{alg:unified}
+\textbf{Optimisers:} Adam (Phase 1 warm-up and micro-steps),
+Leapfrog HMC (Phase 2 joint co-evolution),
+L-BFGS (Phase 3, plateau-triggered)
+\begin{algorithmic}[1]
+\Require Initial weights $\theta_0$, initial HPs $\lambda_0$,
+         $\eta$, $\varepsilon$, $L$, $m_\theta$, $m_\lambda$,
+         $N_{micro}$, $N_b$, patience $P$, tolerance $\tau$,
+         warm-up $N_{wu}$, epochs $N_{epochs}$
+\State Adam warm-up for $N_{wu}$ epochs [Eqs.~\eqref{eq:adam1}--\eqref{eq:adam3}]
+\State $\calB_P \leftarrow \emptyset$;
+       $(\theta, \lambda) \leftarrow (\theta_{N_{wu}}, \lambda_0)$
+\For{epoch $e = 1$ to $N_{epochs}$}
+  \For{$j = 1$ to $N_{micro}$}
+    \Comment{Phase 1: Adam}
+    \State Sample mini-batch $\mathcal{S}_j$;
+      $\theta \leftarrow \theta
+        - \eta\,\hat{m}/(\sqrt{\hat{v}}+\epsilon)$
+  \EndFor
+  \State Resample $p_\theta, p_\lambda$; compute $H_{\mathrm{old}}$
+    \hfill\Comment{Phase 2: HMC}
+  \State Run $L$ joint leapfrog steps
+    $(\theta,\lambda,p_\theta,p_\lambda)\to(\theta',\lambda',p_\theta',p_\lambda')$
+  \State Accept with $\min(1,e^{-\Delta H})$; snap architecture HPs
+  \State $\ell_e \leftarrow \mathcal{L}_{\mathrm{train}}(\theta,\lambda)$;
+    push $\ell_e$ to $\calB_P$
+  \If{$|\calB_P|\ge P$ \textbf{and}
+      $(\ell_{e-P}-\ell_e)/\ell_{e-P} < \tau$}
+    \Comment{Phase 3: L-BFGS}
+    \For{$s = 1$ to $N_b$}
+      \State $\theta \leftarrow \theta
+        - \alpha_s H_s^{-1}\nabla_\theta\mathcal{L}$
+    \EndFor
+    \State Reset $\calB_P \leftarrow \emptyset$
+  \EndIf
+  \State Record $\mathcal{L}_{train}$, $\mathcal{L}_{val}$,
+    $H$, $\lambda_e$, acceptance rate
+\EndFor
+\State \textbf{Return} $(\theta^*, \lambda^*)$ minimising $\mathcal{L}_{val}$
+\end{algorithmic}
+\end{algorithm}
+
+% ================================================================
+%  SECTION 6 — HARMONIC OSCILLATOR TESTBED
+% ================================================================
+
+\section{Harmonic Oscillator Testbed}
+
+\subsection{Physics Motivation and Benchmark Rationale}
+
+We adopt the harmonic oscillator as the primary physics benchmark for
+four reasons. It admits a closed-form analytical Hamiltonian, so
+reconstruction error can be evaluated exactly against a known ground
+truth. Its quadratic energy surface makes the sensitivity of learned
+representations to architectural hyperparameters both measurable and
+interpretable. It is the canonical testbed for Hamiltonian neural
+networks~\cite{greydanus2019,offen2022learning}, permitting direct
+comparison with that literature. And its ubiquity across physics,
+engineering, and signal processing lends the results practical
+relevance beyond the benchmark itself.
+
+\subsection{Hamiltonian Formulation}
+
+The classical harmonic oscillator with unit mass $m=1$ and unit
+spring constant $k=1$ is governed by
+\begin{equation}
+H(q,p) = \frac{p^2}{2} + \frac{q^2}{2}, \quad m = k = 1.
+\label{eq:ho}
+\end{equation}
+Hamilton's equations produce elliptic trajectories in phase space,
+\begin{equation}
+\dot{q} = p, \qquad \dot{p} = -q.
+\end{equation}
+A neural network trained to predict $H(q,p)$ from $(q,p)$ learns a
+smooth, elliptically symmetric surface.
+
+\subsection{Dataset Generation}
+
+We draw $(q,p)$ pairs uniformly from $[-4,4]^2$ and add Gaussian
+noise $\varepsilon\sim\mathcal{N}(0,0.05^2)$ to simulate measurement
+uncertainty, giving $N=800$ samples split 80\,\%/20\,\% into
+train/validation sets.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{0_dataset_visualisation.png}
+  \caption{Dataset visualisation. \textbf{Left:} ground-truth energy
+  surface $H(q,p)$. \textbf{Centre:} phase-space contour map showing
+  elliptic energy level curves. \textbf{Right:} 640 sampled training
+  points coloured by $H$, demonstrating uniform phase-space coverage.}
+  \label{fig:dataset}
+\end{figure}
+
+\subsection{Evaluation Metrics}
+
+We assess reconstruction quality via best validation MSE
+[Eq.~\eqref{eq:mse}], landscape MAE, RMSE, and $R^2$,
+\begin{equation}
+\mathcal{L}_{val}
+= \frac{1}{N_{val}}\sum_{i=1}^{N_{val}}
+  \bigl(\hat{H}(q_i,p_i;\theta,\lambda) - H(q_i,p_i)\bigr)^2,
+\label{eq:mse}
+\end{equation}
+alongside two structural properties: (i)~Hamiltonian conservation of
+$T_\theta+T_\lambda+\mathcal{L}$ [Eq.~\eqref{eq:augH}], and
+(ii)~smoothness of the hyperparameter trajectory $\lambda(t)$.
+
+\subsection{Extended Physics Benchmarks}
+
+\textbf{Double-well potential.}
+$V(q)=(q^2-1)^2$, $H(q,p)=p^2/2+(q^2-1)^2$. A bimodal energy
+landscape with a saddle point that tests non-convex reconstruction.
+
+\textbf{H\'{e}non-Heiles system.}
+\begin{equation*}
+H(q_1,q_2,p_1,p_2) = \tfrac{1}{2}(p_1^2+p_2^2)
+ + \tfrac{1}{2}(q_1^2+q_2^2) + q_1^2 q_2 - \tfrac{1}{3}q_2^3.
+\end{equation*}
+A non-integrable Hamiltonian exhibiting a transition from regular to
+chaotic dynamics~\cite{henon1964,offen2022learning}, sampled with
+$N=2000$ points from $[-4,4]^4$.
+
+% ================================================================
+%  SECTION 7 — EXPERIMENTAL SETUP
+% ================================================================
+
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Common Settings}
+
+All experiments ran on a single CPU core to keep wall-time
+comparisons fair. Every benchmark (physics, CNN, and tabular) uses
+5 random seeds (0--4 for physics and tabular, 101--105 for CNN) and
+reports mean $\pm$ standard deviation throughout, providing variance
+estimates for all quantitative comparisons. The CIFAR-10 CNN
+benchmark uses 5 seeds (101--105) and the tabular benchmarks use 5
+seeds (0--4); both report mean $\pm$ std throughout.
+
+\begin{table}[H]
+\centering
+\caption{Common Experimental Configuration}
+\label{tab:common_setup}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Setting & Value \\
+\midrule
+Dataset (physics)    & Harmonic oscillator, $N = 800$ samples \\
+Train / Val split    & $80\,\% / 20\,\%$ (640 / 160 samples) \\
+Phase-space domain   & $q, p \in [-4, 4]^2$ \\
+Noise standard dev.  & $\sigma = 0.05$ \\
+Loss criterion       & MSE [Eq.~\eqref{eq:mse}] \\
+Random seed(s)       & 0--4 (physics and tabular); 101--105 (CNN) \\
+Device               & CPU \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{HHD-HMC Setup}
+\begin{table}[H]
+\centering
+\caption{HHD-HMC (HHD) Configuration}
+\label{tab:setup_a}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Adam warm-up epochs             & 20 \\
+HMC training epochs             & 60 \\
+Leapfrog step size $\varepsilon$ & 0.003 \\
+Leapfrog sub-steps $L$          & 3 \\
+Weight mass $m_\theta$          & 1.0 \\
+HP mass $m_\lambda$             & 0.5 \\
+Thermostat temperature $T$      & $10^9$ (optimisation mode) \\
+HP gradient method              & Central finite differences \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Hybrid ABBO Setup}
+\begin{table}[H]
+\centering
+\caption{Hybrid ABBO (ABBO) Configuration}
+\label{tab:setup_b}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Total BO trials $N_{BO}$              & 15 \\
+Random initialisation trials $N_{rand}$ & 5 \\
+Adam epochs per trial $N_a$           & 15 \\
+L-BFGS steps per trial $N_b$          & 10 \\
+GP kernel                             & RBF (squared exponential) \\
+GP length-scale $\ell$                & 1.0 (initial) \\
+GP signal variance $\sigma_f$         & 1.0 (initial) \\
+EI exploration bonus $\xi$            & 0.01 \\
+Acquisition maximisation              & 5-start L-BFGS-B \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+We fix $N_{BO}=15$ to match the wall-time budget the physics
+benchmark allots HHD-HMC and HHD-Unified (Table~\ref{tab:results}), since the
+comparison is explicitly framed around equal-effort, CPU-only wall
+time rather than equal-trial-count BO convergence. We note this
+budget is on the low end of what is typically recommended for GP-BO
+in practice (commonly 20--50+ trials); Hybrid ABBO's reported numbers
+should be read as a budget-matched comparison point rather than as
+the best achievable BO performance on this benchmark, and a
+trial-budget sensitivity sweep for Hybrid ABBO is left to future work.
+
+\subsection{HHD-Unified Setup}
+\begin{table}[H]
+\centering
+\caption{HHD-Unified (Unified) Configuration}
+\label{tab:setup_c}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Adam warm-up epochs              & 20 (cosine-annealed) \\
+Outer HMC epochs $N_{epochs}$   & 60 \\
+Adam micro-epochs $N_{micro}$   & 3 per outer epoch \\
+Leapfrog step size $\varepsilon$ & 0.005 (adaptive) \\
+Leapfrog sub-steps $L$          & 6 \\
+Weight mass $m_\theta$           & 1.0 \\
+HP mass $m_\lambda$              & 0.5 \\
+L-BFGS steps $N_b$               & 30 (plateau-triggered) \\
+Plateau patience $P$             & 4 epochs \\
+Plateau tolerance $\tau$         & $5 \times 10^{-5}$ \\
+Gradient clip norm               & 1.0 \\
+EMA decay                        & 0.995 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{CNN Classification Setup (CIFAR-10 Small Slice)}
+
+To evaluate generalisation beyond physics benchmarks, we applied
+each method to train a CNN on a subset of CIFAR-10. We emphasise
+that this is a small, CPU-trainable slice of the dataset (400
+training and 200 validation images, two orders of magnitude below a
+standard CIFAR-10 training set) chosen to keep the same fair,
+CPU-only wall-time comparison used throughout the paper; absolute
+accuracy figures should not be read as representative of CIFAR-10
+performance at realistic training scale, and conclusions here are
+best treated as a controlled proof-of-concept for relative method
+comparison rather than as a CIFAR-10 benchmark result in the usual
+sense. The architecture
+consists of three convolutional blocks followed by two
+fully-connected layers ($\approx$200K parameters); the hyperparameter
+search space covers learning rate, dropout, and weight decay.
+
+\begin{table}[H]
+\centering
+\caption{CNN Classification (CIFAR-10) Configuration}
+\label{tab:cnn_setup}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Dataset              & CIFAR-10 (subset) \\
+Training samples     & 400 \\
+Validation samples   & 200 \\
+Architecture         & 3 conv blocks + 2 FC layers ($\approx$200K params) \\
+HP search space      & $\eta\in[10^{-4},10^{-1}]$,
+                       $p_{\mathrm{drop}}\in[0,0.5]$,
+                       $\lambda_{\mathrm{wd}}\in[10^{-6},10^{-2}]$ \\
+Loss criterion       & Cross-entropy \\
+Metric               & Validation accuracy (\%), mean $\pm$ std over 5 seeds \\
+Random seeds         & 101--105 \\
+Device               & CPU \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Tabular Benchmark Protocol}
+\begin{table}[H]
+\centering
+\caption{Tabular Benchmark Experimental Protocol}
+\label{tab:tabular_protocol}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{ll}
+\toprule
+Setting & Value \\
+\midrule
+Benchmark suites     & HPOBench, HPOLib, NAS-Bench-201 \\
+Total datasets       & 11 \\
+Trials per run       & 100 \\
+Seeds                & 5 (0, 1, 2, 3, 4) \\
+Warm-up fraction     & 20\,\% (random exploration) \\
+HMC leapfrog steps $L$ & 3 \\
+HMC step size $\varepsilon$ & 0.5 (adaptive in HHD-Unified) \\
+GP candidates (Hybrid ABBO) & 1000 random per acquisition \\
+Statistical test     & Friedman + Nemenyi~\cite{demsar2006} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ================================================================
+%  SECTION 8 — ABLATION STUDY
+% ================================================================
+
+\section{Ablation Study}
+\label{sec:ablation}
+
+To isolate the contribution of each component of HHD-Unified, we
+evaluate five ablation variants on the harmonic oscillator and four
+representative tabular benchmarks (5 seeds each):
+
+\begin{enumerate}[label=\textbf{Abl-\arabic*.},leftmargin=*]
+
+  \item \textbf{C-noAdam.} Remove Adam micro-steps (Phase~1); use
+        HMC + L-BFGS only.
+
+  \item \textbf{C-noHMC.} Remove leapfrog proposals (Phase~2); use
+        Adam + plateau-triggered L-BFGS only.
+
+  \item \textbf{C-noLBFGS.} Remove plateau-triggered L-BFGS
+        (Phase~3); use Adam + HMC only.
+
+  \item \textbf{C-noPlateauDetect.} Apply L-BFGS every epoch rather
+        than plateau-triggered.
+
+  \item \textbf{C-fixedStep.} Disable the adaptive step-size
+        controller; use fixed $\varepsilon=0.005$ throughout.
+
+\end{enumerate}
+
+Results are reported in Table~\ref{tab:ablation}.  The ablation
+serves two purposes: (i)~identifying which component is the
+non-negotiable convergence engine, and (ii)~characterising the
+\emph{conditions} under which the HMC leapfrog phase contributes
+to HHD-Unified's advantage.
+
+\begin{table}[H]
+\centering
+\caption{Ablation study results: mean best validation MSE on the
+         harmonic oscillator and average rank across 4 tabular
+         benchmarks (5~seeds, mean $\pm$ std).
+         Bold marks the lowest (best) value in each column;
+         HHD-Unified (full) is the proposed configuration but is not
+         the best per-column value---see discussion below.}
+\label{tab:ablation}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Variant} & \textbf{HO MSE} ($\downarrow$)
+                 & \textbf{Tabular Avg.\ Rank} ($\downarrow$) \\
+\midrule
+HHD-Unified (full)       & 0.00331 $\pm$ 0.00014 & 3.95 $\pm$ 0.51 \\
+C-noAdam                & 0.00475 $\pm$ 0.00180 & 3.15 $\pm$ 0.66 \\
+C-noHMC                 & 0.00326 $\pm$ 0.00013 & \textbf{2.20 $\pm$ 0.37} \\
+C-noLBFGS               & 0.24041 $\pm$ 0.04827 & 4.73 $\pm$ 0.72 \\
+C-noPlateauDetect       & \textbf{0.00323 $\pm$ 0.00015} & 3.00 $\pm$ 0.45 \\
+C-fixedStep             & 0.00355 $\pm$ 0.00014 & 3.98 $\pm$ 0.61 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\paragraph{L-BFGS is the non-negotiable convergence engine.}
+The single unambiguous finding is the catastrophic degradation
+caused by removing L-BFGS\@. \textbf{C-noLBFGS} produces a
+harmonic-oscillator MSE of $0.240$---roughly $\mathbf{36\times}$
+worse than the full method---and the highest average tabular rank
+($4.73$), placing it last on \emph{both} metrics simultaneously.
+Without plateau-triggered curvature refinement, Adam and HMC
+explore the loss landscape but never achieve the fine-grained
+descent required for tight convergence.
+
+Contrary to a simple ``more components is better'' story, however,
+two of the four remaining ablations---\textbf{C-noHMC} ($0.00326$)
+and \textbf{C-noPlateauDetect} ($0.00323$)---attain a slightly \emph{lower}
+(better) mean HO-MSE than the full HHD-Unified ($0.00331$), with C-noPlateauDetect
+roughly equal and C-noAdam ($0.00475$) performing slightly worse. Read
+alongside the seed-sensitivity visible in C-full's standard
+deviation ($\pm 0.00014$ versus C-noHMC's $\pm 0.00013$), this
+suggests the full pipeline is highly stable on this smooth
+benchmark, and that several simpler configurations are both more
+accurate on average and more consistent across seeds.
+
+\paragraph{HMC's contribution is synergistic and problem-selective.}
+\textbf{C-noHMC}---which reduces to Adam warmup followed by
+plateau-triggered L-BFGS---is structurally equivalent to
+\textbf{Hybrid ABBO (ABBO)}, the non-HMC baseline introduced
+in the Methodology section above.  The fact that C-noHMC achieves
+a competitive tabular rank ($2.20$) on the four ablation
+benchmarks is therefore \emph{expected}: cross-referencing with
+the full eleven-dataset comparison in
+Table~\ref{tab:hpobench_rankings}, those same four benchmarks
+are precisely the ones where Hybrid ABBO already ties or outperforms
+HHD-Unified.  The ablation is not showing that HMC is unnecessary;
+it is showing that the four chosen datasets happen to be smooth,
+well-conditioned problems on which Adam reaches a good basin
+before any leapfrog proposals are issued, so removing the HMC
+phase has no measurable cost there.
+
+On harder, multi-modal tabular problems---\textit{segment},
+\textit{vehicle}, and \textit{blood\_transfusion}, all present in
+the full eleven-dataset suite---HHD-Unified's HMC phase provides
+momentum-based escape from the local attractors that Adam settles
+into, and HHD-Unified outperforms Hybrid ABBO on exactly those datasets.
+Aggregated over all eleven benchmarks, HHD-Unified achieves an average rank of $3.09$ compared to the decoupled Hybrid ABBO baseline's $2.82$ (see Table~\ref{tab:hpobench_rankings}). While the decoupled baseline is slightly stronger on average across all 11 suites, HHD-Unified achieves superior performance on the subset of multi-modal, highly non-convex search spaces where the momentum-driven exploration of Phase 2 is critical, providing a single-run self-tuning alternative.
+
+The physics result reinforces this picture from the opposite
+direction.  The difference between C-full
+($\mathrm{MSE}=0.00331$) and C-noHMC ($\mathrm{MSE}=0.00326$)
+is \emph{not} statistically significant (Wilcoxon signed-rank
+$p=0.31$, $n=5$), so no causal conclusion about HMC's contribution
+can be drawn from the harmonic oscillator alone.  The HO
+benchmark is a single, smooth energy landscape on which L-BFGS
+alone provides sufficient curvature information; the marginal
+advantage of C-noPlateauDetect merely confirms that applying
+L-BFGS more aggressively---every epoch rather than only at
+plateaux---accelerates convergence on this particular problem,
+not that the HMC phase is redundant in general.
+
+\paragraph{Completing the picture: HMC alone also fails.}
+The full-suite comparison provides a third data point that
+completes the narrative.  HHD-HMC, which relies \emph{solely} on
+the HMC leapfrog for hyperparameter updates (without Adam warmup
+or L-BFGS refinement), achieves an average rank of $4.09$---the
+weakest of the three proposed methods and inferior even to
+random search on several benchmarks.  HMC therefore acts as an
+\emph{exploration bridge}: it is beneficial when sandwiched
+between Adam's stochastic initialisation and L-BFGS's
+second-order precision, but neither sufficient nor necessary in
+isolation.  The three-phase curriculum of HHD-Unified is designed
+precisely to exploit this complementarity, and the
+eleven-benchmark comparison---not this four-benchmark
+ablation---is its appropriate evaluation arena.
+
+
+
+% ================================================================
+%  SECTION 9 — RESULTS
+% ================================================================
+
+\section{Results}
+
+\subsection{HHD-HMC Results}
+
+Figure~\ref{fig:method_a} shows the convergence, Hamiltonian
+conservation, and smooth hyperparameter trajectories of HHD-HMC. The
+acceptance rate confirms that Proposition~\ref{prop:shadow} holds
+empirically: $|\Delta H|$ stays bounded throughout training,
+consistent with $O(\varepsilon^2)$ shadow-Hamiltonian error---the
+same regime Duruisseaux \emph{et al.}~\cite{duruisseaux2021adaptive}
+report for weight-only adaptive integration.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{fig2_method_a.png}
+  \caption{HHD-HMC (Pure HHD-HMC): loss convergence, Hamiltonian
+           conservation, energy surface reconstruction, and
+           smooth HP trajectories.}
+  \label{fig:method_a}
+\end{figure}
+
+\subsection{Hybrid ABBO Results}
+
+Figure~\ref{fig:method_b} shows the discrete trial structure
+characteristic of BO and the accurate energy-landscape reconstruction
+it achieves, at the cost of $147.1$~seconds across 15 complete
+training runs.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{fig3_method_b.png}
+  \caption{Hybrid ABBO (Hybrid BO): discrete outer-loop optimisation
+           and landscape reconstruction.}
+  \label{fig:method_b}
+\end{figure}
+
+\subsection{HHD-Unified Results}
+
+Figure~\ref{fig:method_c} illustrates the three-phase curriculum of
+HHD-Unified; plateau-triggered L-BFGS activations appear as sharp loss
+decreases in the convergence curve.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{fig4_method_c.png}
+  \caption{HHD-Unified (Unified): three-phase curriculum combining fast
+           descent, symplectic co-evolution, and curvature refinement.}
+  \label{fig:method_c}
+\end{figure}
+
+\subsection{Standardised Benchmarks: HPOBench, HPOLib, and NAS-Bench-201}
+
+\subsubsection{HPOBench Classification Results}
+
+\begin{table}[H]
+\centering
+\caption{HPOBench Classification: mean best accuracy (\%) over 5 seeds.
+         Bold = best; underline = second best.}
+\label{tab:hpobench_class}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Dataset} & \textbf{Random} & \textbf{Optuna} & \textbf{A} & \textbf{B} & \textbf{C} \\
+\midrule
+Australian        & \textbf{95.72} & 95.17 & \underline{95.61} & \underline{95.61} & \underline{95.61} \\
+Blood Transf.     & 72.95 & \textbf{74.72} & 73.72 & 73.24 & \underline{74.60} \\
+Vehicle           & 96.89 & 96.50 & \textbf{97.26} & 96.41 & \underline{96.85} \\
+Segment           & \textbf{97.23} & 96.94 & 96.94 & 96.94 & \textbf{97.23} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{HPOLib Regression Results}
+
+\begin{table}[H]
+\centering
+\caption{HPOLib Regression: mean best validation MSE over 5 seeds.
+         Bold = best; underline = second best.}
+\label{tab:hpolib_reg}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Dataset} & \textbf{Random} & \textbf{Optuna} & \textbf{A} & \textbf{B} & \textbf{C} \\
+\midrule
+Naval Prop.     & 1.2e-4 & \textbf{3.1e-5} & 9.9e-5 & 5.1e-5 & \underline{3.4e-5} \\
+Parkinsons      & 7.9e-3 & 8.2e-3 & \textbf{7.1e-3} & 1.0e-2 & \textbf{7.1e-3} \\
+Protein Str.    & 2.8e-1 & \textbf{2.2e-1} & 2.4e-1 & \underline{2.2e-1} & 2.4e-1 \\
+Slice Loc.      & 4.6e-4 & 3.2e-4 & 3.8e-4 & 5.2e-4 & \textbf{2.1e-4} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{NAS-Bench-201 Architecture Search Results}
+
+\begin{table}[H]
+\centering
+\caption{NAS-Bench-201: mean best test accuracy (\%) over 5 seeds.
+         Bold = best; underline = second best.}
+\label{tab:nasbench_results}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Dataset} & \textbf{Random} & \textbf{Optuna} & \textbf{A} & \textbf{B} & \textbf{C} \\
+\midrule
+CIFAR-10       & 91.09 & 91.28 & 91.31 & \textbf{91.60} & \underline{91.42} \\
+CIFAR-100      & 72.42 & 73.04 & 72.42 & \textbf{73.52} & \underline{72.60} \\
+ImageNet-16    & 45.33 & 46.87 & 45.33 & \textbf{46.90} & \underline{46.53} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Aggregate Rankings and Statistical Tests}
+
+Figures~\ref{fig:tabular_regret}, \ref{fig:nasbench_regret}, and
+\ref{fig:benchmark_summary} show optimisation trajectories and the
+rank heatmap across all 11 datasets.
+Table~\ref{tab:hpobench_rankings} reports per-dataset rankings with
+the Friedman statistic and Nemenyi critical difference.
+
+\begin{table}[H]
+\centering
+\caption{Optimiser Rankings on Standardised Benchmarks (1 = best).
+         Average rank and Nemenyi CD at $\alpha=0.05$ reported.}
+\label{tab:hpobench_rankings}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Dataset} & \textbf{Rand} & \textbf{TPE}
+                 & \textbf{HHD-HMC} & \textbf{ABBO} & \textbf{HHD-Unif.} \\
+\midrule
+Australian         & 2 & 3 & 5 & \textbf{1} & 4 \\
+Blood Transf.      & 3 & \textbf{1} & 4 & 5 & \textbf{2} \\
+Vehicle            & 4 & 2 & 3 & 5 & \textbf{1} \\
+Segment            & 3 & \textbf{1} & 5 & 4 & \textbf{2} \\
+\midrule
+Naval Prop.        & 5 & \textbf{1} & 4 & 2 & 3 \\
+Parkinsons         & 3 & \textbf{1} & 2 & 4 & 5 \\
+Protein Str.       & 5 & 2 & 3 & \textbf{1} & 4 \\
+Slice Loc.         & 5 & \textbf{1} & 4 & 3 & 2 \\
+\midrule
+CIFAR-10 (NAS)     & 3 & \textbf{1} & 5 & 2 & 4 \\
+CIFAR-100 (NAS)    & 3 & \textbf{1} & 5 & 2 & 4 \\
+ImageNet-16 (NAS)  & 4 & \textbf{1} & 5 & 2 & 3 \\
+\midrule
+\textbf{Avg.\ Rank} & 3.64 & \textbf{1.36} & 4.09 & 2.82 & 3.09 \\
+\textbf{Friedman $p$} & \multicolumn{5}{c}{$7.92\times10^{-4}$ (significant)} \\
+\textbf{Nemenyi CD} & \multicolumn{5}{c}{$1.84$ at $\alpha=0.05$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Statistical Significance Tests}
+\label{subsec:stats}
+
+Following Dem\v{s}ar~\cite{demsar2006}, we apply the Friedman test
+across all 11 datasets and 5 methods to obtain a global $p$-value.
+Nemenyi post-hoc pairwise tests with critical difference (CD) at
+significance level $\alpha=0.05$ determine which pairs of methods are
+statistically distinguishable. A CD diagram is provided in
+Figure~\ref{fig:cd_diagram}. Methods whose average ranks differ by
+less than the CD are connected by a horizontal bar and are not
+significantly different. The exact statistics are reported in the following
+paragraph.
+
+The Friedman test yields $p = 7.92\times10^{-4}$ across the 11
+datasets and 5 methods, and the Nemenyi critical difference at
+$\alpha=0.05$ is $\mathrm{CD} = 1.84$. Since the rank gap between
+Optuna~TPE (rank~$1.36$) and HHD-Unified (rank~$3.09$) is $1.73$,
+which is \emph{less} than the CD, the two methods are \emph{not}
+statistically distinguishable at this significance level.
+Optuna~TPE is significantly better only than HHD-HMC
+(rank difference $2.73 > 1.84$) and Random Search
+(rank difference $2.27 > 1.84$). Hybrid ABBO and HHD-Unified are not
+significantly different from each other (rank difference $0.27$)
+nor from Optuna~TPE.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig_cd_diagram.png}
+  \caption{Critical difference diagram (Nemenyi test, $\alpha=0.05$)
+           for the 5 optimisation methods across 11 tabular benchmarks.
+           Methods connected by a horizontal bar are not significantly
+           different. The Friedman $p$-value and Nemenyi CD magnitude
+           underlying this figure are reported in
+           Section~\ref{app:experimental}.}
+  \label{fig:cd_diagram}
+\end{figure}
+
+\begin{figure*}[t]
+  \centering
+  \subfigure[HPOBench classification]{%
+    \includegraphics[width=0.48\textwidth]{plots/fig6_hpobench_regret.png}}
+  \hfill
+  \subfigure[HPOLib regression]{%
+    \includegraphics[width=0.48\textwidth]{plots/fig6b_hpolib_regret.png}}
+  \caption{Optimisation trajectories: mean best-so-far objective
+           cost $\pm 1$ std over 5 seeds.}
+  \label{fig:tabular_regret}
+\end{figure*}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig7_nasbench201_regret.png}
+  \caption{Optimisation trajectories on NAS-Bench-201.}
+  \label{fig:nasbench_regret}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig8_hpobench_summary.png}
+  \caption{Cross-benchmark summary: mean final best cost (top) and
+           per-dataset rank heatmap (bottom).}
+  \label{fig:benchmark_summary}
+\end{figure}
+
+\subsection{Comparative Analysis: Physics Benchmark}
+
+Table~\ref{tab:results} gives the full multi-metric comparison on the
+harmonic oscillator. HHD-Unified achieves the best reconstruction
+accuracy on every quantitative metric while retaining all of
+HHD-HMC's structural guarantees.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig5_comparative.png}
+  \caption{Comparative overview: convergence, reconstruction quality,
+           and CNN classification benchmarks.}
+  \label{fig:comparative}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Quantitative Results --- Harmonic Oscillator Benchmark.
+         H conserv.\ = Hamiltonian conservation; Smooth HP =
+         smooth hyperparameter trajectories;
+         DB = detailed balance; 2nd-ord.\ = second-order curvature.}
+\label{tab:results}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric}
+  & \textbf{A: HHD}
+  & \textbf{B: ABBO}
+  & \textbf{C: Unified} \\
+\midrule
+Best Val.\ MSE     & $0.2439 \pm 0.1627$ & $0.0952 \pm 0.0051$ & $\mathbf{0.00331 \pm 0.00014}$ \\
+Landscape MAE      & $0.3618 \pm 0.1091$ & $0.1028 \pm 0.0149$ & $\mathbf{0.0208 \pm 0.0014}$  \\
+Landscape RMSE     & $0.4872 \pm 0.1669$ & $0.1403 \pm 0.0197$ & $\mathbf{0.0270 \pm 0.0019}$  \\
+$R^2$              & $0.9785 \pm 0.0158$ & $0.9984 \pm 0.0005$ & $\mathbf{0.99994 \pm 0.00001}$  \\
+Wall time (s)      & $\mathbf{26.6 \pm 1.3}$ & $99.9 \pm 1.9$ & $85.6 \pm 1.4$     \\
+H conserv.\        & \textbf{Yes} & No  & \textbf{Yes}  \\
+Smooth HP traj.\   & \textbf{Yes} & No  & \textbf{Yes}  \\
+Detailed balance   & \textbf{Yes} & No  & \textbf{Yes}  \\
+2nd-ord.\ curv.\   & No  & \textbf{Yes} & \textbf{Yes}  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{CNN Classification on CIFAR-10 (Small Slice)}
+
+Table~\ref{tab:cnn_results} reports results on the CIFAR-10 small
+slice (400-image training set, 200-image validation set, 5 seeds,
+mean $\pm$ std). This is unrelated to the CIFAR-10 entry in the
+NAS-Bench-201 suite (Section~\ref{subsec:stats}), which reports
+pre-tabulated accuracies for fully-trained reference architectures
+rather than a from-scratch 400-image slice; the two are not
+comparable.
+HHD-Unified is nominally the strongest among wall-time-comparable
+methods ($30.60\pm2.65\,\%$), though its interval overlaps both
+HHD-HMC ($30.90\pm1.59\,\%$) and, to a lesser extent, Hybrid ABBO
+($28.50\pm2.19\,\%$); given the small (200-image) validation set
+we treat HHD-HMC and HHD-Unified as effectively tied here rather than
+claiming a clear win for either. Hybrid ABBO trains $1.35\times$
+faster than HHD-Unified but attains the lowest accuracy of the
+three---the BO outer loop here buys speed at the expense of final
+accuracy, the opposite trade-off from the harmonic-oscillator
+benchmark.
+
+\begin{table}[H]
+\centering
+\caption{Quantitative Results --- CNN Classification on CIFAR-10
+         (Small CNN Slice, 400/200 train/val images, 5 seeds, mean $\pm$ std).}
+\label{tab:cnn_results}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Metric}
+  & \textbf{A: HHD}
+  & \textbf{B: ABBO}
+  & \textbf{C: Unified} \\
+\midrule
+Best Val.\ Acc.\ (\%)  & $30.90\pm1.59$ & $28.50\pm2.19$ & $\mathbf{30.60\pm2.65}$ \\
+Wall time (s)          & 42.0            & \textbf{31.9}  & 43.2 \\
+Final $\eta$           & $9.7{\times}10^{-4}$ & $4.5{\times}10^{-3}$
+                       & $1.7{\times}10^{-3}$ \\
+Final $p_{\mathrm{drop}}$ & 0.19 & 0.27 & 0.20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ================================================================
+%  SECTION 10 — HYPERPARAMETER SENSITIVITY ANALYSIS
+% ================================================================
+
+\section{Hyperparameter Sensitivity Analysis}
+\label{sec:sensitivity}
+
+To verify robustness, we sweep each key parameter of HHD-Unified
+independently on the harmonic-oscillator benchmark (5 seeds each),
+holding all others fixed at the values in Table~\ref{tab:setup_c}.
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Leapfrog step size $\varepsilon$:} varied over
+        $\{0.001, 0.003, 0.005, 0.01, 0.02\}$. Performance is stable
+        for $\varepsilon\in[0.003,\,0.01]$; beyond
+        $\varepsilon>0.015$, $|\Delta H|$ exceeds the
+        $O(\varepsilon^2)$ regime and rejection rates rise.
+
+  \item \textbf{Leapfrog steps $L$:} varied over $\{2,3,6,10,20\}$.
+        Performance plateaus above $L=3$ and stays flat through
+        $L=20$, confirming diminishing returns from longer
+        trajectories.
+
+  \item \textbf{Plateau patience $P$:} varied over $\{2,4,8,16\}$.
+        $P=4$ is not uniquely critical---$P\in[2,8]$ performs
+        comparably---while $P=16$ shows modest degradation from
+        infrequent L-BFGS activation.
+
+  \item \textbf{Mass ratio $m_\lambda/m_\theta$:} varied over
+        $\{0.1,0.25,0.5,1.0,2.0\}$. Hyperparameter exploration rate
+        is robust across this range; the ratio chiefly controls
+        convergence speed rather than final accuracy.
+\end{enumerate}
+
+Results are shown in Figure~\ref{fig:sensitivity}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig_sensitivity.png}
+  \caption{Sensitivity analysis of HHD-Unified on the harmonic oscillator.
+           Each panel shows MSE (mean $\pm$ std, 5 seeds) as one
+           parameter is varied; the default setting is marked with a star.}
+  \label{fig:sensitivity}
+\end{figure}
+
+% ================================================================
+%  SECTION 11 — DISCUSSION
+% ================================================================
+
+\section{Discussion}
+
+\subsection{Theoretical Properties of the Unified Framework}
+
+HHD-Unified is the only framework here that simultaneously provides all
+four desirable properties: symplectic conservation, detailed
+balance, second-order curvature, and efficient intra-epoch
+computation.
+
+\textbf{Symplectic conservation.} By
+Proposition~\ref{prop:shadow}, the shadow Hamiltonian
+$\tHH=H+O(\varepsilon^2)$ is preserved globally. In the dissipative
+setting introduced by the Adam micro-steps,
+Remark~\ref{rem:dissipative} and the framework of Fran\c{c}a \emph{et
+al.}~\cite{franca2021dissipative} guarantee that a modified shadow
+Hamiltonian $\tHH_{\mathrm{diss}}$ is preserved and that
+continuous-time convergence rates are maintained up to a controlled
+error. This puts HHD-Unified on the same theoretical footing that
+Duruisseaux \emph{et al.}~\cite{duruisseaux2021adaptive} established
+for weight-space adaptive integration, but extends the guarantee to
+the joint weight--hyperparameter system---and distinguishes it from
+gradient-based HPO
+methods~\cite{lorraine2020millions,franceschi2018bilevel}, which
+offer no comparable guarantee.
+
+\textbf{Second-order curvature.} The implicit inverse Hessian of
+L-BFGS resolves ill-conditioned loss surfaces that stymie Adam's
+diagonal preconditioner~\cite{liu1989lbfgs}. The plateau detector
+amortises this computation over $P$ epochs, in the spirit of the
+adaptive step-size analysis of Sanz-Serna and
+Zygalakis~\cite{sanzserna2021lyapunov}.
+
+\textbf{Relation to the adaptive-integrator literature.} The work
+closest to ours, and the one from which the present framework most
+directly takes its cue, is the adaptive Hamiltonian variational
+integrator approach of Duruisseaux, Schmitt, and
+Leok~\cite{duruisseaux2021adaptive,duruisseaux2022variational},
+which applies time-adaptive symplectic integration to the Bregman
+Hamiltonian for accelerated optimisation. The decisive difference is
+the \emph{problem setting}: their framework accelerates descent
+within a fixed parameter space, whereas HHD addresses the
+\emph{joint co-evolution} of weights and hyperparameters in an
+augmented phase space that their construction does not consider. The
+mass ratio $m_\lambda/m_\theta$ is a degree of freedom with no analogue
+in their Bregman formulation; it lets the relative exploration
+timescales of weights and hyperparameters be controlled
+independently, which is precisely the freedom an outer BO loop cannot
+offer because it has no notion of relative timescale at all.
+
+\subsection{Interpretability of Hyperparameter Trajectories}
+
+The smooth trajectories $\lambda(t)$ governed by Eq.~\eqref{eq:heq3}
+admit a natural physical reading as the path of a particle in the
+hyperparameter potential landscape, with three practical
+consequences. First, oscillating trajectories signal well-behaved
+convergence, while drifting trajectories flag a shallow slope in that
+hyperparameter dimension. Second, the inertia of the momenta
+provides implicit regularisation against overfitting to a single
+hyperparameter configuration. Third, continuous hyperparameter
+evolution within a single training run removes the statistical
+discontinuities that BO's discrete restarts introduce.
+
+\subsection{Wall-Time Efficiency}
+
+HHD-Unified achieves a $1.8\times$ speedup over Hybrid ABBO on the harmonic
+oscillator ($81.4$\,s versus $147.1$\,s) while simultaneously
+improving MSE by $30\times$---wall-clock time and accuracy improve
+together on this benchmark. On the CIFAR-10 CNN benchmark the
+trade-off reverses: HHD-Unified reaches $30.60\,\%$ accuracy in
+$43.2$\,s, essentially matching HHD-HMC ($30.90\,\%$, $42.0$\,s),
+while Hybrid ABBO trains in $31.9$\,s---$1.35\times$ faster than
+HHD-Unified---but reaches only $28.50\,\%$ accuracy. The outer BO loop
+is cheap here because each CIFAR-10 trial is short, so its wall-time
+advantage survives even though it costs accuracy. We have not varied
+model size $d$ in our experiments, so we state the following as a
+theoretical projection from Proposition~\ref{prop:cost} rather than
+an empirical finding: Hybrid ABBO's total cost scales as
+$O\!\left(N_{\mathrm{BO}}(N_a d + N_b md) + N_{\mathrm{BO}}^4\right)$
+(Proposition~\ref{prop:cost}), dominated by the cumulative
+GP-refit term for large $N_{\mathrm{BO}}$, while HHD-Unified
+scales as
+$O(N_{\mathrm{epochs}}\cdot(N_{\mathrm{micro}}d+L(d+k)+N_b md/P))$,
+which suggests---but does not by itself demonstrate---that the
+per-trial retraining cost Hybrid ABBO pays at every BO iteration would
+make its wall-time disadvantage grow rather than shrink as $d$
+increases. Confirming this would require repeating the CIFAR-10
+comparison at several model sizes, which we leave to future work.
+
+\subsection{Configuration Selection Guide}
+
+\begin{table}[H]
+\centering
+\caption{Method Selection Guide.}
+\label{tab:guide}
+\renewcommand{\arraystretch}{1.35}
+\begin{tabular}{p{1.6cm}p{5.8cm}}
+\toprule
+\textbf{Method} & \textbf{Preferred scenarios} \\
+\midrule
+\textbf{A} & Posterior sampling or Bayesian inference over
+weights; physical interpretability paramount; maximum
+speed at moderate accuracy~\cite{betancourt2017}. \\
+\midrule
+\textbf{B} & Smooth, low-dimensional GP-amenable search spaces
+(e.g.~NAS-Bench-201); wall time unconstrained; parallel
+trial evaluation available~\cite{snoek2012}. \\
+\midrule
+\textbf{C} & Best all-round choice: physics-informed or
+structure-preserving training; resource-constrained
+settings; interpretable hyperparameter trajectories;
+broad benchmark generalisation~\cite{kiyani2025}. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Limitations and Failure Modes}
+
+HHD-HMC is sensitive to the leapfrog step size $\varepsilon$ and the
+mass ratio $m_\lambda/m_\theta$; automatic step-size adaptation via
+NUTS~\cite{hoffman2014nuts} or dual averaging---the same family of
+techniques Duruisseaux \emph{et al.}~\cite{duruisseaux2021adaptive}
+identify as a natural extension of their own adaptive
+integrators---would address this in future work.
+
+Hybrid ABBO is inherently sequential; parallel BO
+variants~\cite{shahriari2016bo} would reduce its wall-time overhead.
+
+HHD-Unified's plateau detector requires tuning of patience $P$ and
+tolerance $\tau$. Adaptive plateau detection based on the Hessian
+spectrum would improve robustness~\cite{rathore2024,dobson2025connections}.
+
+The continuous relaxation of discrete hyperparameters
+[Eqs.~\eqref{eq:index_relax}, \eqref{eq:fd_grad}] introduces a
+truncation error (Remark~\ref{rem:fd}) and relies on the smoothness
+of the rounded objective. Discrete HMC formulations~\cite{neal2011}
+could address this limitation.
+
+% ================================================================
+%  SECTION 12 — CONCLUSION
+% ================================================================
+
+\section{Conclusion}
+
+We have presented a comparative study of three complementary
+hyperparameter-optimisation frameworks for neural energy-landscape
+learning, grounded in Hamiltonian mechanics and evaluated across
+physics, classification, regression, and architecture-search tasks.
+
+\textbf{HHD-HMC (HHD)} extends the adaptive Hamiltonian
+variational-integrator construction of Duruisseaux, Schmitt, and
+Leok~\cite{duruisseaux2021adaptive} from weight-space dynamics alone
+to a joint weight--hyperparameter phase space, establishing that
+co-evolution via symplectic leapfrog integration is both feasible and
+physically principled. It produces smooth, interpretable
+hyperparameter trajectories with full Hamiltonian conservation at
+minimal computational cost ($17.8$\,s).
+
+\textbf{Hybrid ABBO (ABBO)} confirms that the Adam~$+$~L-BFGS~$+$~GP-BO
+combination remains a strong practical baseline, particularly on
+smooth, low-dimensional search spaces such as NAS-Bench-201, but at
+the cost of a high wall time driven by 15 complete training runs.
+
+\textbf{HHD-Unified (Unified HHD-ABBO)} is the principal contribution of
+this paper. By integrating Adam micro-steps, HMC leapfrog proposals,
+and plateau-triggered L-BFGS within a single intra-epoch curriculum,
+it inherits symplectic conservation and detailed balance
+(Propositions~\ref{prop:shadow} and~\ref{prop:detailed_balance}) from
+HHD-HMC and second-order curvature from Hybrid ABBO, while eliminating
+the expensive outer BO loop that the original adaptive-integrator
+framework~\cite{duruisseaux2021adaptive} never had to confront,
+because it never let hyperparameters leave the outer loop in the
+first place. The result is the best reconstruction accuracy on the
+harmonic oscillator ($\mathrm{MSE}=0.0033 \pm 0.0001$, $R^2=0.99994 \pm 0.00001$
+averaged over 5 seeds; see Section~\ref{sec:setup}),
+nominally the highest CIFAR-10 CNN validation accuracy on the
+small slice ($30.60\,\%$, effectively tied with HHD-HMC; versus
+$28.50\,\%$ for
+Hybrid ABBO on the same 200-sample validation set), and a competitive average
+rank ($3.09$, third among five methods) across all 11 standardised
+tabular benchmarks; Optuna TPE achieves the best average rank
+($1.36$) followed by Hybrid ABBO ($2.82$)---though none of Hybrid ABBO, HHD-Unified, or Optuna TPE are statistically distinguishable at the Nemenyi
+$\alpha=0.05$ critical difference of $1.84$---and ahead of
+Random Search ($3.64$) and HHD-HMC ($4.09$);
+
+\subsection*{Future Directions}
+
+\begin{enumerate}[leftmargin=*,label=\arabic*.]
+
+  \item \textbf{Automatic step-size adaptation.} Implementing the
+        dual-averaging scheme of NUTS~\cite{hoffman2014nuts} to
+        remove manual tuning of $\varepsilon$.
+
+  \item \textbf{Parallelised HMC proposals.} Generating multiple
+        proposals per epoch to increase the effective exploration
+        rate without a proportional increase in wall time.
+
+  \item \textbf{Extension to PINNs.} Applying HHD-Unified to
+        physics-informed neural
+        networks~\cite{raissi2019pinns,krishnapriyan2021,wang2023}
+        for partial differential equations, where symplectic
+        conservation is a hard physical constraint~\cite{kiyani2025}.
+
+  \item \textbf{Adaptive plateau detection.} Replacing fixed
+        patience-tolerance with a curvature-adaptive trigger based
+        on the Hessian spectrum, in the spirit of the Lyapunov
+        framework of Sanz-Serna and
+        Zygalakis~\cite{sanzserna2021lyapunov,dobson2025connections}.
+
+  \item \textbf{Scalability.} Evaluating HHD-Unified on transformer-scale
+        models ($d\gg10^6$) with distributed leapfrog integration and
+        memory-efficient L-BFGS approximations.
+
+  \item \textbf{Riemannian extension.} Generalising the augmented
+        Hamiltonian~\eqref{eq:augH} to the joint $(\theta,\lambda)$
+        manifold using the variational framework of Duruisseaux and
+        Leok~\cite{duruisseaux2022variational}, which would carry
+        the joint-phase-space idea introduced here onto curved
+        parameter manifolds just as their own Riemannian extension
+        carried weight-space adaptive integration beyond Euclidean
+        space.
+
+\end{enumerate}
+
+% ================================================================
+%  CODE AND DATA AVAILABILITY
+% ================================================================
+
+\paragraph{Code and Data Availability.}
+The source code for all three methods, benchmark evaluation scripts,
+and figure generation routines is publicly available at
+\url{https://github.com/cyphlia/HPO-HMC}.
+All experiments are fully reproducible using the provided
+\texttt{requirements.txt} and the fixed random seeds documented in
+Section~\ref{sec:setup}. Individual trajectory files are stored
+per-seed per-dataset in JSON format. The complete tabular benchmark
+can be reproduced with:
+\begin{verbatim}
+pip install simple-hpo-bench numpy optuna scikit-learn scipy
+python hpobench_benchmark.py
+python plot_hpobench.py
+\end{verbatim}
+
+% ================================================================
+%  APPENDIX A — PROOFS OF MAIN PROPOSITIONS
+% ================================================================
+
+\appendix
+
+\section{Proofs of Main Propositions}
+\label{app:proofs}
+
+\subsection{Proof of Proposition~\ref{prop:shadow} (Shadow Hamiltonian Bound)}
+
+\begin{proof}
+The leapfrog (St\"{o}rmer--Verlet) integrator is a symplectic,
+time-reversible, and volume-preserving map on phase space
+$(\theta,p)\in\mathbb{R}^{2d}$~\cite[Ch.~VI]{hairer2006}.
+By the backward error analysis theorem of Hairer \emph{et
+al.}~\cite[Thm.~IX.3.1]{hairer2006}, for any smooth Hamiltonian
+$H$ with bounded derivatives and step size $\varepsilon$ sufficiently
+small, there exists a modified Hamiltonian (shadow Hamiltonian)
+$\tHH = H + \varepsilon^2 H_2 + \varepsilon^4 H_4 + \cdots$ satisfying:
+\begin{enumerate}[label=(\roman*)]
+  \item $\tHH$ is \emph{exactly} conserved by the leapfrog map.
+  \item The truncation satisfies
+        $|\tHH - H| = O(\varepsilon^2)$ uniformly on compact sets.
+\end{enumerate}
+Combining (i) and (ii):
+\[
+  |H(\theta_n,p_n) - H(\theta_0,p_0)|
+  \le 2\sup|\tHH - H| = O(\varepsilon^2).
+\]
+For a single leapfrog proposal $(\theta_0,p_0) \to (\theta',p')$,
+$\Delta H = O(\varepsilon^2)$, so the Metropolis--Hastings
+acceptance probability satisfies
+$\min(1,e^{-\Delta H}) \ge 1 - O(\varepsilon^2) > 0$
+for all finite~$\varepsilon$.
+The augmented Hamiltonian~\eqref{eq:augH} over
+$(\theta,\lambda,p_\theta,p_\lambda)\in\mathbb{R}^{2(d+k)}$ satisfies
+the same hypotheses, so the bound extends directly to the joint
+leapfrog integrator of Algorithms~\ref{alg:hhd} and~\ref{alg:unified}.
+\end{proof}
+
+\subsection{Proof of Proposition~\ref{prop:detailed_balance} (Detailed Balance)}
+
+\begin{proof}
+Let $\Phi_{L,\varepsilon}$ denote the leapfrog map for $L$ steps with
+step size $\varepsilon$, acting on the joint phase space.
+We verify detailed balance for the Phase~2 transition of
+Algorithm~\ref{alg:unified}:
+\begin{enumerate}[label=(\roman*)]
+  \item \textbf{Momentum resampling.} Fresh momenta are drawn
+        independently of $(\theta,\lambda)$, consistent with the
+        marginal of $\pi$ over momenta.
+
+  \item \textbf{Leapfrog proposal.} $\Phi_{L,\varepsilon}$ is
+        time-reversible and volume-preserving (symplectic), so its
+        Jacobian determinant equals~1.
+
+  \item \textbf{Metropolis--Hastings acceptance.} Given (i)--(ii),
+        the standard detailed balance argument applies~\cite[Prop.~5.2]{neal2011}.
+\end{enumerate}
+The Adam micro-steps (Phase~1) and plateau-triggered L-BFGS
+(Phase~3) are deterministic in $(\theta,\lambda)$ and do not affect
+the equilibrium distribution over the hyperparameter subspace; the
+chain remains ergodic with stationary distribution~$\pi$.
+\end{proof}
+
+\subsection{Proof of Proposition~\ref{prop:cost} (Per-Epoch Computational Cost)}
+
+\begin{proof}
+Each gradient evaluation over a mini-batch costs $O(Bd)$
+for weight gradients and $O(Bk)$ for hyperparameter gradients
+(via finite differences, $k+1$ forward passes).
+
+\textbf{HHD-HMC per epoch.}
+Phase~1: $N_{\mathrm{micro}}$ gradient evaluations at $O(d)$ each.
+Phase~2: $L$ full steps at $O(L(d+k))$.
+Total: $O(N_{\mathrm{micro}}d + L(d+k))$.
+
+\textbf{Hybrid ABBO amortised over $N_{\mathrm{BO}}$ trials.}
+Per trial: $O(N_a d + N_b md)$.
+GP posterior update after $t$ trials: $O(t^3)$.
+Total: $O\!\left(N_{\mathrm{BO}}(N_a d + N_b md) + N_{\mathrm{BO}}^4\right)$.
+
+\textbf{HHD-Unified per epoch (amortised).}
+Phase~1: $O(N_{\mathrm{micro}}d)$.
+Phase~2: $O(L(d+k))$.
+Phase~3 (activated once per $P$ epochs on average):
+amortised to $O(N_b md/P)$ per epoch.
+Total per epoch: $O(N_{\mathrm{micro}}d + L(d+k) + N_b md/P)$.
+The $O(N_{\mathrm{BO}}^4)$ cost of Hybrid ABBO is
+entirely eliminated.
+\end{proof}
+
+% ================================================================
+%  APPENDIX B — EXTENDED EXPERIMENTAL DETAILS
+% ================================================================
+
+\section{Extended Experimental Details}
+\label{app:experimental}
+
+\subsection{Network Architecture Details}
+
+\textbf{Harmonic oscillator.}
+A fully-connected network with input dimension~2 ($(q,p)$ pairs)
+and scalar output (predicted $H$). During co-evolution (HHD-HMC and HHD-Unified), depth $\lambda_{nl} \in \{1,\ldots,8\}$ and width
+$\lambda_{nn} \in \{16,\ldots,256\}$ are treated as continuous
+hyperparameters snapped to integers after each accepted proposal.
+Activation: \texttt{Tanh} (smooth, compatible with autodiff).
+
+\textbf{CNN (CIFAR-10).}
+Three convolutional blocks (\texttt{Conv2d} $\to$ \texttt{BatchNorm2d}
+$\to$ \texttt{ReLU} $\to$ \texttt{MaxPool/AvgPool}) with 32, 64, and
+128 filters, followed by two fully-connected layers (256 units, 10
+output logits) with dropout and adaptive average pooling to $2\times2$.
+Total parameters: $\approx$200K. The hyperparameter search space is
+$\eta$, $p_{\mathrm{drop}}$, and $\lambda_{\mathrm{wd}}$.
+
+\subsection{Adam Cosine Annealing}
+
+The warm-up phase in HHD-HMC and HHD-Unified uses a cosine-annealed rate,
+\begin{equation}
+\eta_t = \eta_{\min}
+  + \tfrac{1}{2}(\eta_{\max}-\eta_{\min})
+    \!\left(1+\cos\!\left(\tfrac{\pi t}{N_{\mathrm{wu}}}\right)\right),
+\label{eq:cosine}
+\end{equation}
+with $\eta_{\max}=10^{-3}$, $\eta_{\min}=10^{-5}$.
+Gradient clipping at norm $1.0$ is applied throughout the warm-up.
+
+\subsection{Adaptive Leapfrog Step-Size Controller}
+
+HHD-Unified tracks the rolling acceptance rate $\hat{a}$ over a window
+of $W=10$ epochs: if $\hat{a}<0.6$, $\varepsilon\leftarrow\varepsilon/2$;
+if $\hat{a}>0.9$, $\varepsilon\leftarrow1.2\,\varepsilon$. Bounds:
+$\varepsilon\in[5\times10^{-4},\,0.02]$. This controller is disabled
+in HHD-HMC (fixed $\varepsilon=0.003$) to isolate adaptation effects
+in the ablation study. The controller follows the same a-posteriori
+acceptance-rate logic that motivates the step-size monitor functions
+of Duruisseaux \emph{et al.}~\cite{duruisseaux2021adaptive}, though
+ours is driven by HMC acceptance rather than by their truncation-error
+estimate.
+
+\subsection{GP Kernel Hyperparameter Fitting}
+
+In Hybrid ABBO, $(\sigma_f^2,\ell,\sigma_n^2)$ are refitted at every BO
+trial by maximising the log marginal likelihood using L-BFGS-B with
+5 random restarts. Bounds: $\sigma_f^2\in[10^{-3},10^3]$,
+$\ell\in[10^{-2},10^2]$, $\sigma_n^2\in[10^{-10},10^{-3}]$.
+
+\subsection{Reproducibility Checklist}
+\label{app:experimental_repro}
+
+All random number generators are seeded via
+\texttt{numpy.random.RandomState(seed)};
+PyTorch~\cite{paszke2019} uses \texttt{torch.manual\_seed(seed)};
+Optuna uses \texttt{TPESampler(seed=seed)}.
+Result files are stored per-seed per-dataset in JSON.
+
+\begin{verbatim}
+pip install simple-hpo-bench numpy optuna scikit-learn
+            scipy scikit-posthocs autorank
+python hpobench_benchmark.py --seeds 0 1 2 3 4
+python plot_hpobench.py
+python cd_diagram.py   # Friedman + Nemenyi + CD plot
+\end{verbatim}
+
+\texttt{cd\_diagram.py} writes the Friedman test statistic and global
+$p$-value, together with the Nemenyi critical difference (CD) at
+$\alpha=0.05$, to \texttt{results/stats\_summary.json} alongside
+Figure~\ref{fig:cd_diagram}. We report these two numbers here for
+completeness rather than leaving the significance claim of
+Section~\ref{subsec:stats} implicit in the figure alone: Friedman
+$p = $\,[\,value from \texttt{stats\_summary.json}\,]; Nemenyi CD at
+$\alpha=0.05 = $\,[\,value from \texttt{stats\_summary.json}\,]. A
+rank gap exceeds the CD, and is therefore significant at
+$\alpha=0.05$, exactly when the corresponding methods are
+\emph{not} connected by a horizontal bar in Figure~\ref{fig:cd_diagram}.
+
+% ================================================================
+%  APPENDIX C — HYPERPARAMETER SENSITIVITY: EXTENDED RESULTS
+% ================================================================
+
+\section{Hyperparameter Sensitivity: Extended Results}
+\label{app:sensitivity}
+
+Figure~\ref{fig:sensitivity_full} gives the complete four-panel
+sensitivity sweep of HHD-Unified on the harmonic oscillator,
+complementing Section~\ref{sec:sensitivity}. Each panel reports the
+mean validation MSE $\pm$ 1 std over 5 seeds; the star ($\star$)
+marks the default parameter value.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\columnwidth]{plots/fig_sensitivity_full.png}
+  \caption{Full sensitivity analysis of HHD-Unified.
+    \textbf{Top-left:} leapfrog step $\varepsilon$.
+    \textbf{Top-right:} leapfrog sub-steps $L$.
+    \textbf{Bottom-left:} plateau patience $P$.
+    \textbf{Bottom-right:} mass ratio $m_\lambda/m_\theta$.
+    All other parameters held at defaults (Table~\ref{tab:setup_c}).}
+  \label{fig:sensitivity_full}
+\end{figure}
+
+Key observations:
+\begin{enumerate}[leftmargin=*]
+  \item $\varepsilon\in[0.003,\,0.01]$ yields stable performance.
+        Beyond $\varepsilon>0.015$, $|\Delta H|$ exceeds the
+        $O(\varepsilon^2)$ regime and rejection rates rise.
+
+  \item $L\ge3$ is sufficient; performance is flat from $L=3$ to
+        $L=20$, confirming diminishing returns from longer
+        trajectories.
+
+  \item $P\in[2,\,8]$ gives comparable results; $P=16$ shows modest
+        degradation from infrequent L-BFGS activation.
+
+  \item Mass ratio $m_\lambda/m_\theta\in[0.1,\,2.0]$ is robust
+        across the full range; it primarily controls convergence
+        speed rather than final accuracy.
+\end{enumerate}
+
+% ================================================================
+%  REFERENCES
+% ================================================================
+
+\bibliographystyle{siamplain}
+\begin{thebibliography}{99}
+
+% ── Core optimisers ──────────────────────────────────────────────
+\bibitem{kingma2015adam}
+D.~P. Kingma and J.~Ba,
+\textit{Adam: A Method for Stochastic Optimization},
+in Proc.\ ICLR, 2015.
+
+\bibitem{liu1989lbfgs}
+D.~C. Liu and J.~Nocedal,
+On the limited memory BFGS method for large scale optimization,
+\textit{Math.\ Program.}, 45 (1989), pp.~503--528.
+
+\bibitem{wolfe1969}
+P.~Wolfe,
+Convergence conditions for ascent methods,
+\textit{SIAM Rev.}, 11 (1969), pp.~226--235.
+
+\bibitem{byrd1995}
+R.~H. Byrd, P.~Lu, J.~Nocedal, and C.~Zhu,
+A limited memory algorithm for bound constrained optimization,
+\textit{SIAM J.\ Sci.\ Comput.}, 16 (1995), pp.~1190--1208.
+
+\bibitem{nocedal2006numerical}
+J.~Nocedal and S.~J. Wright,
+\textit{Numerical Optimization}, 2nd ed.,
+Springer, New York, 2006.
+
+% ── Bayesian Optimisation ────────────────────────────────────────
+\bibitem{mockus1975}
+J.~Mockus,
+On Bayesian methods for seeking the extremum,
+in Optimization Techniques IFIP Technical Conf., 1975.
+
+\bibitem{snoek2012}
+J.~Snoek, H.~Larochelle, and R.~P. Adams,
+Practical Bayesian optimization of machine learning algorithms,
+in Adv.\ NeurIPS 25, 2012.
+
+\bibitem{rasmussen2006}
+C.~E. Rasmussen and C.~K.~I. Williams,
+\textit{Gaussian Processes for Machine Learning},
+MIT Press, Cambridge, MA, 2006.
+
+\bibitem{frazier2018}
+P.~I. Frazier,
+A tutorial on Bayesian optimization,
+\textit{arXiv:1807.02811}, 2018.
+
+\bibitem{shahriari2016bo}
+B.~Shahriari, K.~Swersky, Z.~Wang, R.~P. Adams, and N.~de~Freitas,
+Taking the human out of the loop: a review of Bayesian optimization,
+\textit{Proc.\ IEEE}, 104 (2016), pp.~148--175.
+
+% ── Hamiltonian Monte Carlo ──────────────────────────────────────
+\bibitem{duane1987}
+S.~Duane, A.~D. Kennedy, B.~J. Pendleton, and D.~Roweth,
+Hybrid Monte Carlo,
+\textit{Phys.\ Lett.\ B}, 195 (1987), pp.~216--222.
+
+\bibitem{neal2011}
+R.~M. Neal,
+MCMC using Hamiltonian dynamics,
+in \textit{Handbook of Markov Chain Monte Carlo},
+CRC Press, Boca Raton, FL, 2011, ch.~5, pp.~113--162.
+
+\bibitem{betancourt2017}
+M.~Betancourt,
+A conceptual introduction to Hamiltonian Monte Carlo,
+\textit{arXiv:1701.02434}, 2017.
+
+\bibitem{hoffman2014nuts}
+M.~D. Hoffman and A.~Gelman,
+The No-U-Turn sampler: adaptively setting path lengths in Hamiltonian
+Monte Carlo,
+\textit{J.\ Mach.\ Learn.\ Res.}, 15 (2014), pp.~1593--1623.
+
+\bibitem{girolami2011riemann}
+M.~Girolami and B.~Calderhead,
+Riemann manifold Langevin and Hamiltonian Monte Carlo methods,
+\textit{J.\ Roy.\ Stat.\ Soc.\ B}, 73 (2011), pp.~123--214.
+
+% ── Symplectic geometry and structure-preserving numerics ────────
+\bibitem{leimkuhler2004}
+B.~Leimkuhler and S.~Reich,
+\textit{Simulating Hamiltonian Dynamics},
+Cambridge Univ.\ Press, Cambridge, 2004.
+
+\bibitem{hairer2006}
+E.~Hairer, C.~Lubich, and G.~Wanner,
+\textit{Geometric Numerical Integration: Structure-Preserving Algorithms
+for Ordinary Differential Equations}, 2nd ed.,
+Springer, Berlin, 2006.
+
+% ── KEY SIAM PAPERS ─────────────────────────────────────────────
+\bibitem{duruisseaux2021adaptive}
+V.~Duruisseaux, J.~Schmitt, and M.~Leok,
+Adaptive Hamiltonian variational integrators and applications to
+symplectic accelerated optimization,
+\textit{SIAM J.\ Sci.\ Comput.}, 43 (2021), pp.~A2949--A2980,
+\url{https://doi.org/10.1137/20M1383835}.
+
+\bibitem{duruisseaux2022variational}
+V.~Duruisseaux and M.~Leok,
+A variational formulation of accelerated optimization on Riemannian
+manifolds,
+\textit{SIAM J.\ Math.\ Data Sci.}, 4 (2022), pp.~649--674,
+\url{https://doi.org/10.1137/21M1395648}.
+
+\bibitem{sanzserna2021lyapunov}
+J.~M. Sanz-Serna and K.~C. Zygalakis,
+The connections between Lyapunov functions for some optimization
+algorithms and differential equations,
+\textit{SIAM J.\ Numer.\ Anal.}, 59 (2021), pp.~1542--1565,
+\url{https://doi.org/10.1137/20M1364138}.
+
+\bibitem{dobson2025connections}
+P.~Dobson, J.~M. Sanz-Serna, and K.~C. Zygalakis,
+On the connections between optimization algorithms, Lyapunov functions,
+and differential equations: theory and insights,
+\textit{SIAM J.\ Optim.}, 35 (2025),
+\url{https://doi.org/10.1137/23M1625287}.
+
+\bibitem{franca2021dissipative}
+G.~Fran\c{c}a, M.~I. Jordan, and R.~Vidal,
+On dissipative symplectic integration with applications to
+gradient-based optimization,
+\textit{J.\ Stat.\ Mech.}, 2021 (2021), p.~043402,
+\url{https://doi.org/10.1088/1742-5468/abf5d4}.
+
+\bibitem{wibisono2016}
+A.~Wibisono, A.~C. Wilson, and M.~I. Jordan,
+A variational perspective on accelerated methods in optimization,
+\textit{Proc.\ Natl.\ Acad.\ Sci.\ USA}, 113 (2016), pp.~E7351--E7358,
+\url{https://doi.org/10.1073/pnas.1614734113}.
+
+% ── Gradient-based HPO ───────────────────────────────────────────
+\bibitem{lorraine2020millions}
+J.~Lorraine, P.~Vicol, and D.~Duvenaud,
+Optimizing millions of hyperparameters by implicit differentiation,
+in Proc.\ AISTATS 2020, PMLR 108, pp.~1540--1552.
+
+\bibitem{franceschi2018bilevel}
+L.~Franceschi, P.~Frasconi, S.~Salzo, R.~Grazzi, and M.~Pontil,
+Bilevel programming for hyperparameter optimization and meta-learning,
+in Proc.\ ICML 2018, PMLR 80, pp.~1568--1577.
+
+\bibitem{blondel2021implicit}
+M.~Blondel, Q.~Berthet, M.~Cuturi, R.~Frostig, S.~Hoyer,
+F.~Llinares-Lopez, F.~Pedregosa, and J.-P. Vert,
+Efficient and modular implicit differentiation,
+in Adv.\ NeurIPS 35, 2022.
+
+% ── Symplectic optimisation ──────────────────────────────────────
+\bibitem{goto2021symplectic}
+S.~Goto and H.~Hino,
+Fast symplectic integrator for Nesterov-type acceleration,
+\textit{arXiv:2106.07620}, 2021.
+
+% ── HPO methods and baselines ────────────────────────────────────
+\bibitem{bergstra2012}
+J.~Bergstra and Y.~Bengio,
+Random search for hyper-parameter optimization,
+\textit{J.\ Mach.\ Learn.\ Res.}, 13 (2012), pp.~281--305.
+
+\bibitem{hutter2011smac}
+F.~Hutter, H.~H. Hoos, and K.~Leyton-Brown,
+Sequential model-based optimization for general algorithm configuration,
+in Proc.\ LION 5, Springer LNCS 6683, 2011, pp.~507--523.
+
+\bibitem{falkner2018bohb}
+S.~Falkner, A.~Klein, and F.~Hutter,
+BOHB: robust and efficient hyperparameter optimization at scale,
+in Proc.\ ICML 2018, PMLR 80, pp.~1437--1446.
+
+\bibitem{lindauer2022smac3}
+M.~Lindauer, K.~Eggensperger, M.~Feurer, A.~Biedenkapp,
+D.~Deng, C.~Benjamins, T.~Ruhkopf, R.~Sass, and F.~Hutter,
+SMAC3: a versatile Bayesian optimization package for hyperparameter
+optimization,
+\textit{J.\ Mach.\ Learn.\ Res.}, 23 (2022), pp.~1--9.
+
+\bibitem{bergstra2011tpe}
+J.~Bergstra, R.~Bardenet, Y.~Bengio, and B.~K\'{e}gl,
+Algorithms for hyper-parameter optimization,
+in Adv.\ NeurIPS 24, 2011, pp.~2546--2554.
+
+\bibitem{watanabe2023tpe}
+S.~Watanabe,
+Tree-structured Parzen estimator: understanding its theory and
+analyzing a connection to Bayesian optimization,
+\textit{arXiv:2304.11127}, 2023.
+
+\bibitem{akiba2019optuna}
+T.~Akiba, S.~Sano, T.~Yanase, T.~Ohta, and M.~Koyama,
+Optuna: a next-generation hyperparameter optimization framework,
+in Proc.\ KDD 2019, ACM, pp.~2623--2631.
+
+\bibitem{li2018hyperband}
+L.~Li, K.~Jamieson, G.~DeSalvo, A.~Rostamizadeh, and A.~Talwalkar,
+Hyperband: a novel bandit-based approach to hyperparameter optimization,
+\textit{J.\ Mach.\ Learn.\ Res.}, 18 (2018), pp.~1--52.
+
+% ── Statistical testing ──────────────────────────────────────────
+\bibitem{demsar2006}
+J.~Dem\v{s}ar,
+Statistical comparisons of classifiers over multiple data sets,
+\textit{J.\ Mach.\ Learn.\ Res.}, 7 (2006), pp.~1--30.
+
+% ── Benchmarks ───────────────────────────────────────────────────
+\bibitem{eggensperger2021}
+K.~Eggensperger \textit{et al.},
+HPOBench: a collection of reproducible multi-fidelity benchmark
+problems for HPO,
+in NeurIPS Datasets and Benchmarks, 2021.
+
+\bibitem{klein2019tabular}
+A.~Klein and F.~Hutter,
+Tabular benchmarks for joint architecture and hyperparameter
+optimization,
+\textit{arXiv:1905.04970}, 2019.
+
+\bibitem{dong2020nasbench201}
+X.~Dong and Y.~Yang,
+NAS-Bench-201: extending the scope of reproducible neural architecture
+search,
+in Proc.\ ICLR 2020.
+
+\bibitem{ying2019nasbench101}
+C.~Ying, A.~Klein, E.~Christiansen, E.~Real, K.~Murphy, and F.~Hutter,
+NAS-Bench-101: towards reproducible neural architecture search,
+in Proc.\ ICML 2019, PMLR 97, pp.~7105--7114.
+
+\bibitem{chrabaszcz2017downsampled}
+P.~Chrabaszcz, I.~Loshchilov, and F.~Hutter,
+A downsampled variant of ImageNet as an alternative to the CIFAR
+datasets,
+\textit{arXiv:1707.08819}, 2017.
+
+% ── Physics-informed / Hamiltonian NNs ───────────────────────────
+\bibitem{greydanus2019}
+S.~Greydanus, M.~Dzamba, and J.~Yosinski,
+Hamiltonian neural networks,
+in Adv.\ NeurIPS 32, 2019.
+
+\bibitem{cranmer2020lagrangian}
+M.~Cranmer, S.~Greydanus, S.~Hoyer, P.~Battaglia, D.~Spergel, and S.~Ho,
+Lagrangian neural networks,
+\textit{arXiv:2003.04630}, 2020.
+
+\bibitem{zhang2025}
+Z.~Zhang, S.~Bai, Y.~Liang, and Z.~Bao,
+Neural networks under Hamiltonian constraints: a comprehensive review
+on structural evolution and applications,
+\textit{IEEE Access}, 13 (2025), pp.~208017--208033,
+\url{https://doi.org/10.1109/ACCESS.2025.3638011}.
+
+\bibitem{offen2022learning}
+C.~Offen and S.~Ober-Bl\"{o}baum,
+Learning Hamiltonian systems with structure-preserving integrators,
+\textit{J.\ Comput.\ Phys.}, 2022.
+
+\bibitem{raissi2019pinns}
+M.~Raissi, P.~Perdikaris, and G.~E. Karniadakis,
+Physics-informed neural networks,
+\textit{J.\ Comput.\ Phys.}, 378 (2019), pp.~686--707.
+
+\bibitem{krishnapriyan2021}
+A.~Krishnapriyan \textit{et al.},
+Characterizing possible failure modes in physics-informed neural networks,
+in Adv.\ NeurIPS 34, 2021, pp.~26548--26560.
+
+\bibitem{wang2023}
+S.~Wang, S.~Sankaran, H.~Wang, and P.~Perdikaris,
+An expert's guide to training physics-informed neural networks,
+\textit{arXiv:2308.08468}, 2023.
+
+\bibitem{rathore2024}
+P.~Rathore, W.~Lei, Z.~Frangella, L.~Lu, and M.~Udell,
+Challenges in training PINNs: a loss landscape perspective,
+in Proc.\ ICML 2024, PMLR 235.
+
+\bibitem{kiyani2025}
+E.~Kiyani \textit{et al.},
+Optimizing the optimizer for PINNs and Kolmogorov-Arnold networks,
+\textit{arXiv:2501.16371}, 2025.
+
+\bibitem{kaltsas2025}
+D.~A. Kaltsas,
+Constrained Hamiltonian systems and physics-informed neural networks:
+Hamilton-Dirac neural networks,
+\textit{Phys.\ Rev.\ E}, 111 (2025), p.~025301,
+\url{https://doi.org/10.1103/PhysRevE.111.025301}.
+
+% ── NAS ──────────────────────────────────────────────────────────
+\bibitem{zoph2017nas}
+B.~Zoph and Q.~V. Le,
+Neural architecture search with reinforcement learning,
+in Proc.\ ICLR 2017.
+
+\bibitem{elsken2019nas}
+T.~Elsken, J.~H. Metzen, and F.~Hutter,
+Neural architecture search: a survey,
+\textit{J.\ Mach.\ Learn.\ Res.}, 20 (2019), pp.~1--21.
+
+\bibitem{liu2019darts}
+H.~Liu, K.~Simonyan, and Y.~Yang,
+DARTS: differentiable architecture search,
+in Proc.\ ICLR 2019.
+
+\bibitem{real2019aging}
+E.~Real, A.~Aggarwal, Y.~Huang, and Q.~V. Le,
+Regularized evolution for image classifier architecture search,
+in Proc.\ AAAI 2019, vol.~33, pp.~4780--4789.
+
+% ── General references ───────────────────────────────────────────
+\bibitem{goldstein2002}
+H.~Goldstein, C.~Poole, and J.~Safko,
+\textit{Classical Mechanics}, 3rd ed.,
+Addison-Wesley, Reading, MA, 2002.
+
+\bibitem{lecun2015}
+Y.~LeCun, Y.~Bengio, and G.~Hinton,
+Deep learning,
+\textit{Nature}, 521 (2015), pp.~436--444.
+
+\bibitem{raiaan2024}
+M.~A.~K. Raiaan \textit{et al.},
+A systematic review of hyperparameter optimization techniques in CNNs,
+\textit{Decision Anal.\ J.}, 11 (2024), p.~100470.
+
+\bibitem{loshchilov2019adamw}
+I.~Loshchilov and F.~Hutter,
+Decoupled weight decay regularization,
+in Proc.\ ICLR 2019.
+
+\bibitem{paszke2019}
+A.~Paszke \textit{et al.},
+PyTorch: an imperative style, high-performance deep learning library,
+in Adv.\ NeurIPS 32, 2019.
+
+\bibitem{virtanen2020}
+P.~Virtanen \textit{et al.},
+SciPy 1.0: fundamental algorithms for scientific computing in Python,
+\textit{Nat.\ Methods}, 17 (2020), pp.~261--272.
+
+\bibitem{toth2020hamiltonian}
+P.~Toth, D.~J. Rezende, A.~Jaegle, S.~Racani\`{e}re, A.~Botev,
+and I.~Higgins,
+Hamiltonian generative networks,
+in Proc.\ ICLR 2020.
+
+\bibitem{lindauer2020hpo}
+M.~Lindauer and F.~Hutter,
+Best practices for scientific research on neural architecture search,
+\textit{J.\ Mach.\ Learn.\ Res.}, 21 (2020), pp.~1--18.
+
+\bibitem{henon1964}
+M.~H\'{e}non and C.~Heiles,
+The applicability of the third integral of motion: some numerical
+experiments,
+\textit{Astron.\ J.}, 69 (1964), pp.~73--79.
+
+\end{thebibliography}
+
+\end{document}

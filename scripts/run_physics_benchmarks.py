@@ -59,19 +59,19 @@ SYSTEMS = {
         "gen_fn": generate_hamiltonian_data,
         "input_dim": 2,
         "label": "Harmonic Oscillator (2D)",
-        "results_dir": "results_hamiltonian",
+        "results_dir": "results/harmonic_oscillator/method_a",
     },
     "henon_heiles": {
         "gen_fn": generate_henon_heiles_data,
         "input_dim": 4,
         "label": "Hénon-Heiles (4D)",
-        "results_dir": "results_henon_heiles",
+        "results_dir": "results/physics_benchmarks/henon_heiles",
     },
     "double_well": {
         "gen_fn": generate_double_well_data,
         "input_dim": 2,
         "label": "Double-Well (2D)",
-        "results_dir": "results_double_well",
+        "results_dir": "results/physics_benchmarks/double_well",
     },
 }
 
@@ -81,7 +81,7 @@ METHODS = {
     "C": "Method C (Unified)",
 }
 
-RESULTS_ROOT = Path("results_physics_benchmarks")
+RESULTS_ROOT = Path("results/physics_benchmarks")
 
 
 # ---------------------------------------------------------------------------

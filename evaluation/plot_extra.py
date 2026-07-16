@@ -36,9 +36,9 @@ def load_json(p):
 # Plot 1: Harmonic Oscillator Best Val Loss Comparison
 # --------------------------------------------------------------------------- #
 print("Plotting Harmonic Oscillator Best Val Loss Comparison...")
-hA = load_json("results_hamiltonian/history.json")
-hB = load_json("results_hybrid/history.json")
-hC = load_json("results_unified_improved/history.json")
+hA = load_json("results/harmonic_oscillator/method_a/history.json")
+hB = load_json("results/harmonic_oscillator/method_b/history.json")
+hC = load_json("results/harmonic_oscillator/method_c/history.json")
 
 # Extract the best validation loss (min values)
 loss_A = min(hA.get("val_loss", hA.get("best_val_loss", [0.151283])))
@@ -84,7 +84,7 @@ print("  Saved plots/harmonic_val_loss_comparison.png")
 # Plot 2: CNN Comparison (HHD vs ABBO Only)
 # --------------------------------------------------------------------------- #
 print("Plotting CNN Comparison (HHD vs ABBO)...")
-cnn_data = load_json("results_cnn/benchmark_results.json")
+cnn_data = load_json("results/cnn/benchmark_results.json")
 
 # Extract histories
 # HHD (Method A)

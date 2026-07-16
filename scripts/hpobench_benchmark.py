@@ -127,7 +127,7 @@ ALL_OPTIMIZERS = [
     "SMAC3",
 ]
 
-RESULTS_DIR = Path("results_hpobench")
+RESULTS_DIR = Path("results/hpobench")
 
 # ---------------------------------------------------------------------------
 # Helpers

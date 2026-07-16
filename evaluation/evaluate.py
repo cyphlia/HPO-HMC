@@ -111,9 +111,9 @@ def evaluate_harmonic(results_dirs=None, mesh_data=None, output_dir="results"):
     """
     if results_dirs is None:
         results_dirs = {
-            "A": "results_hamiltonian",
-            "B": "results_hybrid",
-            "C": "results_unified_improved",
+            "A": "results/harmonic_oscillator/method_a",
+            "B": "results/harmonic_oscillator/method_b",
+            "C": "results/harmonic_oscillator/method_c",
         }
 
     os.makedirs(output_dir, exist_ok=True)
@@ -254,7 +254,7 @@ def evaluate_harmonic(results_dirs=None, mesh_data=None, output_dir="results"):
 #  CNN Evaluation
 # --------------------------------------------------------------------------- #
 
-def evaluate_cnn(results_file="results_cnn/benchmark_results.json", output_dir="results"):
+def evaluate_cnn(results_file="results/cnn/benchmark_results.json", output_dir="results"):
     """Evaluate CNN benchmark results with tables."""
     os.makedirs(output_dir, exist_ok=True)
 
