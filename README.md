@@ -1,34 +1,30 @@
 # Hamiltonian Hyperparameter Dynamics (HHD)
 ## Self-Tuning Neural Networks via Symplectic Integration
 
-A novel framework for **automatic hyperparameter optimization** that treats hyperparameters as dynamical variables in an extended Hamiltonian system, enabling joint co-evolution of network weights and hyperparameters through symplectic integration.
+A unified optimization framework that treats neural network hyperparameters as continuous dynamical variables in an augmented Bregman Hamiltonian system. HHD enables the joint, concurrent co-evolution of model weights $\theta$ and hyperparameters $\lambda$ along smooth physical trajectories via geometric, symplectic integration.
 
 ---
 
 ## Overview
 
-This project implements and compares three hyperparameter optimization methods:
+This repository implements the three optimization philosophies evaluated in the paper:
 
-| Method | Name | Approach |
-|--------|------|----------|
-| **A** | Pure HHD | Hamiltonian Monte Carlo co-evolution of weights + hyperparameters |
-| **B** | Hybrid BO | Gaussian Process Bayesian Optimization + Adam + L-BFGS |
-| **C** | Unified HHD-ABBO | Three-phase curriculum: Adam → HMC → L-BFGS *(Novel)* |
-
-**Method C** is the novel contribution, combining the theoretical guarantees of symplectic integration (from A) with the practical convergence benefits of second-order optimization (from B).
+| Method | Name | Description | Approach |
+|:---:|:---|:---|:---|
+| **A** | **HHD-HMC** | Pure HHD Co-evolution | Symplectic Leapfrog integration of weights and HPs with a Metropolis-Hastings correction |
+| **B** | **Hybrid ABBO** | Decoupled baseline | Gaussian Process Bayesian Optimization in the outer loop, Adam & L-BFGS in the inner loop |
+| **C** | **HHD-Unified** | Multi-phase HHD *(Novel)* | Three-phase curriculum: Adam Warmup $\rightarrow$ HMC Co-evolution $\rightarrow$ L-BFGS Curvature Polish |
 
 ### Key Innovation
-The extended Hamiltonian:
-```
-H(θ, p_θ, λ, p_λ) = T(p_θ)/m_θ + T(p_λ)/m_λ + L(θ, λ)
-```
-enables **continuous**, **physics-based** hyperparameter trajectories with provable energy conservation guarantees (see [validate.py](file:///c:/Minor%20Project/Model/current/validation/validate.py)).
+HHD shifts hyperparameter optimization from a decoupled outer-loop black-box problem to a joint physical system defined by the augmented Hamiltonian:
+
+$$H(\theta, p_{\theta}, \lambda, p_{\lambda}) = T_{\theta}(p_{\theta}) + T_{\lambda}(p_{\lambda}) + \mathcal{L}(\theta, \lambda)$$
+
+By simulating hyperparameter trajectories using a **symplectic Leapfrog integrator**, HHD preserves a shadow Hamiltonian with provable energy conservation guarantees and smooth hyperparameter curves.
 
 ---
 
 ## Project Structure
-
-The project directory is structured as follows:
 
 ```
 current/
@@ -71,6 +67,7 @@ current/
 │
 ├── docs/                         # LaTeX papers, drafts, and project writeups
 │   ├── compile_latex.py          # Helper script to compile LaTeX documents
+│   ├── HO_main2.tex              # Active paper LaTeX document
 │   ├── cs23b1019_report.pdf      # Final compiled paper PDF
 │   └── PROJECT_OVERVIEW.md       # High-level overview and mathematical details
 │
@@ -91,7 +88,7 @@ current/
 ## Quick Start & Result Reproduction
 
 ### 1. Installation & Environment Setup
-First, install all necessary dependencies (including PyTorch, SciPy, Optuna, scikit-learn, and the HPOBench tabular library):
+Install the necessary requirements (PyTorch, SciPy, Optuna, scikit-learn, and simple-hpo-bench):
 ```bash
 pip install -r requirements.txt
 ```
@@ -112,8 +109,7 @@ pip install -r requirements.txt
 ---
 
 ### 3. How to Reproduce CIFAR-10 CNN Benchmark Results
-The CNN benchmark has been upgraded to a CPU-feasible ResNet model running CIFAR-10 classification, tuning 4 HPs (`log_lr`, `dropout`, `log_wd`, `log_batch_size`).
-1. **Run the Benchmark:** Evaluate all three methods:
+1. **Run the Benchmark:** Evaluate all three methods on the CIFAR-10 small slice:
    ```bash
    python main.py --task cnn
    ```
@@ -147,35 +143,11 @@ The CNN benchmark has been upgraded to a CPU-feasible ResNet model running CIFAR
    ```bash
    python main.py --task hpobench
    ```
-   *Or direct runner command:*
-   ```bash
-   python scripts/hpobench_benchmark.py --trials 100 --seeds 0,1,2,3,4
-   ```
    This writes lookup trajectories to `results/hpobench/`.
 2. **Generate Plots & Statistical Diagrams:**
    ```bash
    python evaluation/plot_hpobench.py
    python scripts/statistical_tests.py
-   ```
-
----
-
-### 5. Run Other Scientific Studies
-1. **Run Multi-System Physics Benchmarks:** Run training across Harmonic Oscillator, Hénon-Heiles (4D), and Double-Well systems:
-   ```bash
-   python main.py --task physics_all
-   ```
-2. **Run Sensitivity Sweep:** Sweep meta-hyperparameters (such as Leapfrog step size $\epsilon$):
-   ```bash
-   python scripts/sensitivity_analysis.py
-   ```
-3. **Run Ablation Studies:** Measure the contribution of individual components of the Method C curriculum:
-   ```bash
-   python scripts/ablation_study.py
-   ```
-4. **Generate All Figures at Once:** Compile all project figures into the `plots/` directory:
-   ```bash
-   python evaluation/plot_all_results.py
    ```
 
 ---
@@ -188,72 +160,81 @@ python validation/validate.py
 
 ---
 
-## Methods in Detail & Tuning Walkthroughs
+## Empirical Results
 
-### 1. Algorithm A: Pure Hamiltonian Hyperparameter Dynamics (HHD)
-Method A co-evolves the network weights $\theta$ and the hyperparameters $\lambda$ inside a joint continuous phase space.
-* **Warm-up:** Train model weights using Adam for 20 epochs while keeping hyperparameters frozen to stabilize gradients.
-* **Momentum Sampling:** Retrieve a training batch and draw random momentum vectors: $p_\theta, p_\lambda \sim \mathcal{N}(0, I)$.
-* **Leapfrog Integration:** Simulate joint trajectories using a **symplectic Leapfrog solver** (Leapfrog step size $\epsilon = 0.01$). Gradients with respect to weights ($\nabla_\theta L$) are computed via backpropagation; gradients with respect to HPs ($\nabla_\lambda L$) are computed via central finite differences.
-* **Metropolis-Hastings:** Evaluate the proposed coordinates ($\theta_{\text{prop}}, \lambda_{\text{prop}}$). Accept the new state with Metropolis probability ($T = 1e9$, optimization mode).
-* **Model Checkpointing (Fixed):** The trainer tracks the best parameter set seen across the HMC trajectory and restores it, preventing the dynamics from wandering away from optimal solutions in later epochs.
+### 1. Harmonic Oscillator Benchmark
+Evaluated over 5 independent random seeds (mean $\pm$ std). Matches the results reported in Table 3 of the paper:
 
-### 2. Algorithm B: Hybrid BO (ABBO)
-Method B treats HPO as a decoupled black-box problem, separating outer-loop hyperparameter queries from inner-loop model training.
-* **HP Selection:** Loop for 15 trials. Suggest hyperparameters randomly (trials 1–3) or by maximizing Expected Improvement (EI) using L-BFGS-B over a Gaussian Process (GP) surrogate.
-* **Model Reset:** Fully discard the previous model. Instantiate a fresh neural network from scratch, initializing weights randomly.
-* **Inner Weight Training:** Train the new model from scratch for 60 epochs using Adam.
-* **GP Update:** Feed validation performance back to update the GP surrogate prior.
-
-### 3. Method C: Unified HHD-ABBO
-Method C merges HHD's physical exploration with second-order L-BFGS curvature refinement in a single, unified curriculum:
-* **Phase 1 (Adam Warm-up):** Quick 20-epoch training to guide weights to a stable local basin.
-* **Phase 2 (Co-Evolution):** Joint HMC updates over 60 epochs with an **adaptive step-size controller** (adjusts $\epsilon$ to target a 65% acceptance rate).
-* **Phase 3 (Plateau L-BFGS Polish):** If a training loss plateau is detected, Method C pauses HMC and runs a sequence of L-BFGS steps. A final 100-step L-BFGS polish is run at the very end of training to lock in hyperparameters and quickly converge weights.
+| Metric | A: HHD-HMC | B: Hybrid ABBO | C: HHD-Unified | C's Improvement vs B |
+|:---|:---:|:---:|:---:|:---:|
+| **Best Val. MSE** | $0.2439 \pm 0.1627$ | $0.0952 \pm 0.0051$ | $\mathbf{0.00331 \pm 0.00014}$ | **~28.8x Better** |
+| **Landscape MAE** | $0.3618 \pm 0.1091$ | $0.1028 \pm 0.0149$ | $\mathbf{0.0208 \pm 0.0014}$ | **~4.9x Better** |
+| **Landscape RMSE**| $0.4872 \pm 0.1669$ | $0.1403 \pm 0.0197$ | $\mathbf{0.0270 \pm 0.0019}$ | **~5.2x Better** |
+| **$R^2$ Score** | $0.9785 \pm 0.0158$ | $0.9984 \pm 0.0005$ | $\mathbf{0.99994 \pm 0.00001}$ | **Near-Perfect Fit** |
+| **Wall time (s)** | $\mathbf{26.6 \pm 1.3}$ | $99.9 \pm 1.9$ | $85.6 \pm 1.4$ | **~14% Faster** |
 
 ---
 
-## Empirical Results
+### 2. CIFAR-10 CNN Classification Benchmark
+Evaluated over 5 independent random seeds (mean $\pm$ std). Matches the results reported in Table 4 of the paper:
 
-### 1. Harmonic Oscillator Performance Comparison
+| Metric | A: HHD-HMC | B: Hybrid ABBO | C: HHD-Unified |
+|:---|:---:|:---:|:---:|
+| **Best Val. Acc. (%)** | $30.90 \pm 1.59$ | $28.50 \pm 2.19$ | $\mathbf{30.60 \pm 2.65}$ |
+| **Wall time (s)** | $42.0$ | $\mathbf{31.9}$ | $43.2$ |
+| **Final $\eta$** | $9.7 \times 10^{-4}$ | $4.5 \times 10^{-3}$ | $1.7 \times 10^{-3}$ |
+| **Final $p_{\mathrm{drop}}$** | $0.19$ | $0.27$ | $0.20$ |
 
-| Metric | Method A (Pure HHD) | Method B (Hybrid BO) | Method C (Unified HHD-ABBO) | Improvement vs Method B |
-|:---|:---:|:---:|:---:|:---:|
-| **Best Val Loss** | 0.151283 | 0.098957 | **0.003270** | **~30.3x Better** |
-| **Landscape MAE** | 0.699041 | 0.104961 | **0.017673** | **~5.9x Better** |
-| **Landscape RMSE**| 0.786251 | 0.139415 | **0.024848** | **~5.6x Better** |
-| **R² Score** | 0.949784 | 0.998421 | **0.999950** | **Near-Perfect Fit** |
-
-### 2. CIFAR-10 CNN Classification Results
-
-| Method | Best Validation Acc | Final Validation Acc | Wall-clock Time (s) | Optimized LR | Optimized Dropout |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| **Method A (HHD)** | **30.90%** | 28.70% | 42.0 | 0.000955 | 0.2017 |
-| **Method B (BO)** | 28.50% | 28.50% | **31.9** | 0.002574 | 0.2727 |
-| **Method C (Unified)**| 30.60% | **29.70%** | 43.2 | 0.001094 | 0.1986 |
+---
 
 ### 3. Fashion-MNIST Deep MLP Classification Results
+Evaluated over 5 independent random seeds (mean $\pm$ std). Evaluates performance under dynamic hidden layers/units:
 
-| Method | Best Validation Acc (mean ± std) | Wall-clock Time (mean) |
-|:---|:---:|:---:|
-| **Default Adam (Fixed HPs)** | 84.43% ± 0.41% | **32.9s** |
-| **Method C (Unified HHD-ABBO)** | **85.01% ± 0.12%** | 85.9s |
+| Method | Best Validation Acc (%) | Wall-clock Time (s) | Final $\eta$ | Final $p_{\mathrm{drop}}$ |
+|:---|:---:|:---:|:---:|:---:|
+| **Default Adam (Fixed HPs)** | $84.43 \pm 0.41$ | $\mathbf{32.9}$ | $1.0 \times 10^{-3}$ | $0.20$ |
+| **C: HHD-Unified** | $\mathbf{85.01 \pm 0.12}$ | $85.9$ | $1.1 \times 10^{-3}$ | $0.20$ |
 
-*Method C achieves a higher validation accuracy than the Default Adam configuration, while maintaining a significantly tighter/more stable standard deviation across seeds due to the adaptive HMC trajectory exploration and second-order refinement.*
+*HHD-Unified achieves a higher validation accuracy than Default Adam, while maintaining a **~3.4x tighter standard deviation** across seeds due to the robust exploratory HMC co-evolution.*
+
+---
+
+### 4. Standardised Tabular Benchmarks (HPOBench, HPOLib, NAS-Bench-201)
+Average Rankings across 11 datasets (1 = best). Matches the rank summary reported in Table 7 of the paper:
+
+1. **Optuna TPE**: **1.36**
+2. **Hybrid ABBO (Method B)**: **2.82**
+3. **HHD-Unified (Method C)**: **3.09**
+4. **Random Search**: **3.64**
+5. **HHD-HMC (Method A)**: **4.09**
+
+*The Friedman test yields $p = 7.92\times10^{-4}$ (highly significant), and the Nemenyi critical difference at $\alpha=0.05$ is $\mathrm{CD} = 1.84$. The rank difference between TPE and HHD-Unified ($1.73$) is less than the critical difference; they are statistically indistinguishable on these datasets.*
 
 ---
 
 ## Theoretical Validation
 
-The `validation/` suite verifies the following mathematical principles:
-1. **Symplectic Conservation (Theorem 1)** — Verifies $| \Delta H | = \mathcal{O}(\epsilon^2)$ energy error scaling for the Leapfrog integrator.
-2. **Detailed Balance (Theorem 2)** — Verifies HMC transition ergodicity and correct distribution sampling.
-3. **Convergence Rates (Theorem 3)** — Empirically validates training loss optimization rates.
+The mathematical proof validation suite in `validation/` evaluates three core properties:
+1. **Symplectic Conservation (Theorem 1)** — Verifies the Leapfrog integrator preserves energy with $| \Delta H | = \mathcal{O}(\epsilon^2)$ scaling.
+2. **Detailed Balance (Theorem 2)** — Verifies that HMC proposals satisfy detailed balance and maintain ergodicity.
+3. **Convergence Rates (Theorem 3)** — Empirically validates optimization loss profiles across training epochs.
 
-Run `python validation/validate.py` to compile metrics and output charts to `results/validation/`.
+Run the validation suite via:
+```bash
+python validation/validate.py
+```
+
+---
+
+## References
+
+1. Duane et al. (1987). "Hybrid Monte Carlo." *Physics Letters B*, 195(2):216-222.
+2. Neal (2011). "MCMC using Hamiltonian Dynamics." *Handbook of Markov Chain Monte Carlo*.
+3. Kingma & Ba (2015). "Adam: A Method for Stochastic Optimization." *ICLR*.
+4. Liu & Nocedal (1989). "On the Limited Memory BFGS Method." *Mathematical Programming*, 45(1):503-528.
+5. Demsar (2006). "Statistical Comparisons of Classifiers over Multiple Data Sets." *JMLR*, 7(1):1-30.
 
 ---
 
 ## License
-
 Academic use. See individual file headers for details.
