@@ -77,24 +77,34 @@ def finite_diff_hp_grads(model, hp_state, batch, criterion, base_loss):
             continue
 
         if k == "dropout":
-            # Perturb dropout rate and evaluate (use eval mode for clean gradients)
+            # Perturb dropout rate and evaluate.
+            # Fix: Keep in train mode and set seed so the dropout mask is
+            # deterministic, otherwise dropout is completely disabled in eval mode
+            # and returns a zero gradient.
             def _eval_dropout(dval):
                 old_d = model.dropout_rate
                 model.dropout_rate = dval
                 for m in model.modules():
                     if isinstance(m, nn.Dropout):
                         m.p = dval
-                model.eval()
-                with torch.no_grad():
-                    loss_val = float(criterion(model(X), y).item())
+                torch.manual_seed(42)
+                model.train()
+                loss_val = float(criterion(model(X), y).item())
                 model.dropout_rate = old_d
                 for m in model.modules():
                     if isinstance(m, nn.Dropout):
                         m.p = old_d
-                model.train()
                 return loss_val
 
             grads[k] = torch.tensor([(_eval_dropout(vp) - _eval_dropout(vm)) / denom])
+
+        elif k == "log_wd":
+            # Analytical gradient for weight decay log_wd (wd = 10^log_wd)
+            # L_reg = L_data + 0.5 * wd * ||w||^2
+            # dL/d(log_wd) = dL/d(wd) * d(wd)/d(log_wd) = 0.5 * ||w||^2 * 10^log_wd * ln(10)
+            wd = 10 ** old_val
+            w_norm_sq = sum(float((p ** 2).sum()) for p in model.parameters())
+            grads[k] = torch.tensor([0.5 * w_norm_sq * wd * np.log(10.0)])
 
         elif k in ("n_layers", "n_neurons"):
             # Structural HP: build temporary model with perturbed architecture

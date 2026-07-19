@@ -121,7 +121,11 @@ class HyperparamState:
         return out
 
     def step_positions(self, eps: float, mass: float):
-        """Update positions: lambda += eps * p_lambda * range / m_lambda"""
+        """
+        Update positions: lambda += eps * p_lambda * range / m_lambda
+        Uses reflection boundary conditions: when a hyperparameter bounces
+        off a boundary, its position is reflected and its momentum is negated.
+        """
         frozen_hps = getattr(self, "frozen_hps", [])
         with torch.no_grad():
             for k in self.values:
@@ -129,8 +133,20 @@ class HyperparamState:
                     continue
                 lo, hi = self.bounds[k]
                 hp_range = hi - lo
-                self.values[k] += eps * self.momenta[k] * hp_range / mass
-                self.values[k].clamp_(lo, hi)
+                new_val = self.values[k] + eps * self.momenta[k] * hp_range / mass
+                
+                # Reflect off boundaries
+                for _ in range(3):  # handle multiple bounces if step is large
+                    if new_val > hi:
+                        new_val = 2.0 * hi - new_val
+                        self.momenta[k] = -self.momenta[k]
+                    elif new_val < lo:
+                        new_val = 2.0 * lo - new_val
+                        self.momenta[k] = -self.momenta[k]
+                    else:
+                        break
+                new_val.clamp_(lo, hi)  # safety clamp for numerical precision
+                self.values[k].copy_(new_val)
 
     def step_momenta(self, grads: Dict[str, torch.Tensor], eps: float, mass: float):
         """Update momenta: p_lambda -= eps * dL/dlambda * range / m_lambda"""

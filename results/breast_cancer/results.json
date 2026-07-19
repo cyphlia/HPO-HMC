@@ -1,0 +1,230 @@
+[
+  {
+    "method": "Default Adam",
+    "seed": 0,
+    "val_auroc": 0.9963624338624338,
+    "test_metrics": {
+      "accuracy": 0.9824561403508771,
+      "f1": 0.9859154929577465,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9990173599737963
+    },
+    "time": 3.38777494430542,
+    "final_hps": {
+      "lr": 0.001,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Random Search",
+    "seed": 0,
+    "val_auroc": 0.9966931216931216,
+    "test_metrics": {
+      "accuracy": 0.9736842105263158,
+      "f1": 0.9787234042553191,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9990173599737963
+    },
+    "time": 34.00516414642334,
+    "final_hps": {
+      "lr": 0.0015676677195506057,
+      "dropout": 0.4291136198234517,
+      "weight_decay": 0.00025766385746135885,
+      "n_hidden": 73,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Optuna TPE",
+    "seed": 0,
+    "val_auroc": 0.9966931216931217,
+    "test_metrics": {
+      "accuracy": 0.9736842105263158,
+      "f1": 0.9787234042553191,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9993449066491975
+    },
+    "time": 38.12578344345093,
+    "final_hps": {
+      "lr": 0.0029548945587266834,
+      "dropout": 0.3672574336334528,
+      "weight_decay": 0.00029358643643953575,
+      "n_hidden": 128,
+      "n_layers": 3
+    }
+  },
+  {
+    "method": "Method C (HHD-ABBO)",
+    "seed": 0,
+    "val_auroc": 0.9940476190476191,
+    "test_metrics": {
+      "accuracy": 0.9824561403508771,
+      "f1": 0.9859154929577465,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9970520799213888
+    },
+    "time": 3.2783780097961426,
+    "final_hps": {
+      "lr": 0.0016398483820450744,
+      "dropout": 0.08815717697143555,
+      "weight_decay": 2.018294652549667e-06,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Default Adam",
+    "seed": 1,
+    "val_auroc": 0.99737962659679,
+    "test_metrics": {
+      "accuracy": 0.9912280701754386,
+      "f1": 0.993103448275862,
+      "malignant_recall": 0.9761904761904762,
+      "auroc": 1.0
+    },
+    "time": 1.858914852142334,
+    "final_hps": {
+      "lr": 0.001,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Random Search",
+    "seed": 1,
+    "val_auroc": 1.0,
+    "test_metrics": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "malignant_recall": 1.0,
+      "auroc": 1.0
+    },
+    "time": 36.5029718875885,
+    "final_hps": {
+      "lr": 0.0378814552109712,
+      "dropout": 0.051026526821866744,
+      "weight_decay": 1.4329107238467828e-06,
+      "n_hidden": 28,
+      "n_layers": 4
+    }
+  },
+  {
+    "method": "Optuna TPE",
+    "seed": 1,
+    "val_auroc": 1.0,
+    "test_metrics": {
+      "accuracy": 0.9912280701754386,
+      "f1": 0.993103448275862,
+      "malignant_recall": 0.9761904761904762,
+      "auroc": 0.9993386243386243
+    },
+    "time": 35.14246606826782,
+    "final_hps": {
+      "lr": 0.030470165585582798,
+      "dropout": 0.09828575102911333,
+      "weight_decay": 0.00010254939137117394,
+      "n_hidden": 48,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Method C (HHD-ABBO)",
+    "seed": 1,
+    "val_auroc": 0.9970520799213889,
+    "test_metrics": {
+      "accuracy": 0.9912280701754386,
+      "f1": 0.993006993006993,
+      "malignant_recall": 1.0,
+      "auroc": 1.0
+    },
+    "time": 3.097360134124756,
+    "final_hps": {
+      "lr": 0.006465628853422229,
+      "dropout": 0.5150152444839478,
+      "weight_decay": 0.00047810782557787285,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Default Adam",
+    "seed": 2,
+    "val_auroc": 0.9933862433862434,
+    "test_metrics": {
+      "accuracy": 0.9649122807017544,
+      "f1": 0.9714285714285714,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9983622666229938
+    },
+    "time": 1.5988764762878418,
+    "final_hps": {
+      "lr": 0.001,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Random Search",
+    "seed": 2,
+    "val_auroc": 0.9976851851851851,
+    "test_metrics": {
+      "accuracy": 0.9649122807017544,
+      "f1": 0.9710144927536232,
+      "malignant_recall": 1.0,
+      "auroc": 0.9996724533245988
+    },
+    "time": 35.51176476478577,
+    "final_hps": {
+      "lr": 0.0021416058974333624,
+      "dropout": 0.015330565109815652,
+      "weight_decay": 0.00044545934800200047,
+      "n_hidden": 55,
+      "n_layers": 2
+    }
+  },
+  {
+    "method": "Optuna TPE",
+    "seed": 2,
+    "val_auroc": 0.9953703703703705,
+    "test_metrics": {
+      "accuracy": 1.0,
+      "f1": 1.0,
+      "malignant_recall": 1.0,
+      "auroc": 1.0
+    },
+    "time": 36.50857853889465,
+    "final_hps": {
+      "lr": 0.0007432757063919565,
+      "dropout": 0.12104593575897919,
+      "weight_decay": 0.0003644407241015734,
+      "n_hidden": 64,
+      "n_layers": 3
+    }
+  },
+  {
+    "method": "Method C (HHD-ABBO)",
+    "seed": 2,
+    "val_auroc": 0.9910714285714285,
+    "test_metrics": {
+      "accuracy": 0.9912280701754386,
+      "f1": 0.993006993006993,
+      "malignant_recall": 0.9767441860465116,
+      "auroc": 0.9990173599737963
+    },
+    "time": 3.1875665187835693,
+    "final_hps": {
+      "lr": 1.9062463439416764e-05,
+      "dropout": 0.040934205055236816,
+      "weight_decay": 5.1165780881824727e-05,
+      "n_hidden": 32,
+      "n_layers": 2
+    }
+  }
+]
