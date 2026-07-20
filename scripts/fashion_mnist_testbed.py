@@ -501,13 +501,27 @@ def run_method_c(seed: int = 0) -> dict:
     opt = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
     lbfgs_count = 0
 
+    val_iter = iter(val_loader)
     for ep in range(n_hmc):
         # HMC proposal
         Xb, yb = next(iter(train_loader))
         Xb, yb = Xb.view(Xb.size(0), -1).to(DEVICE), yb.to(DEVICE)
-        curr_loss = criterion(model(Xb), yb).item()
+
+        try:
+            X_val_b, y_val_b = next(val_iter)
+        except StopIteration:
+            val_iter = iter(val_loader)
+            X_val_b, y_val_b = next(val_iter)
+        X_val_b = X_val_b.view(X_val_b.size(0), -1).to(DEVICE)
+        y_val_b = y_val_b.to(DEVICE)
+
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(X_val_b), y_val_b).item()
+        model.train()
+
         acc_flag, curr_loss = mcmc.propose(
-            model, hp_state, (Xb, yb), criterion, curr_loss)
+            model, hp_state, (Xb, yb), criterion, curr_loss, val_batch=(X_val_b, y_val_b))
 
         # Adaptive step size
         mcmc.leapfrog.eps = step_ctrl.update(mcmc.acceptance_rate)

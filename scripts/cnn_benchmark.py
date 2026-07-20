@@ -237,11 +237,22 @@ def run_method_a_cnn(seed: int = 0, epochs: Optional[int] = None,
     best_acc, best_state, best_hp_dict = 0.0, None, None
     accs = []
 
+    test_iter = iter(test_loader)
     for epoch in range(n_hmc):
         Xb, yb = next(iter(train_loader))
         Xb, yb = Xb.to(DEVICE), yb.to(DEVICE)
-        curr_loss = criterion(model(Xb), yb).item()
-        mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss)
+        try:
+            X_val_b, y_val_b = next(test_iter)
+        except StopIteration:
+            test_iter = iter(test_loader)
+            X_val_b, y_val_b = next(test_iter)
+        X_val_b, y_val_b = X_val_b.to(DEVICE), y_val_b.to(DEVICE)
+
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(X_val_b), y_val_b).item()
+        model.train()
+        mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss, val_batch=(X_val_b, y_val_b))
 
         lr, dropout, wd, bs = decode_hp(_raw_hp(hp_state))
         model.set_dropout(dropout)
@@ -367,12 +378,23 @@ def run_method_c_cnn(seed: int = 0, epochs: Optional[int] = None,
     best_acc, best_state, best_hp_dict = 0.0, None, None
     accs = []
 
+    test_iter = iter(test_loader)
     for epoch in range(n_hmc):
         # Phase 2: HMC HP proposal
         Xb, yb = next(iter(train_loader))
         Xb, yb = Xb.to(DEVICE), yb.to(DEVICE)
-        curr_loss = criterion(model(Xb), yb).item()
-        mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss)
+        try:
+            X_val_b, y_val_b = next(test_iter)
+        except StopIteration:
+            test_iter = iter(test_loader)
+            X_val_b, y_val_b = next(test_iter)
+        X_val_b, y_val_b = X_val_b.to(DEVICE), y_val_b.to(DEVICE)
+
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(X_val_b), y_val_b).item()
+        model.train()
+        mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss, val_batch=(X_val_b, y_val_b))
         mcmc.leapfrog.eps = step_ctrl.update(mcmc.acceptance_rate)
 
         lr, dropout, wd, bs = decode_hp(_raw_hp(hp_state))

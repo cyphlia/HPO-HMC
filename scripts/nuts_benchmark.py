@@ -592,11 +592,16 @@ def _run_method_c_variant(seed, input_dim, n_hmc_epochs, n_warmup, label,
 
     Xall = torch.cat([X for X, y in train_loader]).to(DEVICE)
     yall = torch.cat([y for X, y in train_loader]).to(DEVICE)
+    Xall_val = torch.cat([X for X, y in val_loader]).to(DEVICE)
+    yall_val = torch.cat([y for X, y in val_loader]).to(DEVICE)
 
     for ep in range(n_hmc_epochs):
-        curr_loss = criterion(model(Xall), yall).item()
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(Xall_val), yall_val).item()
+        model.train()
         acc_flag, curr_loss = mcmc.propose(
-            model, hp_state, (Xall, yall), criterion, curr_loss)
+            model, hp_state, (Xall, yall), criterion, curr_loss, val_batch=(Xall_val, yall_val))
 
         # Adapt step size
         integrator = getattr(mcmc, "nuts", getattr(mcmc, "leapfrog", None))

@@ -170,6 +170,15 @@ def finite_diff_hp_grads(model, hp_state, batch, criterion, base_loss):
         else:
             grads[k] = torch.tensor([0.0])
 
+        # Add Logarithmic Barrier Potential gradient to prevent boundary sticking/chatter
+        # V_barrier = -barrier_coef * [ln(val - lo) + ln(hi - val)]
+        # dV/dlambda = -barrier_coef * [1/(val - lo) - 1/(hi - val)]
+        barrier_coef = 1e-4
+        dist_lo = max(1e-6, old_val - lo)
+        dist_hi = max(1e-6, hi - old_val)
+        g_barrier = -barrier_coef * (1.0 / dist_lo - 1.0 / dist_hi)
+        grads[k] = grads[k] + g_barrier
+
     return grads
 
 
@@ -224,15 +233,24 @@ class LeapfrogIntegrator:
             for n in wg:
                 wg[n] = wg[n] * scale
 
-    def _mom_step(self, model, w_mom, hp_state, batch, criterion, coeff):
+    def _mom_step(self, model, w_mom, hp_state, batch, criterion, coeff, val_batch=None):
         """Momentum update for both theta and lambda."""
         loss, wg = compute_loss_and_grads(model, batch, criterion)
         self._clip_grads_(wg)
-        hg = finite_diff_hp_grads(model, hp_state, batch, criterion, loss)
+        
+        hp_batch = val_batch if val_batch is not None else batch
+        loss_hp = loss
+        if val_batch is not None:
+            model.eval()
+            with torch.no_grad():
+                loss_hp = float(criterion(model(val_batch[0]), val_batch[1]).item())
+            model.train()
+
+        hg = finite_diff_hp_grads(model, hp_state, hp_batch, criterion, loss_hp)
         for n in w_mom:
             w_mom[n] -= coeff * wg[n] / self.m_theta
         hp_state.step_momenta(hg, coeff, self.m_lambda)
-        return loss
+        return loss_hp
 
     def _pos_step(self, model, w_mom, hp_state):
         """Position update for both theta and lambda."""
@@ -240,14 +258,14 @@ class LeapfrogIntegrator:
             p.data += self.eps * w_mom[n] / self.m_theta
         hp_state.step_positions(self.eps, self.m_lambda)
 
-    def integrate(self, model, w_mom, hp_state, batch, criterion):
+    def integrate(self, model, w_mom, hp_state, batch, criterion, val_batch=None):
         """Execute one full leapfrog trajectory (L sub-steps)."""
-        self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps / 2)
+        self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps / 2, val_batch=val_batch)
         for _ in range(self.L - 1):
             self._pos_step(model, w_mom, hp_state)
-            self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps)
+            self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps, val_batch=val_batch)
         self._pos_step(model, w_mom, hp_state)
-        final_loss = self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps / 2)
+        final_loss = self._mom_step(model, w_mom, hp_state, batch, criterion, self.eps / 2, val_batch=val_batch)
         return final_loss
 
 
@@ -330,7 +348,7 @@ class HamiltonianMCMC:
                 hp_state.momenta[k] = b * hp_state.momenta[k] + a * fresh_p
         return self._w_mom
 
-    def propose(self, model, hp_state, batch, criterion, current_loss):
+    def propose(self, model, hp_state, batch, criterion, current_loss, val_batch=None):
         """
         Propose a new (theta, lambda) state via leapfrog and accept/reject.
 
@@ -342,12 +360,19 @@ class HamiltonianMCMC:
 
         w_mom = self._refresh_momenta(model, hp_state)
 
+        loss_init = current_loss
+        if val_batch is not None:
+            model.eval()
+            with torch.no_grad():
+                loss_init = float(criterion(model(val_batch[0]), val_batch[1]).item())
+            model.train()
+
         H_init = (self._kinetic_theta(w_mom)
                   + hp_state.kinetic_energy(self.m_lambda)
-                  + current_loss)
+                  + loss_init)
 
         # Leapfrog trajectory (mutates w_mom / hp_state.momenta in place)
-        proposed_loss = self.leapfrog.integrate(model, w_mom, hp_state, batch, criterion)
+        proposed_loss = self.leapfrog.integrate(model, w_mom, hp_state, batch, criterion, val_batch=val_batch)
 
         H_prop = (self._kinetic_theta(w_mom)
                   + hp_state.kinetic_energy(self.m_lambda)

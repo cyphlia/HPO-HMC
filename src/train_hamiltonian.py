@@ -126,13 +126,21 @@ class HamiltonianTrainer:
 
         # Phase 2: HMC co-evolution
         print(f"  [Method A] HMC co-evolution: {n_hamilton} epochs")
-        current_loss = self._evaluate(train_loader)
+        current_loss = self._evaluate(val_loader)
+        val_iter = iter(val_loader)
         for epoch in range(n_hamilton):
             Xb, yb = next(iter(train_loader))
             Xb, yb = Xb.to(self.device), yb.to(self.device)
+            try:
+                X_val_b, y_val_b = next(val_iter)
+            except StopIteration:
+                val_iter = iter(val_loader)
+                X_val_b, y_val_b = next(val_iter)
+            X_val_b, y_val_b = X_val_b.to(self.device), y_val_b.to(self.device)
+
             acc, current_loss = self.mcmc.propose(
                 self.model, self.hp_state, (Xb, yb),
-                self.criterion, current_loss,
+                self.criterion, current_loss, val_batch=(X_val_b, y_val_b)
             )
 
             tl = self._evaluate(train_loader)

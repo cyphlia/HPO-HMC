@@ -438,14 +438,19 @@ def run_method_c(seed: int, input_dim: int, n_hmc_epochs: int, n_warmup: int = 8
     opt = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
     lbfgs_count = 0
 
-    # Pre-concatenate full training set for HMC proposals (fixes noisy
-    # single-batch HP gradients — the #1 source of quality gap vs Optuna)
+    # Pre-concatenate full training set for HMC weight gradients
     Xall = torch.cat([X for X, y in train_loader]).to(DEVICE)
     yall = torch.cat([y for X, y in train_loader]).to(DEVICE)
+    # Pre-concatenate full validation set for HMC hyperparameter updates
+    Xall_val = torch.cat([X for X, y in val_loader]).to(DEVICE)
+    yall_val = torch.cat([y for X, y in val_loader]).to(DEVICE)
 
     for ep in range(n_hmc_epochs):
-        curr_loss = criterion(model(Xall), yall).item()
-        acc_flag, curr_loss = mcmc.propose(model, hp_state, (Xall, yall), criterion, curr_loss)
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(Xall_val), yall_val).item()
+        model.train()
+        acc_flag, curr_loss = mcmc.propose(model, hp_state, (Xall, yall), criterion, curr_loss, val_batch=(Xall_val, yall_val))
         mcmc.leapfrog.eps = step_ctrl.update(mcmc.acceptance_rate)
 
         lr, dropout, wd, n_hidden, n_layers = decode_hp(_raw_hp(hp_state))

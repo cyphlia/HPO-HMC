@@ -469,11 +469,23 @@ def run_method_c(seed: int, input_dim: int, n_hmc_epochs: int, dataset: str, n_w
     opt = optim.Adam(model.parameters(), lr=lr, weight_decay=wd)
     lbfgs_count = 0
 
+    val_iter = iter(val_loader)
     for ep in range(n_hmc_epochs):
         Xb, yb = next(iter(train_loader))
         Xb, yb = Xb.to(DEVICE), yb.to(DEVICE)
-        curr_loss = criterion(model(Xb), yb).item()
-        acc_flag, curr_loss = mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss)
+        try:
+            X_val_b, y_val_b = next(val_iter)
+        except StopIteration:
+            val_iter = iter(val_loader)
+            X_val_b, y_val_b = next(val_iter)
+        X_val_b, y_val_b = X_val_b.to(DEVICE), y_val_b.to(DEVICE)
+
+        model.eval()
+        with torch.no_grad():
+            curr_loss = criterion(model(X_val_b), y_val_b).item()
+        model.train()
+
+        acc_flag, curr_loss = mcmc.propose(model, hp_state, (Xb, yb), criterion, curr_loss, val_batch=(X_val_b, y_val_b))
         mcmc.leapfrog.eps = step_ctrl.update(mcmc.acceptance_rate)
 
         lr, dropout, wd, n_hidden, n_layers = decode_hp(_raw_hp(hp_state))

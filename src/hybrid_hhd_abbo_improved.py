@@ -381,7 +381,7 @@ class ImprovedUnifiedTrainer:
 
         # ----- Phase 2+3: HMC + Multi-Step Adam + L-BFGS -----
         print(f"  [Method C] Phase 2+3 - HMC + Adam + L-BFGS: {n_hamilton} epochs")
-        current_loss = self._eval(train_loader)
+        current_loss = self._eval(val_loader)
 
         # Reset optimizer with fresh state for phase 2
         opt = optim.Adam(
@@ -390,6 +390,7 @@ class ImprovedUnifiedTrainer:
 
         consecutive_rejects = 0
         lbfgs_count = 0
+        val_iter = iter(val_loader)
 
         for ep in range(n_hamilton):
             # ----- HMC Proposal (skipped if ablation: C-noHMC) -----
@@ -397,9 +398,16 @@ class ImprovedUnifiedTrainer:
             if self.use_hmc:
                 Xb, yb = next(iter(train_loader))
                 Xb, yb = Xb.to(self.device), yb.to(self.device)
+                try:
+                    X_val_b, y_val_b = next(val_iter)
+                except StopIteration:
+                    val_iter = iter(val_loader)
+                    X_val_b, y_val_b = next(val_iter)
+                X_val_b, y_val_b = X_val_b.to(self.device), y_val_b.to(self.device)
+
                 acc, current_loss = self.mcmc.propose(
                     self.model, self.hp_state, (Xb, yb),
-                    self.criterion, current_loss,
+                    self.criterion, current_loss, val_batch=(X_val_b, y_val_b)
                 )
 
                 if acc:
