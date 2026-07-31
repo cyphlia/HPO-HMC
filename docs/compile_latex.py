@@ -6,18 +6,23 @@ def compile_latex():
     # Detect directories dynamically relative to script location
     script_dir = os.path.dirname(os.path.abspath(__file__))
     tarball_name = os.path.join(script_dir, "latex_project.tar.bz2")
-    main_tex = os.path.join(script_dir, "HO_main2.tex")
+    main_tex = os.path.join(script_dir, "HO_main.tex")
     plots_dir = os.path.abspath(os.path.join(script_dir, "..", "plots"))
     
     print("Creating tarball...")
     with tarfile.open(tarball_name, "w:bz2") as tar:
         # Add the main tex file
         if os.path.exists(main_tex):
-            tar.add(main_tex, arcname="HO_main2.tex")
-            print(f"Added {main_tex} as HO_main2.tex")
+            tar.add(main_tex, arcname="HO_main.tex")
+            print(f"Added {main_tex} as HO_main.tex")
         else:
             print(f"Error: {main_tex} not found!")
             return
+            
+        results_tex = os.path.join(script_dir, "results.tex")
+        if os.path.exists(results_tex):
+            tar.add(results_tex, arcname="results.tex")
+            print(f"Added {results_tex} as results.tex")
         
         # File mapping for referenced figures to restrict size and map correct names
         file_mapping = {
@@ -33,6 +38,17 @@ def compile_latex():
             "plots/fig5_comparative.png": "fig5_comparative.png",
             "plots/fig_sensitivity.png": "sensitivity_epsilon.png",
             "plots/fig_sensitivity_full.png": "sensitivity_2x2.png",
+            "method_c_pipeline_overview.png": "method_c_pipeline_overview.png",
+            "energy_conservation_live.png": "energy_conservation_live.png",
+            "hp_trajectory_harmonic.png": "hp_trajectory_harmonic.png",
+            "roc_curves_real_world.png": "roc_curves_real_world.png",
+            "project_summary_dashboard.png": "project_summary_dashboard.png",
+            "cd_diagram.png": "cd_diagram.png",
+            "fig6_hpobench_regret.png": "fig6_hpobench_regret.png",
+            "fig6b_hpolib_regret.png": "fig6b_hpolib_regret.png",
+            "fig7_nasbench201_regret.png": "fig7_nasbench201_regret.png",
+            "fig8_hpobench_summary.png": "fig8_hpobench_summary.png",
+            "fig5_comparative.png": "fig5_comparative.png",
         }
         
         # Add mapped files (compressed in memory to avoid 413 Entity Too Large error)
@@ -82,7 +98,7 @@ def compile_latex():
     for host in hosts:
         url = f"{host}/data"
         params = {
-            "target": "HO_main2.tex",
+            "target": "HO_main.tex",
             "command": "pdflatex",
             "force": "true"
         }
@@ -97,7 +113,7 @@ def compile_latex():
             print(f"Response status code: {response.status_code}")
             
             if response.status_code == 200:
-                output_pdf = os.path.join(script_dir, "HO_main2.pdf")
+                output_pdf = os.path.join(script_dir, "HO_main.pdf")
                 with open(output_pdf, "wb") as pdf_file:
                     pdf_file.write(response.content)
                 print(f"Success! Compiled PDF saved as: {output_pdf}")

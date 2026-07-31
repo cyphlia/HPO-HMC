@@ -179,11 +179,23 @@ def _load_raw(dataset: str):
         # on pos_label=1 is always the clinically critical number.
         X, y = data.data.astype(np.float32), (1 - data.target).astype(np.float32)
     elif dataset == "diabetes":
-        csv_path = os.path.join(os.path.dirname(__file__), "..", "data",
-                                "pima-indians-diabetes.csv")
-        df = pd.read_csv(csv_path, header=None)
-        X = df.iloc[:, :8].to_numpy(dtype=np.float32)
-        y = df.iloc[:, 8].to_numpy(dtype=np.float32)  # 1 = diabetic
+        csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data",
+                                                "pima-indians-diabetes.csv"))
+        if os.path.exists(csv_path):
+            df = pd.read_csv(csv_path, header=None)
+            X = df.iloc[:, :8].to_numpy(dtype=np.float32)
+            y = df.iloc[:, 8].to_numpy(dtype=np.float32)
+        else:
+            from sklearn.datasets import fetch_openml
+            d = fetch_openml(name='diabetes', version=1, as_frame=True)
+            df = d.frame
+            os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+            # Save raw numpy array without header matching standard Pima CSV format
+            X = df.iloc[:, :8].to_numpy(dtype=np.float32)
+            raw_y = df.iloc[:, 8].to_numpy()
+            y = np.where((raw_y == 'tested_positive') | (raw_y == 1) | (raw_y == '1'), 1.0, 0.0).astype(np.float32)
+            combined = np.column_stack([X, y])
+            np.savetxt(csv_path, combined, delimiter=",", fmt="%.6f")
     else:
         raise ValueError(f"Unknown dataset: {dataset}. Choices: {DATASET_CHOICES}")
     return X, y
