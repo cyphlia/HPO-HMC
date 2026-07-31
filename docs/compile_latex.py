@@ -49,6 +49,8 @@ def compile_latex():
             "fig7_nasbench201_regret.png": "fig7_nasbench201_regret.png",
             "fig8_hpobench_summary.png": "fig8_hpobench_summary.png",
             "fig5_comparative.png": "fig5_comparative.png",
+            "ablation_study.png": "ablation_study.png",
+            "nuts_comparison.png": "nuts_comparison.png",
         }
         
         # Add mapped files (compressed in memory to avoid 413 Entity Too Large error)
