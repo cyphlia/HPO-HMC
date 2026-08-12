@@ -50,7 +50,7 @@
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\calL}{\mathcal{L}}
 \newcommand{\calD}{\mathcal{D}}
-\newcommand{\calB}{\mathcal{P}}
+\newcommand{\calP}{\mathcal{P}}
 \newcommand{\Bset}{\mathcal{B}}
 \newcommand{\HH}{H}
 \newcommand{\eps}{\varepsilon}
@@ -118,7 +118,7 @@ testing. The Unified framework
 (Method~C) attains the strongest reconstruction accuracy on the
 physics benchmark averaged over five seeds
 ($\mathrm{MSE} = 0.0033 \pm 0.0001$, $R^2 = 0.99994 \pm 0.00001$), representing
-approximately a $14\times$ reduction in error relative to ABBO at a
+approximately a $29\times$ reduction in error relative to ABBO at a
 comparable wall-clock cost, while retaining symplectic energy
 conservation, smooth hyperparameter trajectories, and second-order
 curvature exploitation that pure HHD lacks. Across the eleven HPO
@@ -128,14 +128,14 @@ Tree-structured Parzen Estimator ($1.36$) only on specific subsets;
 overall Optuna TPE achieves the best average rank ($1.36$), followed
 by Method~B ($2.82$), Method~C ($3.09$), random search ($3.64$),
 and Method~A ($4.09$). The Friedman test across 11 datasets is
-significant ($p=7.9\times10^{-4}$), and the Nemenyi CD at
+significant ($p=7.92\times10^{-4}$), and the Nemenyi CD at
 $\alpha=0.05$ is $1.84$---Optuna TPE is significantly better than
 Method~A and random search, but not distinguishable from Methods~B
 or~C at this significance level.
-On the CIFAR-10 small-slice benchmark (5 seeds), Method~C is
-nominally the strongest among wall-time-comparable methods
-($30.60\,\%$), though its interval overlaps Method~A ($30.90\,\%$);
-the two are treated as effectively tied on this small validation set.
+On the CIFAR-10 small-slice benchmark (5 seeds), Method~A attains the
+highest nominal accuracy ($30.90\,\%$), with Method~C effectively tied
+($30.60\,\%$) within overlapping confidence intervals; both surpass
+Method~B ($28.50\,\%$) on accuracy.
 Taken
 together, these results extend the variational-integrator
 perspective on optimisation from the weight space alone to the joint
@@ -173,7 +173,7 @@ $T$ & Kinetic energy $= \sum p^2 / (2m)$
 $\varepsilon$ & Leapfrog step size
   & $L$ & Leapfrog sub-steps per HMC proposal \\
 $\Delta H$ & Hamiltonian error of a leapfrog proposal
-  & $\calB_P$ & L-BFGS plateau buffer (length $P$) \\
+  & $\calP_P$ & L-BFGS plateau buffer (length $P$) \\
 \midrule
 \multicolumn{4}{l}{\textit{Optimisers: Adam and L-BFGS}} \\
 \midrule
@@ -716,7 +716,7 @@ $(\theta,\lambda,p_\theta,p_\lambda)$ via the leapfrog integrator
 Metropolis--Hastings.
 
 \paragraph{Phase~3 --- Plateau-Triggered L-BFGS.}
-The training loss is tracked in a rolling buffer $\calB_P$ of length
+The training loss is tracked in a rolling buffer $\calP_P$ of length
 $P$. L-BFGS activates for $N_b$ full-batch steps when the relative
 decrease over $P$ epochs falls below tolerance $\tau$:
 \begin{equation}
@@ -888,7 +888,7 @@ L-BFGS (Phase 3, plateau-triggered)
          $N_{micro}$, $N_b$, patience $P$, tolerance $\tau$,
          warm-up $N_{wu}$, epochs $N_{epochs}$
 \State Adam warm-up for $N_{wu}$ epochs [Eqs.~\eqref{eq:adam1}--\eqref{eq:adam3}]
-\State $\calB_P \leftarrow \emptyset$;
+\State $\calP_P \leftarrow \emptyset$;
        $(\theta, \lambda) \leftarrow (\theta_{N_{wu}}, \lambda_0)$
 \For{epoch $e = 1$ to $N_{epochs}$}
   \For{$j = 1$ to $N_{micro}$}
@@ -903,15 +903,15 @@ L-BFGS (Phase 3, plateau-triggered)
     $(\theta,\lambda,p_\theta,p_\lambda)\to(\theta',\lambda',p_\theta',p_\lambda')$
   \State Accept with $\min(1,e^{-\Delta H})$; snap architecture HPs
   \State $\ell_e \leftarrow \mathcal{L}_{\mathrm{train}}(\theta,\lambda)$;
-    push $\ell_e$ to $\calB_P$
-  \If{$|\calB_P|\ge P$ \textbf{and}
+    push $\ell_e$ to $\calP_P$
+  \If{$|\calP_P|\ge P$ \textbf{and}
       $(\ell_{e-P}-\ell_e)/\ell_{e-P} < \tau$}
     \Comment{Phase 3: L-BFGS}
     \For{$s = 1$ to $N_b$}
       \State $\theta \leftarrow \theta
         - \alpha_s H_s^{-1}\nabla_\theta\mathcal{L}$
     \EndFor
-    \State Reset $\calB_P \leftarrow \emptyset$
+    \State Reset $\calP_P \leftarrow \emptyset$
   \EndIf
   \State Record $\mathcal{L}_{train}$, $\mathcal{L}_{val}$,
     $H$, $\lambda_e$, acceptance rate
@@ -1013,9 +1013,7 @@ All experiments ran on a single CPU core to keep wall-time
 comparisons fair. Every benchmark (physics, CNN, and tabular) uses
 5 random seeds (0--4 for physics and tabular, 101--105 for CNN) and
 reports mean $\pm$ standard deviation throughout, providing variance
-estimates for all quantitative comparisons. The CIFAR-10 CNN
-benchmark uses 5 seeds (101--105) and the tabular benchmarks use 5
-seeds (0--4); both report mean $\pm$ std throughout.
+estimates for all quantitative comparisons.
 
 \begin{table}[H]
 \centering
@@ -1315,12 +1313,15 @@ discontinuities that BO's discrete restarts introduce.
 
 \subsection{Wall-Time Efficiency}
 
-Method~C achieves a $1.8\times$ speedup over Method~B on the harmonic
-oscillator ($81.4$\,s versus $147.1$\,s) while simultaneously
-improving MSE by $30\times$---wall-clock time and accuracy improve
-together on this benchmark. On the CIFAR-10 CNN benchmark the
+On the harmonic oscillator, Method~C ($85.6$\,s) is $1.17\times$
+faster than Method~B ($99.9$\,s) while simultaneously improving MSE
+by $\approx29\times$ (Table~\ref{tab:results})---wall-clock time and
+accuracy improve together on this benchmark. Method~A is the fastest
+at $26.6$\,s but at substantially higher MSE
+(Table~\ref{tab:results}). On the CIFAR-10 CNN benchmark the
 trade-off reverses: Method~C reaches $30.60\,\%$ accuracy in
-$43.2$\,s, essentially matching Method~A ($30.90\,\%$, $42.0$\,s),
+$43.2$\,s, effectively matching Method~A ($30.90\,\%$, $42.0$\,s)
+within overlapping confidence intervals,
 while Method~B trains in $31.9$\,s---$1.35\times$ faster than
 Method~C---but reaches only $28.50\,\%$ accuracy. The outer BO loop
 is cheap here because each CIFAR-10 trial is short, so its wall-time
@@ -1406,7 +1407,7 @@ to a joint weight--hyperparameter phase space, establishing that
 co-evolution via symplectic leapfrog integration is both feasible and
 physically principled. It produces smooth, interpretable
 hyperparameter trajectories with full Hamiltonian conservation at
-minimal computational cost ($17.8$\,s).
+minimal computational cost ($26.6$\,s; Table~\ref{tab:results}).
 
 \textbf{Method B (ABBO)} confirms that the Adam~$+$~L-BFGS~$+$~GP-BO
 combination remains a strong practical baseline, particularly on
@@ -1425,8 +1426,8 @@ because it never let hyperparameters leave the outer loop in the
 first place. The result is the best reconstruction accuracy on the
 harmonic oscillator ($\mathrm{MSE}=0.0033 \pm 0.0001$, $R^2=0.99994 \pm 0.00001$
 averaged over 5 seeds; see Section~\ref{sec:setup}),
-nominally the highest CIFAR-10 CNN validation accuracy on the
-small slice ($30.60\,\%$, effectively tied with Method~A; versus
+a CIFAR-10 CNN validation accuracy effectively tied with Method~A
+($30.60\,\%$ vs $30.90\,\%$, overlapping confidence intervals; versus
 $28.50\,\%$ for
 Method~B on the same 200-sample validation set), and the best average
 rank ($3.09$, third among five methods) across all 11 standardised
