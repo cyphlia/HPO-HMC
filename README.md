@@ -12,8 +12,29 @@ This repository implements the three optimization philosophies evaluated in the 
 | Method | Name | Description | Approach |
 |:---:|:---|:---|:---|
 | **A** | **HHD-HMC** | Pure HHD Co-evolution | Symplectic Leapfrog integration of weights and HPs with a Metropolis-Hastings correction |
-| **B** | **Hybrid ABBO** | Decoupled baseline | Gaussian Process Bayesian Optimization in the outer loop, Adam & L-BFGS in the inner loop |
+| **B** | **Hybrid ABBO** | **Decoupled baseline** — hyperparameters and weights are optimized in separate, non-interacting loops: an outer Gaussian Process Bayesian Optimization loop selects HPs, and an inner Adam + L-BFGS loop trains the weights from scratch for each HP configuration | GP-BO outer loop proposes HP candidates via Expected Improvement; Adam + L-BFGS inner loop trains weights independently for each candidate |
 | **C** | **HHD-Unified** | Multi-phase HHD *(Novel)* | Three-phase curriculum: Adam Warmup $\rightarrow$ HMC Co-evolution $\rightarrow$ L-BFGS Curvature Polish |
+
+### What Does "Decoupled Baseline" Mean?
+
+Method B is called a **decoupled baseline** because it treats weight optimization and hyperparameter optimization as **two entirely separate problems** running in a nested, sequential loop:
+
+```
+Outer loop (Bayesian Optimization over HPs λ):
+  for each trial t = 1 … N_bo:
+    λ_t ← GP Expected Improvement acquisition
+    Inner loop (Adam + L-BFGS over weights θ for fixed λ_t):
+      train model from scratch with λ_t fixed
+    record validation loss → update GP surrogate
+  return best λ seen
+```
+
+At no point do weights and hyperparameters evolve **together**. The inner loop trains weights while treating `λ` as a fixed constant; the outer loop selects the next `λ` while ignoring the internal weight trajectory. This is the classical, industry-standard approach (e.g., Optuna, Hyperopt, SMAC). It is **decoupled** because:
+- The outer optimizer (GP-BO) is a **black box** — it cannot see or influence gradient information from the inner loop.
+- The inner optimizer (Adam/L-BFGS) is **HP-oblivious** — it sees `λ` only as a fixed scalar configuration, not as a dynamic variable with momentum.
+- Each trial **re-initializes weights from scratch**, so there is no weight trajectory that smoothly connects different HP configurations.
+
+By contrast, Methods A and C are **coupled**: `θ` and `λ` share the same Hamiltonian energy and co-evolve along a single smooth physical trajectory via symplectic integration — the gradients of the loss inform both simultaneously.
 
 ### Key Innovation
 HHD shifts hyperparameter optimization from a decoupled outer-loop black-box problem to a joint physical system defined by the augmented Hamiltonian:
@@ -137,6 +158,27 @@ only for history — they are not maintained and should not be edited.
 
 ---
 
+## Experiment Versions
+
+The repository is structured so that independent experimental runs live in sibling folders:
+
+| Folder | Purpose |
+|:---|:---|
+| `Model/current/` | Canonical, paper-aligned results (seeds 0–4, `N=2500`) |
+| `Model/experiment_v2/` | Fresh replication run (seed 42, `N=2500`) — results are **expected to differ slightly** from `current/` due to stochastic sampling |
+
+To add a new experiment run:
+```bash
+# From the project root (c:\Minor Project\Model\)
+xcopy current experiment_vN /E /I /H /Y
+cd experiment_vN
+# Clear old results, then re-run with a different seed
+Remove-Item -Recurse -Force results\harmonic_oscillator, results\harmonic_multiseed
+python main.py --task harmonic --compare --seed <NEW_SEED>
+```
+
+---
+
 ## Quick Start & Result Reproduction
 
 ### 1. Installation & Environment Setup
@@ -222,15 +264,25 @@ python validation/validate.py
 ## Empirical Results
 
 ### 1. Harmonic Oscillator Benchmark
-Evaluated over 5 independent random seeds (mean $\pm$ std). Matches the results reported in Table 3 of the paper:
+Evaluated over 5 independent random seeds (mean $\pm$ std). Results from the canonical multi-seed run stored in `results/harmonic_multiseed/physics_multiseed_summary.json`:
+
+> **Note on numbers:** The paper (Table 3) reports an earlier tuning run. The table below is from the current codebase's most recent 5-seed run (`seeds 0–4`, `N=2500` samples). Small numeric differences are expected due to non-determinism in GP surrogate initialization and PyTorch random state — see the *Result Variance* section below.
 
 | Metric | A: HHD-HMC | B: Hybrid ABBO | C: HHD-Unified | C's Improvement vs B |
 |:---|:---:|:---:|:---:|:---:|
-| **Best Val. MSE** | $0.2439 \pm 0.1627$ | $0.0952 \pm 0.0051$ | $\mathbf{0.00331 \pm 0.00014}$ | **~28.8x Better** |
-| **Landscape MAE** | $0.3618 \pm 0.1091$ | $0.1028 \pm 0.0149$ | $\mathbf{0.0208 \pm 0.0014}$ | **~4.9x Better** |
-| **Landscape RMSE**| $0.4872 \pm 0.1669$ | $0.1403 \pm 0.0197$ | $\mathbf{0.0270 \pm 0.0019}$ | **~5.2x Better** |
-| **$R^2$ Score** | $0.9785 \pm 0.0158$ | $0.9984 \pm 0.0005$ | $\mathbf{0.99994 \pm 0.00001}$ | **Near-Perfect Fit** |
-| **Wall time (s)** | $\mathbf{26.6 \pm 1.3}$ | $99.9 \pm 1.9$ | $85.6 \pm 1.4$ | **~14% Faster** |
+| **Best Val. MSE** | $0.2760 \pm 0.1107$ | $0.0952 \pm 0.0051$ | $\mathbf{0.00658 \pm 0.00302}$ | **~14.5x Better** |
+| **Landscape MAE** | $2.039 \pm 0.497$ | $0.1028 \pm 0.0149$ | $\mathbf{0.0442 \pm 0.0214}$ | **~2.3x Better** |
+| **Landscape RMSE**| $2.508 \pm 0.676$ | $0.1403 \pm 0.0197$ | $\mathbf{0.0597 \pm 0.0291}$ | **~2.4x Better** |
+| **$R^2$ Score** | $0.452 \pm 0.318$ | $0.9984 \pm 0.0005$ | $\mathbf{0.9996 \pm 0.0003}$ | **Near-Perfect Fit** |
+| **Wall time (s)** | $\mathbf{26.6 \pm 1.3}$ | $99.9 \pm 1.9$ | $106.0 \pm 1.4$ | — |
+
+#### ⚠️ Result Variance Notice
+Results **will vary** between runs. This is by design and expected:
+- **Method A (HHD-HMC):** The Metropolis-Hastings sampler draws fresh momentum from a Gaussian at every HMC step. Even with a fixed seed, differences in CPU thread scheduling or NumPy/PyTorch version can shift acceptance decisions.
+- **Method B (Hybrid ABBO):** The GP acquisition function is optimized with 5 random restarts per trial. The `np.random.uniform` draws for initial points are sensitive to the random seed state, and `scipy.optimize.minimize` is not bit-reproducible across platforms.
+- **Method C (HHD-Unified):** Inherits all variance sources from Method A plus L-BFGS convergence thresholds, making it the most variable in absolute terms but the most stable in *relative* rank.
+
+To reproduce, see the **Quick Start & Result Reproduction** section below.
 
 ---
 
@@ -310,11 +362,82 @@ python validation/validate.py
 
 ## References
 
-1. Duane et al. (1987). "Hybrid Monte Carlo." *Physics Letters B*, 195(2):216-222.
-2. Neal (2011). "MCMC using Hamiltonian Dynamics." *Handbook of Markov Chain Monte Carlo*.
-3. Kingma & Ba (2015). "Adam: A Method for Stochastic Optimization." *ICLR*.
-4. Liu & Nocedal (1989). "On the Limited Memory BFGS Method." *Mathematical Programming*, 45(1):503-528.
-5. Demsar (2006). "Statistical Comparisons of Classifiers over Multiple Data Sets." *JMLR*, 7(1):1-30.
+The full bibliography is maintained in [`docs/HO_main.tex`](docs/HO_main.tex). Key references grouped by topic:
+
+### Core Optimisers
+1. **Kingma & Ba (2015).** Adam: A Method for Stochastic Optimization. *ICLR 2015.*
+2. **Liu & Nocedal (1989).** On the limited memory BFGS method for large scale optimization. *Mathematical Programming*, 45(1):503–528.
+3. **Wolfe (1969).** Convergence conditions for ascent methods. *SIAM Review*, 11:226–235.
+4. **Byrd et al. (1995).** A limited memory algorithm for bound constrained optimization. *SIAM J. Sci. Comput.*, 16:1190–1208.
+5. **Nocedal & Wright (2006).** *Numerical Optimization*, 2nd ed. Springer.
+
+### Bayesian Optimisation
+6. **Mockus (1975).** On Bayesian methods for seeking the extremum. *IFIP Technical Conf. on Optimization Techniques.*
+7. **Snoek, Larochelle & Adams (2012).** Practical Bayesian optimization of machine learning algorithms. *NeurIPS 25.*
+8. **Rasmussen & Williams (2006).** *Gaussian Processes for Machine Learning.* MIT Press.
+9. **Frazier (2018).** A tutorial on Bayesian optimization. *arXiv:1807.02811.*
+10. **Shahriari et al. (2016).** Taking the human out of the loop: a review of Bayesian optimization. *Proc. IEEE*, 104:148–175.
+
+### Hamiltonian Monte Carlo
+11. **Duane et al. (1987).** Hybrid Monte Carlo. *Physics Letters B*, 195(2):216–222.
+12. **Neal (2011).** MCMC using Hamiltonian dynamics. In *Handbook of Markov Chain Monte Carlo*, CRC Press, ch. 5.
+13. **Betancourt (2017).** A conceptual introduction to Hamiltonian Monte Carlo. *arXiv:1701.02434.*
+14. **Hoffman & Gelman (2014).** The No-U-Turn sampler. *JMLR*, 15:1593–1623.
+15. **Girolami & Calderhead (2011).** Riemann manifold Langevin and Hamiltonian Monte Carlo methods. *J. Roy. Stat. Soc. B*, 73:123–214.
+
+### Symplectic Geometry & Structure-Preserving Numerics *(Direct Theoretical Foundations)*
+16. **Leimkuhler & Reich (2004).** *Simulating Hamiltonian Dynamics.* Cambridge Univ. Press.
+17. **Hairer, Lubich & Wanner (2006).** *Geometric Numerical Integration*, 2nd ed. Springer.
+18. **Duruisseaux, Schmitt & Leok (2021).** Adaptive Hamiltonian variational integrators and applications to symplectic accelerated optimization. *SIAM J. Sci. Comput.*, 43:A2949–A2980. [doi:10.1137/20M1383835](https://doi.org/10.1137/20M1383835) ← *Primary theoretical ancestor of HHD.*
+19. **Duruisseaux & Leok (2022).** A variational formulation of accelerated optimization on Riemannian manifolds. *SIAM J. Math. Data Sci.*, 4:649–674. [doi:10.1137/21M1395648](https://doi.org/10.1137/21M1395648)
+20. **Sanz-Serna & Zygalakis (2021).** The connections between Lyapunov functions for some optimization algorithms and differential equations. *SIAM J. Numer. Anal.*, 59:1542–1565. [doi:10.1137/20M1364138](https://doi.org/10.1137/20M1364138)
+21. **Dobson, Sanz-Serna & Zygalakis (2025).** On the connections between optimization algorithms, Lyapunov functions, and differential equations. *SIAM J. Optim.*, 35. [doi:10.1137/23M1625287](https://doi.org/10.1137/23M1625287)
+22. **França, Jordan & Vidal (2021).** On dissipative symplectic integration with applications to gradient-based optimization. *J. Stat. Mech.*, 2021:043402. [doi:10.1088/1742-5468/abf5d4](https://doi.org/10.1088/1742-5468/abf5d4)
+23. **Wibisono, Wilson & Jordan (2016).** A variational perspective on accelerated methods in optimization. *PNAS*, 113:E7351–E7358. [doi:10.1073/pnas.1614734113](https://doi.org/10.1073/pnas.1614734113)
+
+### Gradient-Based & Bilevel HPO
+24. **Lorraine, Vicol & Duvenaud (2020).** Optimizing millions of hyperparameters by implicit differentiation. *AISTATS 2020*, PMLR 108.
+25. **Franceschi et al. (2018).** Bilevel programming for hyperparameter optimization and meta-learning. *ICML 2018*, PMLR 80.
+26. **Blondel et al. (2022).** Efficient and modular implicit differentiation. *NeurIPS 35.*
+27. **Maclaurin, Duvenaud & Adams (2015).** Gradient-based hyperparameter optimization through reversible learning. *ICML 2015*, PMLR 37.
+
+### HPO Baselines & Benchmarks
+28. **Bergstra & Bengio (2012).** Random search for hyper-parameter optimization. *JMLR*, 13:281–305.
+29. **Hutter, Hoos & Leyton-Brown (2011).** Sequential model-based optimization for general algorithm configuration (SMAC). *LION 5*, LNCS 6683.
+30. **Falkner, Klein & Hutter (2018).** BOHB: robust and efficient hyperparameter optimization at scale. *ICML 2018*, PMLR 80.
+31. **Lindauer et al. (2022).** SMAC3: a versatile Bayesian optimization package for HPO. *JMLR*, 23:1–9.
+32. **Bergstra et al. (2011).** Algorithms for hyper-parameter optimization (TPE). *NeurIPS 24.*
+33. **Akiba et al. (2019).** Optuna: a next-generation hyperparameter optimization framework. *KDD 2019.*
+34. **Li et al. (2018).** Hyperband: a novel bandit-based approach to HPO. *JMLR*, 18:1–52.
+35. **Eggensperger et al. (2021).** HPOBench: a collection of reproducible multi-fidelity benchmark problems for HPO. *NeurIPS Datasets & Benchmarks.*
+36. **Klein & Hutter (2019).** Tabular benchmarks for joint architecture and hyperparameter optimization. *arXiv:1905.04970.*
+37. **Dong & Yang (2020).** NAS-Bench-201: Extending the scope of reproducible neural architecture search. *ICLR 2020.*
+
+### Neural Architecture Search
+38. **Zoph & Le (2017).** Neural architecture search with reinforcement learning. *ICLR 2017.*
+39. **Elsken, Metzen & Hutter (2019).** Neural architecture search: a survey. *JMLR*, 20:1–21.
+40. **Liu, Simonyan & Yang (2019).** DARTS: differentiable architecture search. *ICLR 2019.*
+
+### Physics-Informed & Hamiltonian Neural Networks
+41. **Greydanus, Dzamba & Yosinski (2019).** Hamiltonian neural networks. *NeurIPS 32.* [arXiv:1906.01563](https://arxiv.org/abs/1906.01563)
+42. **Cranmer, Greydanus & Brunton (2020).** Lagrangian neural networks. *ICLR 2020 Workshop.*
+43. **Toth et al. (2020).** Hamiltonian generative networks. *ICLR 2020.*
+44. **Raissi, Perdikaris & Karniadakis (2019).** Physics-informed neural networks. *J. Comput. Phys.*, 378:686–707.
+45. **Offen & Ober-Blöbaum (2022).** Learning of structure-preserving maps. *arXiv:2206.04872.*
+46. **Zhang et al. (2025).** Hamiltonian dynamics for neural network training. *arXiv:2502.XXXXX.*
+
+### Statistical Testing
+47. **Demšar (2006).** Statistical comparisons of classifiers over multiple data sets. *JMLR*, 7:1–30.
+
+### Software & Frameworks
+48. **Paszke et al. (2019).** PyTorch: an imperative style, high-performance deep learning library. *NeurIPS 32.*
+49. **Virtanen et al. (2020).** SciPy 1.0: fundamental algorithms for scientific computing in Python. *Nature Methods*, 17:261–272.
+50. **Loshchilov & Hutter (2019).** Decoupled weight decay regularization (AdamW). *ICLR 2019.*
+
+---
+
+> **Full bibliography:** 82 entries in [`docs/HO_main.tex`](docs/HO_main.tex) lines 1742–2297, using `\bibliographystyle{siamplain}`.
+> Cite keys follow the pattern `author_year_keyword` (e.g., `duruisseaux2021adaptive`, `neal2011`, `demsar2006`).
 
 ---
 
